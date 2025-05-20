@@ -1,0 +1,16 @@
+﻿#cardId,hookType,effectType,amount,flag
+c1,Activate,Damage,20,0
+c1,Priority,AddDamage,20,0
+c2,Activate,Damage,25,0
+c2,IQA,StackDamage,,
+c3,Guard,GetDefense,10,0
+c3,Activate,Damage,40,0
+c4 ,Activate,Damage,20,
+c4 ,Priority,DamageMeBangMoo,10,
+c5,Activate,Damage,80,
+c5,Counter,whenDamagedFlagOn,1,0
+c5,Counter,DamageMeBangMoo,10,1
+c6,Activate,Damage,20,0
+c7,Activate,NotRumbleFlagOn,1,0
+c7,Activate,OpNextActionisMoveFlagOn,2,1
+c7,Activate,ReplaceNextOpsMovetoStun,4,2

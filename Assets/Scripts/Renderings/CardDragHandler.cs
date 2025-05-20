@@ -1,0 +1,251 @@
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using DG.Tweening;
+using Photon.Realtime;
+using System.Collections.Generic;
+using Photon.Pun;
+
+public class CardDragHandler : MonoBehaviour,
+    IBeginDragHandler,
+    IDragHandler,
+    IEndDragHandler,
+    IPointerClickHandler
+{
+    [Header("Sprites")]
+    public Sprite arrowSprite;
+    public Sprite defaultSprite;
+
+    private RectTransform rectTransform;
+    private CanvasGroup canvasGroup;
+    private Image uiImage;
+    private Canvas canvas;
+    private RectTransform dropZone;
+
+    private LayoutElement layoutElement;
+    private Vector2 dragOffset;
+    private Vector2 originalAnchoredPos;
+    private Vector2 originalSizeDelta;
+    private Vector3 originalScale;
+
+    // Character and shape data
+    private GameObject myChara;
+    public Vector3Int playerCoord;
+    public List<Vector3Int> debugYong;
+    public float angle;
+
+    // Card data
+    private Card thisCardData;
+
+    // Tile highlighting
+    private List<int> prevHighlighted = new List<int>();
+
+    private void Awake()
+    {
+        rectTransform = GetComponent<RectTransform>();
+        canvasGroup = GetComponent<CanvasGroup>();
+        uiImage = GetComponent<Image>();
+        defaultSprite = uiImage.sprite;
+        originalSizeDelta = rectTransform.sizeDelta;
+        originalScale = transform.localScale;
+
+        layoutElement = GetComponent<LayoutElement>() ?? gameObject.AddComponent<LayoutElement>();
+        layoutElement.ignoreLayout = false;
+
+        var zone = GameObject.FindWithTag("dropzone");
+        if (zone != null)
+            dropZone = zone.GetComponent<RectTransform>();
+
+        int actor = PhotonNetwork.LocalPlayer.ActorNumber;
+        myChara = LocalState.Instance?.PlayerObDic[actor];
+        playerCoord = GridManagement.Instance.GetCoordFromIndex(LocalState.Instance.localPlayers[actor].curpos);
+
+    
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        canvas = GetComponentInParent<Canvas>();//원래 어웨이크에서 해주려고 할라했는데 그게 호출 순서때문에 그럴 수 없다
+        thisCardData = GetComponent<EachCardInfo>().cardData;
+        canvasGroup.blocksRaycasts = false;
+        originalAnchoredPos = rectTransform.anchoredPosition;
+        layoutElement.ignoreLayout = true;
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvas.transform as RectTransform,
+            eventData.position,
+            eventData.pressEventCamera,
+            out Vector2 localPoint);
+        dragOffset = localPoint - originalAnchoredPos;
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvas.transform as RectTransform,
+            eventData.position,
+            eventData.pressEventCamera,
+            out Vector2 localPoint);
+        rectTransform.anchoredPosition = localPoint - dragOffset;
+
+        bool inside = IsInsideDropZone(eventData.position);
+        SetDragVisual(inside);
+        CalculateAndLogAngleWithPlayer(inside);
+
+        if (thisCardData.tileType == 0)
+        {
+            debugYong = HexSkill.GetSkillTargets(
+                SkillTileDatabase.skillShapes[thisCardData.zoneIndex],
+                DegreeToDirection(angle),
+                playerCoord
+            );
+        }
+        else //베이가 w의 경우
+        { 
+
+        }
+        HighlightTiles(debugYong);
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        canvasGroup.blocksRaycasts = true;
+        layoutElement.ignoreLayout = false;
+
+        if (!IsInsideDropZone(eventData.position))
+        {
+            rectTransform.DOAnchorPos(originalAnchoredPos, 0.25f).SetEase(Ease.OutQuad);
+            transform.DOScale(originalScale, 0.25f).SetEase(Ease.OutQuad);
+            uiImage.sprite = defaultSprite;
+            ResetAllTileColors();
+        }
+
+
+        else //카드 내려놓기
+        {
+            var curaction = new ActionData
+            {
+                actionId = 1,
+                defense = thisCardData.defense,
+                rumblePoint = thisCardData.rumblePoint,
+                cardcode = thisCardData.code,
+                animations = thisCardData.animations,
+                actionClock = thisCardData.actionClock,
+                cardname = thisCardData.name,
+            };
+
+            if (thisCardData.tileType == 0) //베이가 q의 경우
+            {
+                var coords = HexSkill.GetSkillTargets(
+                    SkillTileDatabase.skillShapes[thisCardData.zoneIndex],
+                    DegreeToDirection(angle),
+                    playerCoord
+                );
+                curaction.effectTiles = CoordsToIndices(coords);
+            }
+            else //베이가 w의 경우
+            {
+
+            }
+            ResetAllTileColors();
+            CardDragDropRendering();
+            CardModeState.Instance.StopSelectCardLoop(curaction);
+        }
+    }
+    private void CardDragDropRendering()
+    {
+
+        //다른 드래그 드랍애니메이션도
+        LocalState.Instance.mydefense.text = thisCardData.defense.ToString();
+
+
+    }
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        PlayClickScaleAnimation();
+    }
+
+    private void SetDragVisual(bool inside)
+    {
+        uiImage.sprite = inside ? arrowSprite : defaultSprite;
+        rectTransform.sizeDelta = originalSizeDelta;
+    }
+
+    private bool IsInsideDropZone(Vector2 screenPos) =>
+        dropZone != null && RectTransformUtility.RectangleContainsScreenPoint(dropZone, screenPos);
+
+    private void PlayClickScaleAnimation()
+    {
+        transform.DOKill();
+        var seq = DOTween.Sequence();
+        seq.Append(transform.DOScale(originalScale * 1.1f, 0.08f).SetEase(Ease.OutQuad));
+        seq.Append(transform.DOScale(originalScale, 0.08f).SetEase(Ease.InQuad));
+    }
+
+    private void CalculateAndLogAngleWithPlayer(bool inside)
+    {
+        if (!inside || myChara == null) return;
+
+        Vector2 uiPos = RectTransformUtility.WorldToScreenPoint(null, rectTransform.position);
+        Vector2 plPos = Camera.main.WorldToScreenPoint(myChara.transform.position);
+        Vector2 dir = (plPos - uiPos).normalized;
+        angle = Vector2.SignedAngle(Vector2.up, dir);
+    //    Debug.Log($"Player와 이루는 각도: {angle}도");
+    }
+
+    private Vector3Int DegreeToDirection(float deg)
+    {
+        if (deg >= 60f && deg < 120f) return new Vector3Int(1, -1, 0);
+        if (deg >= 120f && deg <= 180f) return new Vector3Int(0, -1, 1);
+        if (deg >= 0f && deg < 60f) return new Vector3Int(-1, 0, 1);
+        if (deg < 0f && deg >= -60f) return new Vector3Int(0, 1, -1);
+        if (deg < -60f && deg >= -120f) return new Vector3Int(-1, 1, 0);
+        if (deg < -120f && deg >= -180f) return new Vector3Int(1, 0, -1);
+        throw new System.ArgumentOutOfRangeException(nameof(deg), deg, "지원되지 않는 각도입니다.");
+    }
+
+    private void HighlightTiles(List<Vector3Int> coords)
+    {
+        var current = CoordsToIndices(coords);
+
+        // Reset previous highlights
+        foreach (var idx in prevHighlighted)
+        {
+            if (!current.Contains(idx) && GridManagement.Instance.tileObjects.TryGetValue(idx, out var go))
+                go.GetComponent<SpriteRenderer>().color = Color.white;
+        }
+
+        // Apply new highlights
+        foreach (var idx in current)
+        {
+            if (!prevHighlighted.Contains(idx) && GridManagement.Instance.tileObjects.TryGetValue(idx, out var go))
+                go.GetComponent<SpriteRenderer>().color = Color.red;
+        }
+
+        prevHighlighted = current;
+    }
+
+    public void ResetAllTileColors()
+    {
+        foreach (var kvp in GridManagement.Instance.tileObjects)
+        {
+            if (kvp.Value.TryGetComponent<SpriteRenderer>(out var sr))
+                sr.color = Color.white;
+        }
+    }
+
+    /// <summary>
+    /// Converts a list of Vector3Int coords to their corresponding grid indices.
+    /// </summary>
+    private List<int> CoordsToIndices(List<Vector3Int> coords)
+    {
+        var indices = new List<int>(coords.Count);
+        foreach (var coord in coords)
+        {
+            int idx = GridManagement.Instance.GetIndexFromCoord(coord);
+            if (idx >= 0)
+                indices.Add(idx);
+        }
+        return indices;
+    }
+}
