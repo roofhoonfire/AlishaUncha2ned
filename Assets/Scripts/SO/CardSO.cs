@@ -27,7 +27,7 @@ public class Card
 }
 public enum HookType { Activate, Priority, IQA, Counter, Guard ,BeforeRumble, RumbleWin, RumbleLose, Combo }
 public enum EffectType { Damage, Move, Heal, StackDamage,  GetDefense, DamageMeBangMoo, AddDamage, OpNextActionisMoveFlagOn,
-    whenDamagedFlagOn, NotRumbleFlagOn, ReplaceNextOpsMovetoStun}
+    whenDamagedFlagOn, NotRumbleFlagOn, ReplaceNextOpsMovetoStun, StunRecovery}
 
 
 public class CardEffect
@@ -47,14 +47,14 @@ public class CardEffect
 
     public void Apply(int actorNum, ActionData myAction,  int oppActorNum, ActionData rightnextopponent , ActionData rightnowOP, ActionData myrightnextAction)
     {
-        
+
         //if (rumbleOp != null)
         //{
-          //   isRumble = true;
+        //   isRumble = true;
         //}
-       // else
-       // {
-         //   isRumble = false;
+        // else
+        // {
+        //   isRumble = false;
         //}
         switch (effectType)
         {
@@ -64,7 +64,7 @@ public class CardEffect
                 Debug.Log($"플레이어 {actorNum}이 {amount}로 이동한다");
 
                 break;
-            
+
 
             case EffectType.Damage:
                 // actorId가 공격자, opponent.ownerId가 피해 대상이라 가정
@@ -101,19 +101,36 @@ public class CardEffect
                 break;
 
             case EffectType.NotRumbleFlagOn:
-                CardAction.Instance.FlagOn(actorNum,myAction, amount);
+                if (rightnowOP == null) { 
+                    CardAction.Instance.FlagOn(actorNum, myAction, amount);
                 Debug.Log($"럼블이 아닌 일반 타격이므로 플래그 {amount}가 추가된다");
+                    break;
+                }
+
+                Debug.Log($"럼블이기 때문에 플래그 {amount}가 추가되지 아늠");
 
                 break;
-            case EffectType.OpNextActionisMoveFlagOn: 
-                CardAction.Instance.FlagOn(actorNum,myAction,amount);
-                Debug.Log($"플레이어{actorNum}의 적은 다음 행동은 이동이다");
+            case EffectType.OpNextActionisMoveFlagOn:
+                if (rightnextopponent.actionId == 0)
+                {
+                    CardAction.Instance.FlagOn(actorNum, myAction, amount);
+                    Debug.Log($"상대의 다음 행동이 이동이므로 플래그 {amount}가 추가된다");
+                    break;
+                }
+
+                Debug.Log($"이동이 아니기 때문에 플래그 {amount}가 추가되지 아늠");
 
                 break;
-            
-            case EffectType.ReplaceNextOpsMovetoStun: 
-                
+            case EffectType.ReplaceNextOpsMovetoStun:
+                CardAction.Instance.StunOp(rightnextopponent, amount, oppActorNum);
+                Debug.Log($"크하하 플레이어 {oppActorNum}은 이제 {amount}동안 기절이다 꼴 좋군!");
                 break;
+
+            case EffectType.StunRecovery:
+                CardAction.Instance.StunRecovery(actorNum);
+                Debug.Log($"크하하 플레이어 {actorNum}은 기절로 부터 회복했다");
+                break;
+
 
         }
     }

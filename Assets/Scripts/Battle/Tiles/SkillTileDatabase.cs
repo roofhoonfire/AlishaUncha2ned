@@ -26,5 +26,7 @@ public static class SkillTileDatabase
         new List<Vector3Int> {
         new(1, -1, 0), new(2, -2, 0)
         },
+
+        
     };
 }

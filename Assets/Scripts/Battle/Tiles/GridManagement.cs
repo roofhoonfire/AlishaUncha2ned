@@ -116,4 +116,15 @@ public class GridManagement : MonoBehaviour
             return default;
         }
     }
+
+    public List<int> ReturnEveryTile()
+    {
+        List<int> everytile = new List<int>();
+
+        for (int i = 0; i <= 36; i++)
+        {
+            everytile.Add(i);
+        }
+        return everytile;
+    }
 }

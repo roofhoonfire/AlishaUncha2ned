@@ -20,7 +20,55 @@ public class CardAction : MonoBehaviour
         }
     }
 
+    
+    public void StunRecovery(int actorNum)
+    {
+        Overmind.Instance.players[actorNum].isStunned = false;
 
+
+    }
+    public void StunOp(ActionData opNext, int amount, int opactorNum)
+    {
+
+        Overmind.Instance.players[opactorNum].isStunned = true;
+        //effect activate에 스턴 해제 (players 데이터 값 바꾸는거)
+        //해가지고 애니메이션 렌더링 해주면 딱일듯
+        //걍 액션 새로 만들어서 넣는게 더 나을지도? opNext는 걍 큐에서 지워버리고
+        var toRemove =
+        Overmind.Instance.actionQueue.Find(entry => object.ReferenceEquals(entry.action, opNext));
+        if (toRemove != default)
+        {
+            
+            Overmind.Instance.actionQueue.Remove(toRemove);
+        }
+
+        Overmind.Instance.globalaction++;
+
+        ActionData stun = new ActionData()
+        {
+            actionId = 1,
+            actionClock = amount,
+            rumblePoint = 0,
+            defense = 0,
+            hasOtherExecutedSinceInsertion = false,
+            cardname = "기절회복",
+            nthaction = Overmind.Instance.globalaction,
+            effectTiles = GridManagement.Instance.ReturnEveryTile(),
+            cardcode = "미싱노",
+        }
+        ;
+        stun.actionClock = amount;
+        stun.effects.Add(new CardEffect(HookType.Activate, EffectType.StunRecovery, 0, 0));
+        
+        Overmind.Instance.actionQueue.Add((opactorNum, stun, amount));
+        Overmind.Instance.actionQueue.Sort((a, b) =>
+            a.remainingCost != b.remainingCost
+                ? a.remainingCost.CompareTo(b.remainingCost)
+                : a.action.nthaction.CompareTo(b.action.nthaction)
+        );
+
+
+    }
     public void MoveChara(int actorNum, int amount) {
         Overmind.Instance.players[actorNum].curpos = amount; //destindex로 할지 amount로 할지 고민중
         //amount로 쓰고 actionData의 destindex는 쓰지 않도록 해보자 

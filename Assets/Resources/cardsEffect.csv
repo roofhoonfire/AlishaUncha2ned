@@ -10,7 +10,7 @@ c4 ,Priority,DamageMeBangMoo,10,
 c5,Activate,Damage,80,
 c5,Counter,whenDamagedFlagOn,1,0
 c5,Counter,DamageMeBangMoo,10,1
-c6,Activate,Damage,20,0
-c7,Activate,NotRumbleFlagOn,1,0
-c7,Activate,OpNextActionisMoveFlagOn,2,1
-c7,Activate,ReplaceNextOpsMovetoStun,4,2
+c6,Activate,Damage,10,0
+c6,Activate,NotRumbleFlagOn,1,0
+c6,Activate,OpNextActionisMoveFlagOn,2,1
+c6,Activate,ReplaceNextOpsMovetoStun,4,2

@@ -24,6 +24,10 @@ public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 
     public int defense; // localstateUIrendering에서는 playerdata의 값을 일괄적으로 보기 때문에 action이랑 중복해서도 저장해서 쓴다.. 
     //즉 방어도 렌더링은 카드 내릴때, 한번 처음 해주고 그 뒤엔 localUIRendering에서 맘껏 건들면될듯 ;;
     public int energy;
+
+    public bool isStunned = false;
+
+
     public PlayerData(int actorNumber, List<string> deckCodes, int initialHP = 100)
     {
         ActorNumber = actorNumber;
@@ -51,8 +55,7 @@ public class ActionData
     public bool isfirstStrikeSuccess = false; //이것도 사실상 의미가 없어졌지만, 일단 냅두자
     public string cardname;
     public List<AnimationClip> animations;//사실상 필요가 없어졌다
-
-
+  
     public List<CardEffect> effects = new();
 
     public List<int> effectTiles = new();
@@ -133,14 +136,14 @@ public class Overmind : MonoBehaviourPunCallbacks
     public myDeckList localDeckLoader;
 
 
-    private int globalaction = 0;
+    public int globalaction = 0;
     // 플레이어 데이터
     public Dictionary<int, PlayerData> players = new Dictionary<int, PlayerData>();
 
     // 선택 대기 및 실행 큐
 
     private Dictionary<int, (ActionData action, int cost)> pendingSelections;
-    private List<(int actorNumber, ActionData action, int remainingCost)> actionQueue;
+    public List<(int actorNumber, ActionData action, int remainingCost)> actionQueue;
 
 
     private int syncCount = 0;
@@ -509,11 +512,12 @@ public class Overmind : MonoBehaviourPunCallbacks
     private void InitActionBeforeInsert(ActionData action, int actorNum)
     {
         globalaction++;
+
+        action.nthaction = globalaction;
         if (action.actionId == 0)
             return;
         action.hasOtherExecutedSinceInsertion = false;
         action.InitializeEffects();
-        action.nthaction = globalaction;
         players[actorNum].defense = action.defense;
 
     }
