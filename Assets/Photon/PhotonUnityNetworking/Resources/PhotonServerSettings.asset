@@ -52,6 +52,9 @@ MonoBehaviour:
   - RPC_SyncUpdateState
   - RPC_PlayRumbleAction
   - RPC_PlayShowDownAction
+  - RPC_ChooseTile
+  - RPC_ReceiveTile
+  - RPC_JustCostRendering
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

@@ -23,7 +23,6 @@ public class LocalState : MonoBehaviour
 
     private Coroutine _chooseMoveRoutine;
  
-    private Coroutine _tempActionAlert;
 
     private int previousHPMe = 100; //플레이어 데이터에 붙은 prev는 싸이클 체커용이라 별개임
 
@@ -38,10 +37,7 @@ public class LocalState : MonoBehaviour
 
 
     public GameObject alim; // 나중엔 걍 애니메이션으로 퉁쳐잇~
-    public GameObject dialoguePanel; //마찬가지로 나중엔 죽일거다
-    public  GameObject dialogueText;
-    //s나중에 렌더링 따로 싹다 새 클래스로 빼서 쓰자..
-
+  
     void Awake()
     {
         if (Instance == null)
@@ -220,37 +216,7 @@ public class LocalState : MonoBehaviour
     }
 
  
-    IEnumerator tempActionAlert(ActionData action, int actorNum, HookType h)
-    {
-        string message = $"플레이어 {actorNum}의 {action.cardname}의 {h} 크하하하!";
-        float startDelay = 0.5f;
-        float typingSpeed = 0.1f;
-        dialoguePanel.SetActive(true);
-        dialogueText.GetComponent<TextMeshProUGUI>().text = "";
-        
-        yield return new WaitForSeconds(startDelay); // 타이핑 시작 전 0.5초 지연
-
-        foreach (char letter in message.ToCharArray())
-        {
-            dialogueText.GetComponent<TextMeshProUGUI>().text += letter;
-            yield return new WaitForSeconds(typingSpeed);
-        }
-
-        yield return new WaitForSeconds(2f); // 타이핑 완료 후 2초 대기
-        dialoguePanel.SetActive(false);
-        _tempActionAlert = null;
-    }
-    IEnumerator StartTempActionAlertWhenFree(ActionData action, int actorNum, HookType h)
-    {
-        // 이미 실행 중이라면, 끝날 때까지 매 프레임 대기
-        while (_tempActionAlert != null)
-        {
-            yield return null;
-        }
-
-        // null이 된 순간, 새 코루틴을 시작하고 _tempActionAlert에 할당
-        _tempActionAlert = StartCoroutine(tempActionAlert(action, actorNum, h));
-    }
+   
     public void PlayActionRendering(int actorNum, ActionData action, int opCost, HookType h) //여기에 상대 액숀도받아 와서 남은 시간 체크
     {
         if (action.actionId == 0)//이동이면
@@ -265,7 +231,7 @@ public class LocalState : MonoBehaviour
         { //처맞고 때리고 하는 애니메이숑 액션에 붙어있는 애니메이션 클립출력
 
             Debug.Log($"플레이어 {actorNum}의 {action.cardname}의 {h} 크후후!");
-            StartCoroutine(StartTempActionAlertWhenFree(action, actorNum, h));
+            AlertDialogue.Instance.StartDialogue(action, actorNum, h, DialogueType.Activate);
         }
 
         OpponentCostRendering(h);
@@ -388,13 +354,14 @@ public class LocalState : MonoBehaviour
 
     }
 
-    private void OpponentCostRendering(HookType h)
+    public void OpponentCostRendering(HookType h)
     {
         int myactorNum = PhotonNetwork.LocalPlayer.ActorNumber;
 
         int realcost = GetMinOpLocalRemainingCost(myactorNum);
 
-        if (h == HookType.Activate)
+        //값이 바뀌었을 때만 애니 출력하게 바꾸자
+        if (h == HookType.Activate)// 카드 중 발동 효과로 상대의 액션을 느리게 만드는 놈도 있기 땜에 넣어줘야함//일단은?
         {
             if (realcost != 0)
                 opponencostRemainTxt.text = $"상대 행동까지 {realcost} 남았다";

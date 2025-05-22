@@ -90,21 +90,7 @@ public class CardDragHandler : MonoBehaviour,
 
         bool inside = IsInsideDropZone(eventData.position);
         SetDragVisual(inside);
-        CalculateAndLogAngleWithPlayer(inside);
-
-        if (thisCardData.tileType == 0)
-        {
-            debugYong = HexSkill.GetSkillTargets(
-                SkillTileDatabase.skillShapes[thisCardData.zoneIndex],
-                DegreeToDirection(angle),
-                playerCoord
-            );
-        }
-        else //베이가 w의 경우
-        { 
-
-        }
-        HighlightTiles(debugYong);
+        
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -117,7 +103,6 @@ public class CardDragHandler : MonoBehaviour,
             rectTransform.DOAnchorPos(originalAnchoredPos, 0.25f).SetEase(Ease.OutQuad);
             transform.DOScale(originalScale, 0.25f).SetEase(Ease.OutQuad);
             uiImage.sprite = defaultSprite;
-            ResetAllTileColors();
         }
 
 
@@ -132,29 +117,17 @@ public class CardDragHandler : MonoBehaviour,
                 animations = thisCardData.animations,
                 actionClock = thisCardData.actionClock,
                 cardname = thisCardData.name,
+                zoneIndex = thisCardData.zoneIndex,
+                tileType = thisCardData.tileType,
             };
 
-            if (thisCardData.tileType == 0) //베이가 q의 경우
-            {
-                var coords = HexSkill.GetSkillTargets(
-                    SkillTileDatabase.skillShapes[thisCardData.zoneIndex],
-                    DegreeToDirection(angle),
-                    playerCoord
-                );
-                curaction.effectTiles = CoordsToIndices(coords);
-            }
-            else //베이가 w의 경우
-            {
-
-            }
-            ResetAllTileColors();
             CardDragDropRendering();
             CardModeState.Instance.StopSelectCardLoop(curaction);
         }
     }
     private void CardDragDropRendering()
     {
-
+        
         //다른 드래그 드랍애니메이션도
         LocalState.Instance.mydefense.text = thisCardData.defense.ToString();
 
@@ -182,57 +155,8 @@ public class CardDragHandler : MonoBehaviour,
         seq.Append(transform.DOScale(originalScale, 0.08f).SetEase(Ease.InQuad));
     }
 
-    private void CalculateAndLogAngleWithPlayer(bool inside)
-    {
-        if (!inside || myChara == null) return;
+    
 
-        Vector2 uiPos = RectTransformUtility.WorldToScreenPoint(null, rectTransform.position);
-        Vector2 plPos = Camera.main.WorldToScreenPoint(myChara.transform.position);
-        Vector2 dir = (plPos - uiPos).normalized;
-        angle = Vector2.SignedAngle(Vector2.up, dir);
-    //    Debug.Log($"Player와 이루는 각도: {angle}도");
-    }
-
-    private Vector3Int DegreeToDirection(float deg)
-    {
-        if (deg >= 60f && deg < 120f) return new Vector3Int(1, -1, 0);
-        if (deg >= 120f && deg <= 180f) return new Vector3Int(0, -1, 1);
-        if (deg >= 0f && deg < 60f) return new Vector3Int(-1, 0, 1);
-        if (deg < 0f && deg >= -60f) return new Vector3Int(0, 1, -1);
-        if (deg < -60f && deg >= -120f) return new Vector3Int(-1, 1, 0);
-        if (deg < -120f && deg >= -180f) return new Vector3Int(1, 0, -1);
-        throw new System.ArgumentOutOfRangeException(nameof(deg), deg, "지원되지 않는 각도입니다.");
-    }
-
-    private void HighlightTiles(List<Vector3Int> coords)
-    {
-        var current = CoordsToIndices(coords);
-
-        // Reset previous highlights
-        foreach (var idx in prevHighlighted)
-        {
-            if (!current.Contains(idx) && GridManagement.Instance.tileObjects.TryGetValue(idx, out var go))
-                go.GetComponent<SpriteRenderer>().color = Color.white;
-        }
-
-        // Apply new highlights
-        foreach (var idx in current)
-        {
-            if (!prevHighlighted.Contains(idx) && GridManagement.Instance.tileObjects.TryGetValue(idx, out var go))
-                go.GetComponent<SpriteRenderer>().color = Color.red;
-        }
-
-        prevHighlighted = current;
-    }
-
-    public void ResetAllTileColors()
-    {
-        foreach (var kvp in GridManagement.Instance.tileObjects)
-        {
-            if (kvp.Value.TryGetComponent<SpriteRenderer>(out var sr))
-                sr.color = Color.white;
-        }
-    }
 
     /// <summary>
     /// Converts a list of Vector3Int coords to their corresponding grid indices.

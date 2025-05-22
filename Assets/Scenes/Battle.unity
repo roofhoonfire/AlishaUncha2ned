@@ -4168,6 +4168,8 @@ GameObject:
   - component: {fileID: 1334487632}
   - component: {fileID: 1334487633}
   - component: {fileID: 1334487634}
+  - component: {fileID: 1334487635}
+  - component: {fileID: 1334487636}
   m_Layer: 0
   m_Name: BattleManager
   m_TagString: Untagged
@@ -4210,8 +4212,6 @@ MonoBehaviour:
   opdefense: {fileID: 0}
   opponencostRemainTxt: {fileID: 1838439935}
   alim: {fileID: 1606330242}
-  dialoguePanel: {fileID: 1257518544060334673}
-  dialogueText: {fileID: 299005635}
 --- !u!114 &1334487631
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4268,6 +4268,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dffb354bd9177004495306f33eac39c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1334487635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334487628}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69c031da14f3ced4ea2d7bc105457ab9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  alertUI: {fileID: 1257518544060334673}
+  alertText: {fileID: 299005637}
+--- !u!114 &1334487636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334487628}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec1a80b85f198074fbe83d4c92836729, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  angle: 0
+  debugYong: []
 --- !u!1 &1334508145
 GameObject:
   m_ObjectHideFlags: 0

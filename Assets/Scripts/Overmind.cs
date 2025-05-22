@@ -41,7 +41,7 @@ public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 
     }
 }
 
-public class ActionData
+public class ActionData //여기 뭐 추가할 거면 carddragHandler로 수정해야함
 {
 
     public int actionId; //0 이면 이동 1이면 카드.. 등
@@ -54,6 +54,8 @@ public class ActionData
     public List <int> flags = new List<int> () ;//
     public bool isfirstStrikeSuccess = false; //이것도 사실상 의미가 없어졌지만, 일단 냅두자
     public string cardname;
+    public int tileType;
+    public int zoneIndex;
     public List<AnimationClip> animations;//사실상 필요가 없어졌다
   
     public List<CardEffect> effects = new();
@@ -143,6 +145,8 @@ public class Overmind : MonoBehaviourPunCallbacks
     // 선택 대기 및 실행 큐
 
     private Dictionary<int, (ActionData action, int cost)> pendingSelections;
+
+    private List<(int actorNum, List<int> tiles)> pendingTiles;
     public List<(int actorNumber, ActionData action, int remainingCost)> actionQueue;
 
 
@@ -159,6 +163,7 @@ public class Overmind : MonoBehaviourPunCallbacks
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            pendingTiles = new List<(int actorNum, List<int> tiles)> ();
             pendingSelections = new Dictionary<int, (ActionData, int)>();
             actionQueue = new List<(int, ActionData, int)>();
             SceneManager.sceneLoaded += OnSceneLoaded;
@@ -309,7 +314,7 @@ public class Overmind : MonoBehaviourPunCallbacks
         var receivedq = JsonConvert
             .DeserializeObject<List<Dictionary<string, int>>>(qjson);
         LocalState.Instance?.SyncPartial(data, receivedq); //부분 업데이트 함수
-
+        
         // 마스터 포함 모든 클라이언트가 완료 보고
         photonView.RPC(nameof(RPC_SyncDone), RpcTarget.MasterClient,
             PhotonNetwork.LocalPlayer.ActorNumber);
@@ -475,9 +480,9 @@ public class Overmind : MonoBehaviourPunCallbacks
                         if(mynextMoveChecker == 1) myMoveAfterthisTurn = actionQueue[i].action;
                     }
                 } //MasterActionCalc를 위한 next제외 액션들 할당 해주는 코드
-              
 
 
+                yield return chooseTile((next.actorNumber, next.action), (900, null));
                 //액션 결과 마스터 내부에서 연산해서 player데이터 바꾸는 함수
                 yield return MasterActionCalc(next.actorNumber, GuardOrCounter, next.action, myMoveAfterthisTurn);//경계와 발동 처리는 여기서 진행한다
 
@@ -751,7 +756,116 @@ public class Overmind : MonoBehaviourPunCallbacks
 
 
     }
-    IEnumerator  afterHook((int actorNum, ActionData action)Nowhooker, HookType h )
+
+    [PunRPC]
+    void RPC_JustCostRendering(HookType h)
+    {
+
+        LocalState.Instance.OpponentCostRendering(h);
+
+        photonView.RPC(nameof(RPC_SyncDone), RpcTarget.MasterClient,
+              PhotonNetwork.LocalPlayer.ActorNumber);
+    }
+
+    IEnumerator chooseTile ((int actornum, ActionData action)p1, (int actornum, ActionData action)p2)
+    {
+        photonView.RPC(nameof(RPC_SyncUpdateState), RpcTarget.All, JsonConvert.SerializeObject(players), toSendActionQbutOnlyActorNumandCost());
+        yield return new WaitUntil(() => syncCount == 2);
+        syncCount = 0;
+        Debug.Log("타일 결정 전 싱크 완료우");
+
+        photonView.RPC(nameof(RPC_JustCostRendering), RpcTarget.All, HookType.Activate);
+        yield return new WaitUntil(() => syncCount == 2);
+        syncCount = 0;
+        Debug.Log("코스트 렌더링 싱크 완료");
+
+        //여기서 로컬이랑 싱크한번해도 낫배드 일듯
+
+        List<(int actornum, ActionData action)> templist = new List<(int actorNum, ActionData action)>();
+        if (p1.action!=null) templist.Add(p1);
+        if (p2.action!=null) templist.Add(p2);
+        int howmany = 0;
+        foreach (var p in templist)
+        {
+                if (p.action != null && p.action.actionId == 1) {
+                    string actionJson  = JsonConvert.SerializeObject(p.action);
+                    photonView.RPC(nameof(RPC_ChooseTile), RpcTarget.All, p.actornum, actionJson);
+                    howmany++;
+           }
+       }
+        
+        yield return new WaitUntil(() => pendingTiles.Count == howmany);
+
+
+
+        foreach (var (actorNum, tiles) in pendingTiles)
+        {
+            if (p1.actornum == actorNum)
+            {
+                p1.action.effectTiles = new List<int>(tiles);
+            }
+            else if (p2.actornum == actorNum)
+            {
+                p2.action.effectTiles = new List<int>(tiles);
+            }
+        }
+
+
+
+
+
+        pendingTiles.Clear();
+    }
+
+
+
+
+    [PunRPC]
+
+    void RPC_ChooseTile(int actornum, string actioJson)
+    {
+
+        
+        if (actornum != PhotonNetwork.LocalPlayer.ActorNumber)
+        {
+            //액터넘이 내가 아닌데, 이미 다른 코루틴이 실행중이라면 을 생각해서 좀해보셈
+
+            //이거 경우 잘 생각해서 기다리기 모션도 잘 만들어보쟈
+        }
+
+        else
+        {
+            var action = JsonConvert.DeserializeObject<ActionData>(actioJson);
+
+            CardChooseTile.Instance.SetActive(true, action);
+
+        }
+
+    }
+
+
+    public void SendTile(int actorNum, List<int> tiles)
+    {
+
+        string tilejson = JsonConvert.SerializeObject(tiles);
+        photonView.RPC(nameof(RPC_ReceiveTile),RpcTarget.MasterClient, actorNum,tilejson  );
+
+
+
+    }
+    
+    [PunRPC]
+    void RPC_ReceiveTile(int actorNum, string tileListJson)
+    {
+        List<int> deser =  JsonConvert.DeserializeObject<List<int>>(tileListJson);
+        pendingTiles.Add((actorNum, deser));
+
+
+    }
+
+
+
+    IEnumerator afterHook((int actorNum, ActionData action)Nowhooker, HookType h )
     {
         int opCost = GetMinOpponentRemainingCost(Nowhooker.actorNum);
 
@@ -779,6 +893,13 @@ public class Overmind : MonoBehaviourPunCallbacks
 
 
     }
+
+
+
+
+
+
+
 
     [PunRPC]
 
@@ -969,12 +1090,15 @@ public class Overmind : MonoBehaviourPunCallbacks
             }
         }
 
+        yield return chooseTile((a1.actor, a1.action), (a2.actor,a2.action));
 
 
 
         // 두 액션 모두 메인액션인 경우만 진짜 격돌
         if (isMain1 && isMain2)
         {
+
+
             MasterBeforeRumbleCalc(a1.actor, a1.action, a2.action);
             MasterBeforeRumbleCalc(a2.actor, a2.action, a1.action);
             //각각의 럼블포인트 계산

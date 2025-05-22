@@ -53,7 +53,8 @@ public class CardAction : MonoBehaviour
             hasOtherExecutedSinceInsertion = false,
             cardname = "기절회복",
             nthaction = Overmind.Instance.globalaction,
-            effectTiles = GridManagement.Instance.ReturnEveryTile(),
+            tileType =0,
+            zoneIndex = 4,
             cardcode = "미싱노",
         }
         ;
