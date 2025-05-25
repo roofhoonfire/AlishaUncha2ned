@@ -195,7 +195,9 @@ public class LocalState : MonoBehaviour
         // 대기 상태
         while (true)
         {
-            if (Input.GetKeyDown(KeyCode.M))
+            if (Input.GetKeyDown(KeyCode.M) && 
+                LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].canMove
+                )
             {
                 // M 키 눌리면 MoveModeState의 반복 로직 시작
                 MoveModeState.Instance.SetActive(true);

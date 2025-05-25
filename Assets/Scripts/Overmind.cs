@@ -24,6 +24,7 @@ public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 
     public int defense; // localstateUIrendering에서는 playerdata의 값을 일괄적으로 보기 때문에 action이랑 중복해서도 저장해서 쓴다.. 
     //즉 방어도 렌더링은 카드 내릴때, 한번 처음 해주고 그 뒤엔 localUIRendering에서 맘껏 건들면될듯 ;;
     public int energy;
+    public bool canMove = true; 
 
     public bool isStunned = false;
 
@@ -1289,15 +1290,19 @@ public class Overmind : MonoBehaviourPunCallbacks
             if (newState == 0)
             {
                 players[1].energy ++;
+                players[1].canMove = true;
                 players[2].energy ++;
+                players[2].canMove = true;
             }
             else if (newState == 1)
             {
                 players[newState].energy++;
+                players[newState].canMove = false;
             }
             else if (newState == 2)
             {
                 players[newState].energy++;
+                players[newState].canMove = false;
             }
         }
         else
@@ -1305,7 +1310,9 @@ public class Overmind : MonoBehaviourPunCallbacks
             if (newState == 0)
             {
                 players[1].energy++;
+                players[1].canMove = true;
                 players[2].energy++;
+                players[2].canMove = true;
             }
         }
             cycleState = newState;

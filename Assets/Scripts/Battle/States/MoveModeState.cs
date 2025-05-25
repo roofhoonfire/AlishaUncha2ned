@@ -56,7 +56,8 @@ public class MoveModeState : MonoBehaviour
         int myActorNum = Photon.Pun.PhotonNetwork.LocalPlayer.ActorNumber;
         int startIndex = LocalState.Instance.localPlayers[myActorNum].curpos;
         int energy = LocalState.Instance.localPlayers[myActorNum].energy;
-
+        
+        LocalState.Instance.localPlayers[myActorNum].canMove = false;
         // 모든 타일 초기화
         foreach (var tileObj in GridManagement.Instance.tileObjects.Values)
         {
