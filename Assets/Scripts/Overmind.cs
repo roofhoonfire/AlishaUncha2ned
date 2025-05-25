@@ -153,10 +153,8 @@ public class Overmind : MonoBehaviourPunCallbacks
     private int syncCount = 0;
 
     private int faceOffCount = 0;// 더 좋은 방법있음 나와보라그래
-
-    public int prevturn = 0; //1,2 는 액터넘버, 0은 격돌
-    public int nowturn = 0; 
-
+    
+    public int cycleState = -1; // -1: initial, 0: FaceOff, 1: Actor1, 2: Actor2
     void Awake()
     {
         if (Instance == null)
@@ -394,8 +392,7 @@ public class Overmind : MonoBehaviourPunCallbacks
                 //경우  1 : 격돌
                 if (readyCount > 1)
                 {
-                    nowturn = 0;
-                    TurnStartandCycleChecker();
+                    UpdateCycleState(0);
                     yield return HandleRumblePhase();
 
                     if (actionQueue.Count <= 0) //연계카드가 없다면 무조건 이 경우일 것
@@ -447,9 +444,8 @@ public class Overmind : MonoBehaviourPunCallbacks
 
                 //다음 액션 뽑고
                 var next = actionQueue[0];
+                UpdateCycleState(next.actorNumber);
                 actionQueue.RemoveAt(0);
-                nowturn = next.actorNumber;
-                TurnStartandCycleChecker();
 
                 //선공 대처 결정
                 ActionData tempOp = null;
@@ -955,25 +951,7 @@ public class Overmind : MonoBehaviourPunCallbacks
                               actionQueue[i].remainingCost - minCost);
 
     }
-    private void TurnStartandCycleChecker()
-    {
-
-        if (prevturn == 0)
-        {
-            //이전 턴은 격돌이었다
-        }
-
-        if (prevturn != nowturn)
-        {
-            Debug.Log($"플레이어 {nowturn}의 새로운 싸이클 시작!");
-            //이 경우의 beginchoosemove에서 에너지획득
-
-        }
-        prevturn = nowturn;
-
-    }
-
-
+   
     void OnDestroy()
     {
         if (Instance == this)
@@ -1303,5 +1281,33 @@ public class Overmind : MonoBehaviourPunCallbacks
 
         string queueJson = JsonConvert.SerializeObject(simpleQueue);
         return queueJson;
+    }
+    private void UpdateCycleState(int newState) {
+
+        if (cycleState != newState)
+        {
+            if (newState == 0)
+            {
+                players[1].energy ++;
+                players[2].energy ++;
+            }
+            else if (newState == 1)
+            {
+                players[newState].energy++;
+            }
+            else if (newState == 2)
+            {
+                players[newState].energy++;
+            }
+        }
+        else
+        {
+            if (newState == 0)
+            {
+                players[1].energy++;
+                players[2].energy++;
+            }
+        }
+            cycleState = newState;
     }
 }
