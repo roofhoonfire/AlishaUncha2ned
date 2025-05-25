@@ -10,6 +10,7 @@ using UnityEngine;
 public class Card
 {
     public string code;
+    public int cardType; // 0: Action, 1: Support, 2: ImmediateSupport
     public string name;
 
     public Sprite sprite;
@@ -22,12 +23,13 @@ public class Card
     public int mana;
     public int tileType;
     public int zoneIndex;
+    public int energy;
 
     public string cardText;
 }
-public enum HookType { Activate, Priority, IQA, Counter, Guard ,BeforeRumble, RumbleWin, RumbleLose, Combo }
+public enum HookType { Activate, Priority, IQA, Counter, Guard ,BeforeRumble, RumbleWin, RumbleLose, Combo, Support, ImSupport }
 public enum EffectType { Damage, Move, Heal, StackDamage,  GetDefense, DamageMeBangMoo, AddDamage, OpNextActionisMoveFlagOn,
-    whenDamagedFlagOn, NotRumbleFlagOn, ReplaceNextOpsMovetoStun, StunRecovery}
+    whenDamagedFlagOn, NotRumbleFlagOn, ReplaceNextOpsMovetoStun, StunRecovery, SelectActionClockChange}
 
 
 public class CardEffect
@@ -130,7 +132,10 @@ public class CardEffect
                 CardAction.Instance.StunRecovery(actorNum);
                 Debug.Log($"크하하 플레이어 {actorNum}은 기절로 부터 회복했다");
                 break;
-
+            case EffectType.SelectActionClockChange:
+                CardMultipleChoice.Instance.ChoiceStart(amount);
+                Debug.Log($"");
+                break;
 
         }
     }

@@ -5,6 +5,8 @@ using DG.Tweening;
 using Photon.Realtime;
 using System.Collections.Generic;
 using Photon.Pun;
+using ExitGames.Client.Photon;
+using System.Linq;
 
 public class CardDragHandler : MonoBehaviour,
     IBeginDragHandler,
@@ -33,6 +35,7 @@ public class CardDragHandler : MonoBehaviour,
     public Vector3Int playerCoord;
     public List<Vector3Int> debugYong;
     public float angle;
+    
 
     // Card data
     private Card thisCardData;
@@ -40,6 +43,7 @@ public class CardDragHandler : MonoBehaviour,
     // Tile highlighting
     private List<int> prevHighlighted = new List<int>();
 
+    
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
@@ -108,21 +112,71 @@ public class CardDragHandler : MonoBehaviour,
 
         else //카드 내려놓기
         {
-            var curaction = new ActionData
+            if (thisCardData.cardType == 0)
             {
-                actionId = 1,
-                defense = thisCardData.defense,
-                rumblePoint = thisCardData.rumblePoint,
-                cardcode = thisCardData.code,
-                animations = thisCardData.animations,
-                actionClock = thisCardData.actionClock,
-                cardname = thisCardData.name,
-                zoneIndex = thisCardData.zoneIndex,
-                tileType = thisCardData.tileType,
-            };
-
-            CardDragDropRendering();
-            CardModeState.Instance.StopSelectCardLoop(curaction);
+                CardModeState.Instance.curAction.actionId = 1;
+                CardModeState.Instance.curAction.defense = thisCardData.defense;
+                CardModeState.Instance.curAction.rumblePoint = thisCardData.rumblePoint;
+                CardModeState.Instance.curAction.cardcode = thisCardData.code;
+                CardModeState.Instance.curAction.animations = thisCardData.animations;
+                CardModeState.Instance.curAction.actionClock = Mathf.Max(1, thisCardData.actionClock + CardModeState.Instance.actionClockBuffer);
+                CardModeState.Instance.curAction.cardname = thisCardData.name;
+                CardModeState.Instance.curAction.zoneIndex = thisCardData.zoneIndex;
+                CardModeState.Instance.curAction.tileType = thisCardData.tileType;
+                
+                CardDragDropRendering();
+                CardModeState.Instance.StopSelectCardLoop(CardModeState.Instance.curAction);
+            }
+            else if (thisCardData.cardType == 1) {
+                if (LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy < thisCardData.energy)
+                {
+                    Debug.Log("Not enogh energ");
+                    rectTransform.DOAnchorPos(originalAnchoredPos, 0.25f).SetEase(Ease.OutQuad);
+                    transform.DOScale(originalScale, 0.25f).SetEase(Ease.OutQuad);
+                    uiImage.sprite = defaultSprite;
+                }
+                else
+                {
+                    LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy -= thisCardData.energy;
+                    CardModeState.Instance.curAction.effects.AddRange(CardDEffectDatabase.GetEffects(thisCardData.code));
+                    CardDragDropRendering();
+                    Destroy(gameObject);
+                }
+            }
+            else if (thisCardData.cardType == 2)
+            {
+                if (LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy < thisCardData.energy)
+                {
+                    Debug.Log("Not enogh energ");
+                    rectTransform.DOAnchorPos(originalAnchoredPos, 0.25f).SetEase(Ease.OutQuad);
+                    transform.DOScale(originalScale, 0.25f).SetEase(Ease.OutQuad);
+                    uiImage.sprite = defaultSprite;
+                }
+                else {
+                    var effectsList = CardDEffectDatabase.GetEffects(thisCardData.code);
+                    LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy -= thisCardData.energy;
+                    foreach (var e in effectsList)
+                    {
+                        if (e.hookType == HookType.ImSupport)
+                        {
+                            e.Apply(0, null, 0, null, null, null);
+                        }
+                        else if (e.hookType == HookType.Support)
+                        {
+                            CardModeState.Instance.curAction.effects.Append(e);
+                        }
+                        else
+                        {
+                            Debug.LogError("Immediate Support Card should not have any hook type other than ImSupport. Card code: " + thisCardData.code);
+                        }
+                    }
+                    CardDragDropRendering();
+                    Destroy(gameObject);
+                }
+                
+            }
+            
+            
         }
     }
     private void CardDragDropRendering()

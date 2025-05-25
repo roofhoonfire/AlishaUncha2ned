@@ -60,18 +60,19 @@ public static class CardMetaDatabase //이름은 데이터 베이스지만 실제 메타 데이터
             return new Card
             {
                 code = cols[0].Trim(),
-                name = cols[1].Trim(),
-                sprite = LoadSprite(cols[2]),
-                animations = LoadAnimations(cols[3]),
-
-                actionClock = TryParseInt(cols[4], 0),
-                rumblePoint = TryParseInt(cols[5], 0),
-                defense = TryParseInt(cols[6], 0),
-                disappear = TryParseInt(cols[7], 0),
-                mana = TryParseInt(cols[8], 0),
-                tileType = TryParseInt(cols[9], 0),
-                zoneIndex = TryParseInt(cols[10], 0),
-                cardText = cols[11].Trim(),
+                cardType = TryParseInt(cols[1], 0),
+                name = cols[2].Trim(),
+                sprite = LoadSprite(cols[3]),
+                animations = LoadAnimations(cols[4]),
+                actionClock = TryParseInt(cols[5], 0),
+                rumblePoint = TryParseInt(cols[6], 0),
+                defense = TryParseInt(cols[7], 0),
+                disappear = TryParseInt(cols[8], 0),
+                mana = TryParseInt(cols[9], 0),
+                tileType = TryParseInt(cols[10], 0),
+                zoneIndex = TryParseInt(cols[11], 0),
+                energy = TryParseInt(cols[12], 0),
+                cardText = cols[13].Trim(),
                 
             };
         }

@@ -13,6 +13,11 @@ public class CardModeState : MonoBehaviour
 
    
     public static CardModeState Instance;
+    
+    // Buffer
+    public ActionData curAction;
+    public int actionClockBuffer = 0;
+
     public bool isActive = false;
     private Coroutine _selectCardCoroutine;
     // Start is called before the first frame update
@@ -43,12 +48,20 @@ public class CardModeState : MonoBehaviour
     {
         PopulateCards();//손패 쫘자작
 
+        InitBuffer();
+
         if (_selectCardCoroutine == null)
             _selectCardCoroutine = StartCoroutine(SelectCardLoop());
 
 
     }
-
+    private void InitBuffer()
+    {
+        // Reset buffers
+        curAction = new ActionData();
+        curAction.effects = new List<CardEffect>();
+        actionClockBuffer = 0;
+    }
     private IEnumerator SelectCardLoop()
     {
         while (isActive)

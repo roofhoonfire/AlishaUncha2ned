@@ -73,8 +73,10 @@ public class ActionData //여기 뭐 추가할 거면 carddragHandler로 수정�
     public void InitializeEffects()
     {
 
-        effects = CardDEffectDatabase.GetEffects(cardcode);
-
+        if (effects != null && effects.Count > 0)
+            effects.AddRange(CardDEffectDatabase.GetEffects(cardcode));
+        else
+            effects = CardDEffectDatabase.GetEffects(cardcode);
         // 여기서 이펙트 리스트 채워넣고
         // 그다음에 럼블 포인트, 수비력 등 도 채워넣으면댐
     }
@@ -95,7 +97,7 @@ public class ActionData //여기 뭐 추가할 거면 carddragHandler로 수정�
         foreach (var e in effects)
         {
             // 훅 타입이 다르면 스킵
-            if (e.hookType != hook)
+            if (e.hookType != hook && e.hookType != HookType.Support)
                 continue;
 
             // 선공 훅인데 이미 다른 행동이 실행된 적이 있으면 스킵 (flag 상관없이 적용)
