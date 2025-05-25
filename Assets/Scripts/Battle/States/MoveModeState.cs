@@ -1,8 +1,9 @@
-using Photon.Pun;
+ï»¿using Photon.Pun;
 using Photon.Pun.Demo.PunBasics;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MoveModeState : MonoBehaviour
@@ -16,12 +17,12 @@ public class MoveModeState : MonoBehaviour
     public GameObject alim;
     private static readonly Vector3Int[] directions = new Vector3Int[]
     {
-        new Vector3Int(-1, 0, 1),  // ÁÂ»ó
-        new Vector3Int(0, -1, 1),  // ¿ì»ó
-        new Vector3Int(-1, 1, 0),  // ÁÂ
-        new Vector3Int(1, -1, 0),  // ¿ì
-        new Vector3Int(0, 1, -1),  // ÁÂÇÏ
-        new Vector3Int(1, 0, -1)   // ¿ìÇÏ
+        new Vector3Int(-1, 0, 1),  // ì¢Œìƒ
+        new Vector3Int(0, -1, 1),  // ìš°ìƒ
+        new Vector3Int(-1, 1, 0),  // ì¢Œ
+        new Vector3Int(1, -1, 0),  // ìš°
+        new Vector3Int(0, 1, -1),  // ì¢Œí•˜
+        new Vector3Int(1, 0, -1)   // ìš°í•˜
     };
     void Awake()
     {
@@ -39,21 +40,83 @@ public class MoveModeState : MonoBehaviour
 
     public void SetActive(bool active)
     {
-        if (active == isActive) return; //ÀÌ¹ÌÁßº¹ ÄÚ·çÆ¾ ½ÃÀÛ ¹æÁö
+        if (active == isActive) return; //ì´ë¯¸ì¤‘ë³µ ì½”ë£¨í‹´ ì‹œì‘ ë°©ì§€
         isActive = active;
         if (isActive) StartSelectDestLoop();
         else StopSelectDestLoop();
     }
     private void StartSelectDestLoop()
     {
+        TilePreprocessing();
         if (_selectDestCoroutine == null)
             _selectDestCoroutine = StartCoroutine(SelectDestLoop());
+    }
+    private void TilePreprocessing()
+    {
+        int myActorNum = Photon.Pun.PhotonNetwork.LocalPlayer.ActorNumber;
+        int startIndex = LocalState.Instance.localPlayers[myActorNum].curpos;
+        int energy = LocalState.Instance.localPlayers[myActorNum].energy;
+
+        // ëª¨ë“  íƒ€ì¼ ì´ˆê¸°í™”
+        foreach (var tileObj in GridManagement.Instance.tileObjects.Values)
+        {
+            EachTile tile = tileObj.GetComponent<EachTile>();
+            tile.defaultColor = Color.white;
+            tile.cost = 0;
+            tile.canMove = false;
+            tileObj.GetComponent<SpriteRenderer>().color = tile.defaultColor;
+        }
+
+        Queue<(int index, int dist)> queue = new Queue<(int, int)>();
+        HashSet<int> visited = new HashSet<int>();
+
+        queue.Enqueue((startIndex, 0));
+        visited.Add(startIndex);
+
+        while (queue.Count > 0)
+        {
+            var (currentIndex, dist) = queue.Dequeue();
+            if (dist > energy)
+                continue;
+
+            if (currentIndex == startIndex)
+            {
+                // ì‹œì‘ íƒ€ì¼ì€ ìƒ‰ì„ ë‹¤ë¥´ê²Œ í‘œì‹œ
+                var startTileObj = GridManagement.Instance.tileObjects[currentIndex];
+                EachTile startTile = startTileObj.GetComponent<EachTile>();
+                startTile.defaultColor = Color.green;
+                startTile.canMove = false;
+                startTileObj.GetComponent<SpriteRenderer>().color = startTile.defaultColor;
+            }
+            else
+            {
+                var tileObj = GridManagement.Instance.tileObjects[currentIndex];
+                EachTile tile = tileObj.GetComponent<EachTile>();
+                tile.defaultColor = Color.cyan;
+                tile.cost = dist;
+                tile.canMove = true;
+                tileObj.GetComponent<SpriteRenderer>().color = tile.defaultColor;
+            }
+            
+
+            Vector3Int currentCoord = GridManagement.Instance.GetCoordFromIndex(currentIndex);
+
+            foreach (var dir in directions)
+            {
+                Vector3Int nextCoord = currentCoord + dir;
+                if (GridManagement.Instance.coordToIndex.TryGetValue(nextCoord, out int nextIndex) && !visited.Contains(nextIndex))
+                {
+                    visited.Add(nextIndex);
+                    queue.Enqueue((nextIndex, dist + 1));
+                }
+            }
+        }
     }
     private IEnumerator SelectDestLoop()
     {
         while (isActive)
         {
-            SelectDest();     // ¸Å ÇÁ·¹ÀÓ ¸ñÀûÁö ¼±ÅÃ ·ÎÁ÷
+            SelectDest();     // ë§¤ í”„ë ˆì„ ëª©ì ì§€ ì„ íƒ ë¡œì§
             yield return null;
         }
     }
@@ -62,57 +125,53 @@ public class MoveModeState : MonoBehaviour
 
         if (_selectDestCoroutine != null)
         {
-            
+            foreach (var tileObj in GridManagement.Instance.tileObjects.Values)
+            {
+                EachTile tile = tileObj.GetComponent<EachTile>();
+                tile.defaultColor = Color.white;
+                tile.cost = 0;
+                tile.canMove = false;
+                tileObj.GetComponent<SpriteRenderer>().color = tile.defaultColor;
+            }
             StopCoroutine(_selectDestCoroutine);
             _selectDestCoroutine = null;
         }
     }
     void SelectDest()
     {
-        //Debug.Log("¹«ºê¸ğµåµ¹ÀÔ");
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        int destinationIndex;
+        int distance; 
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
             GameObject hoveredObj = hit.collider.gameObject;
             EachTile currentTile = hoveredObj.GetComponent<EachTile>();
 
-            if (currentTile != null)
+            if (currentTile != null && currentTile.canMove)
             {
                 alim.SetActive(true);
-                // ÀÌÀü hover »ö ¿øº¹ (¼±ÅÃµÈ Å¸ÀÏÀº À¯Áö)
+                // ì´ì „ hover ìƒ‰ ì›ë³µ (ì„ íƒëœ íƒ€ì¼ì€ ìœ ì§€)
                 if (hoveredTile != null && hoveredTile != selectedTile)
-                    hoveredTile.GetComponent<SpriteRenderer>().color = Color.white;
+                    hoveredTile.GetComponent<SpriteRenderer>().color = hoveredTile.defaultColor;
 
-                // ÇöÀç hover Å¸ÀÏ »ö ³ë¶õ»öÀ¸·Î º¯°æ
+                // í˜„ì¬ hover íƒ€ì¼ ìƒ‰ ë…¸ë€ìƒ‰ìœ¼ë¡œ ë³€ê²½
                 if (currentTile != selectedTile)
                     hoveredObj.GetComponent<SpriteRenderer>().color = Color.yellow;
 
                 hoveredTile = currentTile;
-                int destinationIndex = currentTile.tileIndex;
-                int distance = BFS(LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].curpos, destinationIndex);
-
-                alim.GetComponent<TextMeshProUGUI>().text = $"ÀÌµ¿±îÁö {distance} Çàµ¿ ¼Ò¸ğ";
-
-                // Å¬¸¯ Ã³¸®
+                
+                // í´ë¦­ ì²˜ë¦¬
                 if (Input.GetMouseButtonDown(0))
                 {
-                    if (distance != -1)
-                    {
-                        //Debug.Log($"ÇÃ·¹ÀÌ¾î°¡ {distance}Ä­ ÀÌµ¿À»¼±ÅÃÇß´Ù");
-                        selectedTile = currentTile;
-                        selectedTile.GetComponent<SpriteRenderer>().color = Color.red;
-                        
-                    }
-                    else
-                    {
-                      //  Debug.Log("ÀÌµ¿ ºÒ°¡ÇÑ Å¸ÀÏÀÔ´Ï´Ù.");
-                    }
+                    destinationIndex = currentTile.tileIndex;
+                    distance = currentTile.cost;
+                    alim.GetComponent<TextMeshProUGUI>().text = $"ì´ë™ê¹Œì§€ {distance} í–‰ë™ ì†Œëª¨";
                     StopSelectDestLoop();
               
                     ActionData action = new ActionData();
                     action.actionId = 0;
-                    action.destindex = destinationIndex; //·»´õ¸µÇÒ ¶§´Â ÀÌ°ª
-                    CardEffect moveEffect = new CardEffect(HookType.Activate, EffectType.Move, destinationIndex, 0); //ÀÌµ¿ °è»êÀº ÀÌÆåÆ®·Î
+                    action.destindex = destinationIndex; //ë Œë”ë§í•  ë•ŒëŠ” ì´ê°’
+                    CardEffect moveEffect = new CardEffect(HookType.Activate, EffectType.Move, destinationIndex, 0); //ì´ë™ ê³„ì‚°ì€ ì´í™íŠ¸ë¡œ
                     action.effects.Add(moveEffect);
 
 
@@ -123,17 +182,15 @@ public class MoveModeState : MonoBehaviour
                     hoveredTile = null;
                     selectedTile = null;
                     alim.SetActive(false);
-                    // ¸ğµå Á¾·á ¹× »ö ÃÊ±âÈ­
-                    ////StartCoroutine(ExitMoveModeAfterFrame());
                 }
             }
         }
         else
         {
-            // ¾Æ¹« °Íµµ hover ¾È ÇßÀ» ¶§ ÀÌÀü hover »ö ¿øº¹
+            // ì•„ë¬´ ê²ƒë„ hover ì•ˆ í–ˆì„ ë•Œ ì´ì „ hover ìƒ‰ ì›ë³µ
             if (hoveredTile != null && hoveredTile != selectedTile)
             {
-                hoveredTile.GetComponent<SpriteRenderer>().color = Color.white;
+                hoveredTile.GetComponent<SpriteRenderer>().color = hoveredTile.defaultColor;
                 hoveredTile = null;
             }
         }
@@ -143,7 +200,7 @@ public class MoveModeState : MonoBehaviour
 
     /* IEnumerator ExitMoveModeAfterFrame()
      {
-         yield return new WaitForSecondsRealtime(0.05f); ; // 1 ÇÁ·¹ÀÓ ±â´Ù¸° ÈÄ Á¾·á (Å¬¸¯°ú »ö °»½Å Ãæµ¹ ¹æÁö)
+         yield return new WaitForSecondsRealtime(0.05f); ; // 1 í”„ë ˆì„ ê¸°ë‹¤ë¦° í›„ ì¢…ë£Œ (í´ë¦­ê³¼ ìƒ‰ ê°±ì‹  ì¶©ëŒ ë°©ì§€)
 
          foreach (var obj in grid.tileObjects.Values)
          {
@@ -152,7 +209,7 @@ public class MoveModeState : MonoBehaviour
          }
 
 
-         //Ä³¸¯ÅÍ À§Ä¡ ÀÌµ¿
+         //ìºë¦­í„° ìœ„ì¹˜ ì´ë™
          if (selectedTile != null)
          {
              Transform charPoint = selectedTile.transform.Find("charpoint");
@@ -162,7 +219,7 @@ public class MoveModeState : MonoBehaviour
              }
              else
              {
-                 Debug.LogWarning("¼±ÅÃµÈ Å¸ÀÏ¿¡ 'charpoint' ¿ÀºêÁ§Æ®°¡ ¾ø½À´Ï´Ù.");
+                 Debug.LogWarning("ì„ íƒëœ íƒ€ì¼ì— 'charpoint' ì˜¤ë¸Œì íŠ¸ê°€ ì—†ìŠµë‹ˆë‹¤.");
              }
          }
 
@@ -171,35 +228,4 @@ public class MoveModeState : MonoBehaviour
          selectedTile = null;
      }
  */
-    int BFS(int startIndex, int goalIndex)
-    {
-
-        Vector3Int start = GridManagement.Instance.GetCoordFromIndex(startIndex);
-        Vector3Int goal = GridManagement.Instance.GetCoordFromIndex(goalIndex);
-
-        Queue<(Vector3Int coord, int dist)> queue = new Queue<(Vector3Int, int)>();
-        HashSet<Vector3Int> visited = new HashSet<Vector3Int>();
-
-        queue.Enqueue((start, 0));
-        visited.Add(start);
-
-        while (queue.Count > 0)
-        {
-            var (current, dist) = queue.Dequeue();
-            if (current == goal)
-                return dist;
-
-            foreach (var dir in directions)
-            {
-                Vector3Int next = current + dir;
-                if (GridManagement.Instance.coordToIndex.ContainsKey(next) && !visited.Contains(next))
-                {
-                    visited.Add(next);
-                    queue.Enqueue((next, dist + 1));
-                }
-            }
-        }
-
-        return -1;
-    }
 }
