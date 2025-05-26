@@ -70,6 +70,7 @@ public class LocalState : MonoBehaviour
                 localData.defense = masterData.defense;
                 localData.prevHP = masterData.prevHP;
                 localData.energy = masterData.energy;
+                localData.canMove = masterData.canMove;
                 localData.isStunned = masterData.isStunned;
                 // 덱 정보도 완전히 교체
                // localData.DeckCodes = new List<string>(masterData.DeckCodes);

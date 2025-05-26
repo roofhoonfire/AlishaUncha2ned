@@ -157,7 +157,7 @@ public class Overmind : MonoBehaviourPunCallbacks
 
     private int faceOffCount = 0;// 더 좋은 방법있음 나와보라그래
     
-    public int cycleState = -1; // -1: initial, 0: FaceOff, 1: Actor1, 2: Actor2
+    public int cycleState = 0; // -1: Initial, 0: FaceOff, 1: Actor1, 2: Actor2
     void Awake()
     {
         if (Instance == null)
@@ -338,6 +338,7 @@ public class Overmind : MonoBehaviourPunCallbacks
     IEnumerator FaceOff()
     {
         faceOffCount++;
+        UpdateCycleState(0);
         // Begin selection for all players
         pendingSelections.Clear();
         foreach (int actor in players.Keys)
@@ -395,7 +396,7 @@ public class Overmind : MonoBehaviourPunCallbacks
                 //경우  1 : 격돌
                 if (readyCount > 1)
                 {
-                    UpdateCycleState(0);
+                    
                     yield return HandleRumblePhase();
 
                     if (actionQueue.Count <= 0) //연계카드가 없다면 무조건 이 경우일 것
@@ -1287,6 +1288,12 @@ public class Overmind : MonoBehaviourPunCallbacks
     }
     private void UpdateCycleState(int newState) {
 
+        if (cycleState == -1)
+        {
+            cycleState = newState;
+            return;
+        }
+
         if (cycleState != newState)
         {
             if (newState == 0)
@@ -1299,12 +1306,12 @@ public class Overmind : MonoBehaviourPunCallbacks
             else if (newState == 1)
             {
                 players[newState].energy++;
-                players[newState].canMove = false;
+                players[newState].canMove = true;
             }
             else if (newState == 2)
             {
                 players[newState].energy++;
-                players[newState].canMove = false;
+                players[newState].canMove = true;
             }
         }
         else

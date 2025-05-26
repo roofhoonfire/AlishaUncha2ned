@@ -62,6 +62,7 @@ public class CardEffect
         {
 
             case EffectType.Move:
+                Overmind.Instance.players[actorNum].canMove = false;
                 CardAction.Instance.MoveChara(actorNum, amount);
                 Debug.Log($"플레이어 {actorNum}이 {amount}로 이동한다");
 

@@ -57,7 +57,6 @@ public class MoveModeState : MonoBehaviour
         int startIndex = LocalState.Instance.localPlayers[myActorNum].curpos;
         int energy = LocalState.Instance.localPlayers[myActorNum].energy;
         
-        LocalState.Instance.localPlayers[myActorNum].canMove = false;
         // 모든 타일 초기화
         foreach (var tileObj in GridManagement.Instance.tileObjects.Values)
         {
@@ -158,15 +157,15 @@ public class MoveModeState : MonoBehaviour
                 // 현재 hover 타일 색 노란색으로 변경
                 if (currentTile != selectedTile)
                     hoveredObj.GetComponent<SpriteRenderer>().color = Color.yellow;
-
+                distance = currentTile.cost;
+                alim.GetComponent<TextMeshProUGUI>().text = $"이동까지 {distance} 행동 소모";
                 hoveredTile = currentTile;
                 
                 // 클릭 처리
                 if (Input.GetMouseButtonDown(0))
                 {
                     destinationIndex = currentTile.tileIndex;
-                    distance = currentTile.cost;
-                    alim.GetComponent<TextMeshProUGUI>().text = $"이동까지 {distance} 행동 소모";
+                    
                     StopSelectDestLoop();
               
                     ActionData action = new ActionData();
@@ -177,8 +176,7 @@ public class MoveModeState : MonoBehaviour
 
 
                     Overmind.Instance?.SubmitSelection(action, distance);
-                    selectedTile.GetComponent<SpriteRenderer>().color = Color.white;
-
+                    
                     isActive = false;
                     hoveredTile = null;
                     selectedTile = null;
