@@ -123,7 +123,7 @@ public class CardDragHandler : MonoBehaviour,
                 CardModeState.Instance.curAction.cardname = thisCardData.name;
                 CardModeState.Instance.curAction.zoneIndex = thisCardData.zoneIndex;
                 CardModeState.Instance.curAction.tileType = thisCardData.tileType;
-                
+                CardModeState.Instance.curAction.effects.AddRange(CardDEffectDatabase.GetEffects(thisCardData.code));
                 CardDragDropRendering();
                 CardModeState.Instance.StopSelectCardLoop(CardModeState.Instance.curAction);
             }
@@ -157,17 +157,15 @@ public class CardDragHandler : MonoBehaviour,
                     LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy -= thisCardData.energy;
                     foreach (var e in effectsList)
                     {
-                        if (e.hookType == HookType.ImSupport)
+                        if (e.hookType == HookType.Support)
                         {
                             e.Apply(0, null, 0, null, null, null);
-                        }
-                        else if (e.hookType == HookType.Support)
-                        {
-                            CardModeState.Instance.curAction.effects.Append(e);
+                            Debug.Log("ImSupport added");
                         }
                         else
                         {
-                            Debug.LogError("Immediate Support Card should not have any hook type other than ImSupport. Card code: " + thisCardData.code);
+                            CardModeState.Instance.curAction.effects.Add(e);
+                            Debug.Log("support added");
                         }
                     }
                     CardDragDropRendering();

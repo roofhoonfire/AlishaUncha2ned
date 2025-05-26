@@ -27,9 +27,9 @@ public class Card
 
     public string cardText;
 }
-public enum HookType { Activate, Priority, IQA, Counter, Guard ,BeforeRumble, RumbleWin, RumbleLose, Combo, Support, ImSupport }
+public enum HookType { Activate, Priority, IQA, Counter, Guard ,BeforeRumble, RumbleWin, RumbleLose, Combo, Support }
 public enum EffectType { Damage, Move, Heal, StackDamage,  GetDefense, DamageMeBangMoo, AddDamage, OpNextActionisMoveFlagOn,
-    whenDamagedFlagOn, NotRumbleFlagOn, ReplaceNextOpsMovetoStun, StunRecovery, SelectActionClockChange}
+    whenDamagedFlagOn, NotRumbleFlagOn, ReplaceNextOpsMovetoStun, StunRecovery, SelectActionClockChange, UseEnergy}
 
 
 public class CardEffect
@@ -135,7 +135,11 @@ public class CardEffect
                 break;
             case EffectType.SelectActionClockChange:
                 CardMultipleChoice.Instance.ChoiceStart(amount);
-                Debug.Log($"");
+                Debug.Log($"Immediate support card만 가질수 있는 특성이다, Local에서 호출된다");
+                break;
+            case EffectType.UseEnergy:
+                Overmind.Instance.players[actorNum].energy -= amount;
+                Debug.Log($"[플레이어 {actorNum}] energy now {Overmind.Instance.players[actorNum].energy} ");
                 break;
 
         }

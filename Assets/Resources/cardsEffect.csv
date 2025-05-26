@@ -14,5 +14,7 @@ c6,Activate,Damage,10,0
 c6,Activate,NotRumbleFlagOn,1,0
 c6,Activate,OpNextActionisMoveFlagOn,2,1
 c6,Activate,ReplaceNextOpsMovetoStun,4,2
-c7,Support,AddDamage,20,0
-c8,ImSupport,SelectActionClockChange,3,0
+c7,Activate,AddDamage,20,0
+c7,Activate,UseEnergy,3,0
+c8,Activate,UseEnergy,3,0
+c8,Support,SelectActionClockChange,3,0

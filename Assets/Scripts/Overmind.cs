@@ -97,7 +97,7 @@ public class ActionData //여기 뭐 추가할 거면 carddragHandler로 수정�
         foreach (var e in effects)
         {
             // 훅 타입이 다르면 스킵
-            if (e.hookType != hook && e.hookType != HookType.Support)
+            if (e.hookType != hook)
                 continue;
 
             // 선공 훅인데 이미 다른 행동이 실행된 적이 있으면 스킵 (flag 상관없이 적용)
