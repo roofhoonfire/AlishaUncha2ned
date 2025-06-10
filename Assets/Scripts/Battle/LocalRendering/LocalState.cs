@@ -72,6 +72,9 @@ public class LocalState : MonoBehaviour
                 localData.energy = masterData.energy;
                 localData.canMove = masterData.canMove;
                 localData.isStunned = masterData.isStunned;
+                localData.actionClockManuplate = masterData.actionClockManuplate;
+                localData.defenseManuplate  = masterData.defenseManuplate;
+                localData.timeBombSetinTomMotion    =       masterData  .timeBombSetinTomMotion; 
                 // 덱 정보도 완전히 교체
                // localData.DeckCodes = new List<string>(masterData.DeckCodes);
             }
@@ -91,6 +94,7 @@ public class LocalState : MonoBehaviour
             localActionQueue.Add((actorNum, remainingCost));
         }
 
+        PlayerStateUIRendering();
 
         Debug.Log("LocalState: 부분 동기화 완료");
     }
@@ -135,6 +139,7 @@ public class LocalState : MonoBehaviour
     public void CharaObInit()
     {
         //여기서 렌더링 정보 다하기 . 스킨 보는 방향 등.
+        //셀렉션 바 연결
         foreach (var pinfo in localPlayers)
 
 
@@ -152,6 +157,17 @@ public class LocalState : MonoBehaviour
                 myHP = charinfo.Hp;
                 mydefense = charinfo.Def;
                 mcChecker.SetActive(true);
+               SelectionBarManager.Instance.CM =  temp.GetComponent<Transform>().Find("CM");
+               SelectionBarManager.Instance.MM = temp.GetComponent<Transform>().Find("MM");
+               SelectionBarManager.Instance.JM = temp.GetComponent<Transform>().Find("JM");
+                if (SelectionBarManager.Instance.CM == null) Debug.LogError("CM 못 찾음!");
+                if (SelectionBarManager.Instance.MM == null) Debug.LogError("MM 못 찾음!");
+                if (SelectionBarManager.Instance.JM == null) Debug.LogError("JM 못 찾음!");
+                SelectionBarManager.Instance.CM.gameObject.SetActive(false);
+                SelectionBarManager.Instance.MM.gameObject.SetActive(false);
+                SelectionBarManager.Instance.JM.gameObject.SetActive(false);
+                CameraLovesAlisha.Instance.target = temp.GetComponent<Transform>();
+
             }
             else
             {
@@ -193,6 +209,8 @@ public class LocalState : MonoBehaviour
 
     private IEnumerator ChooseMoveInputLoop()
     {
+
+        SelectionBarManager.Instance.SetActive();
         // 대기 상태
         while (true)
         {
@@ -216,10 +234,12 @@ public class LocalState : MonoBehaviour
 
         // 코루틴 참조 해제
         _chooseMoveRoutine = null;
+        SelectionBarManager.Instance.SetActive();
+
     }
 
- 
-   
+
+
     public void PlayActionRendering(int actorNum, ActionData action, int opCost, HookType h) //여기에 상대 액숀도받아 와서 남은 시간 체크
     {
         if (action.actionId == 0)//이동이면
@@ -232,8 +252,14 @@ public class LocalState : MonoBehaviour
         }
         else if (action.actionId == 1)
         { //처맞고 때리고 하는 애니메이숑 액션에 붙어있는 애니메이션 클립출력
+            if (action.destindex != -10)
+            {
+                //이동 + 이동 아니메이션
 
-            Debug.Log($"플레이어 {actorNum}의 {action.cardname}의 {h} 크후후!");
+                LocalMoveRendering(actorNum, action.destindex);
+
+            }
+            Debug.Log($"플레이어 {actorNum}의 {action.cardname}의 {h} ");
             AlertDialogue.Instance.StartDialogue(action, actorNum, h, DialogueType.Activate);
         }
 

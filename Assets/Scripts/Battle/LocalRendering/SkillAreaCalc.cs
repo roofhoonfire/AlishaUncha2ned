@@ -60,18 +60,71 @@ public static class HexSkill
         var rotated = RotateShape(defaultShape, rotateCount);
         return rotated.Select(v => v + origin).ToList();
     }
+    public static List<Vector3Int> GetSkillAreaByClickedTile(List<Vector3Int> defaultShape, int clickedTileIndex)
+    {
+        Vector3Int clickedCoord = GridManagement.Instance.GetCoordFromIndex(clickedTileIndex);
+        return defaultShape.Select(offset => clickedCoord + offset).ToList();
+    }
+    public static List<Vector3Int> GetTilesBetweenPlayerAndTarget(Vector3Int playerCoord, Vector3Int targetCoord)
+    {
+        Vector3Int? matchedDir = null;
+
+        foreach (var dir in Directions)
+        {
+            Vector3Int current = playerCoord;
+
+            while (true)
+            {
+                current += dir;
+                if (current == targetCoord)
+                {
+                    matchedDir = dir;
+                    break;
+                }
+
+                if (!GridManagement.Instance.coordToIndex.ContainsKey(current))
+                    break;
+            }
+
+            if (matchedDir.HasValue)
+                break;
+        }
+
+        if (!matchedDir.HasValue)
+            return new List<Vector3Int>();
+
+        // 방향 확인 완료 → 그 방향으로 playerCoord 다음부터 targetCoord까지 타일 모으기
+        Vector3Int dirToUse = matchedDir.Value;
+        Vector3Int curCoord = playerCoord + dirToUse;
+
+        List<Vector3Int> result = new();
+
+        while (true)
+        {
+            if (!GridManagement.Instance.coordToIndex.ContainsKey(curCoord))
+                break;
+
+            result.Add(curCoord);
+
+            if (curCoord == targetCoord)
+            
+                break;
+            
+            curCoord += dirToUse;
+        }
+        // targetCoord를 맨 앞으로 이동
+        if (result.Count > 0)
+        {
+            result.Remove(targetCoord);
+            result.Insert(0, targetCoord);
+        }
+        return result;
+    }
+
 }
 public class SkillAreaCalc : MonoBehaviour
 {
     // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

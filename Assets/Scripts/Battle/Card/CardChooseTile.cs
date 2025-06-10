@@ -1,6 +1,7 @@
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.VirtualTexturing;
 
@@ -60,6 +61,36 @@ public class CardChooseTile : MonoBehaviour
         playerCoord = GridManagement.Instance.GetCoordFromIndex(LocalState.Instance.localPlayers[actor].curpos);
         myChara = LocalState.Instance?.PlayerObDic[actor];
         AlertDialogue.Instance.StartDialogue(action, actor, HookType.Activate, DialogueType.TileChoose);
+
+
+        // ★ tileType이 -1이면 바로 종료
+        if (action.tileType == -1)
+        {
+            Overmind.Instance.SendTile(PhotonNetwork.LocalPlayer.ActorNumber, new List<int>());
+            isActive = false;
+
+            _selectTileCoroutine = null; // 안전하게 핸들 초기화
+
+            yield break;
+        }
+        if (action.tileType >= 11)
+        {
+            GridManagement.Instance.HighlightReachableTilesFrom(
+                GridManagement.Instance.coordToIndex[playerCoord],
+                action.tileType, // tileType >= 11이면 LinearSkill 처리됨
+                Color.cyan,
+                "LinearSkill"
+            );
+        }
+        else if (action.tileType != 0) {
+            GridManagement.Instance.HighlightReachableTilesFrom(
+        GridManagement.Instance.coordToIndex[playerCoord],
+        action.tileType,     // 스킬 사거리
+        Color.cyan ,    // 스킬 선택 범위 색
+        "Skill"
+        );
+        }
+        
         while (isActive)
         {
 
@@ -68,31 +99,10 @@ public class CardChooseTile : MonoBehaviour
             yield return null;
             if (Input.GetMouseButtonDown(0))
             {
-                ResetAllTileColors();
+                GridManagement.Instance.ResetAllTiles();
                 StopSelectTileLoop();
             }
         }
-    }
-
-    private void SelectTile (int tiletype, int zoneIndex)
-    {
-        if (myChara == null) return;
-
-        CalculateAndLogAngleWithMouseToPlayer();
-
-        if (tiletype == 0)
-        {
-            debugYong = HexSkill.GetSkillTargets(
-                SkillTileDatabase.skillShapes[zoneIndex],
-                DegreeToDirection(angle),
-                playerCoord
-            );
-        }
-        else //베이가 w의 경우
-        {
-
-        }
-        HighlightTiles(debugYong);
     }
     private void StopSelectTileLoop()
     {
@@ -110,6 +120,54 @@ public class CardChooseTile : MonoBehaviour
 
         //
     }
+    private void SelectTile (int tiletype, int zoneIndex)
+    {
+        if (myChara == null) return;
+
+        CalculateAndLogAngleWithMouseToPlayer();
+
+        if (tiletype == 0)
+        {
+            debugYong = HexSkill.GetSkillTargets(
+                SkillTileDatabase.skillShapes[zoneIndex],
+                DegreeToDirection(angle),
+                playerCoord
+            );
+        }
+        else if (tiletype > 0 && tiletype<11)//베이가 w의 경우
+        {
+            GameObject hoveredTIle = GridManagement.Instance.GetTileUnderMouse();
+            if (hoveredTIle == null) return;
+
+            EachTile tile = hoveredTIle.GetComponent<EachTile>();
+            if (tile == null || tile.canMove == false) return;
+
+            int HoverdedIndex = tile.tileIndex;
+    
+            debugYong = HexSkill.GetSkillAreaByClickedTile(
+                SkillTileDatabase.skillShapes[zoneIndex],
+                HoverdedIndex
+            );
+
+        }
+        else if (tiletype > 10)
+        {
+            GameObject hoveredTile = GridManagement.Instance.GetTileUnderMouse();
+            if (hoveredTile == null) return;
+
+            EachTile tile = hoveredTile.GetComponent<EachTile>();
+            if (tile == null || tile.canMove == false) return;
+
+            Vector3Int targetCoord = GridManagement.Instance.GetCoordFromIndex(tile.tileIndex);
+
+            // HexSkill에서 계산 요청
+            debugYong = HexSkill.GetTilesBetweenPlayerAndTarget(playerCoord, targetCoord);
+
+
+        }
+        HighlightTiles(debugYong);
+    }
+ 
     private void CalculateAndLogAngleWithMouseToPlayer()
     {
         if (myChara == null) return;
@@ -134,28 +192,32 @@ public class CardChooseTile : MonoBehaviour
         throw new System.ArgumentOutOfRangeException(nameof(deg), deg, "지원되지 않는 각도입니다.");
     }
 
-    private void HighlightTiles(List<Vector3Int> coords)
+    private void HighlightTiles(List<Vector3Int> coordsToHighlight)
     {
-        var current = CoordsToIndices(coords);
-
-        // Reset previous highlights
-        foreach (var idx in prevHighlighted)
+        foreach (var kvp in GridManagement.Instance.tileObjects)
         {
-            if (!current.Contains(idx) && GridManagement.Instance.tileObjects.TryGetValue(idx, out var go))
-                go.GetComponent<SpriteRenderer>().color = Color.white;
-        }
+            int tileIndex = kvp.Key;
+            GameObject tileObj = kvp.Value;
 
-        // Apply new highlights
-        foreach (var idx in current)
-        {
-            if (!prevHighlighted.Contains(idx) && GridManagement.Instance.tileObjects.TryGetValue(idx, out var go))
-                go.GetComponent<SpriteRenderer>().color = Color.red;
-        }
+            EachTile tile = tileObj.GetComponent<EachTile>();
+            Vector3Int tileCoord = GridManagement.Instance.GetCoordFromIndex(tileIndex);
 
-        prevHighlighted = current;
+            if (coordsToHighlight != null && coordsToHighlight.Contains(tileCoord))
+            {
+                tileObj.GetComponent<SpriteRenderer>().color = Color.yellow;
+            }
+            else
+            {
+                tileObj.GetComponent<SpriteRenderer>().color = tile.defaultColor;
+            }
+        }
     }
     private List<int> CoordsToIndices(List<Vector3Int> coords)
     {
+        // coords가 null이면 빈 리스트 리턴
+        if (coords == null) //디버그용이 널 즉 tiletype이 -1인경우
+            return new List<int>();
+
         var indices = new List<int>(coords.Count);
         foreach (var coord in coords)
         {
@@ -165,12 +227,5 @@ public class CardChooseTile : MonoBehaviour
         }
         return indices;
     }
-    private void ResetAllTileColors()
-    {
-        foreach (var kvp in GridManagement.Instance.tileObjects)
-        {
-            if (kvp.Value.TryGetComponent<SpriteRenderer>(out var sr))
-                sr.color = Color.white;
-        }
-    }
+
 }

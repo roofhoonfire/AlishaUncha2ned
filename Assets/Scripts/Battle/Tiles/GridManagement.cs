@@ -127,4 +127,140 @@ public class GridManagement : MonoBehaviour
         }
         return everytile;
     }
+    public GameObject GetTileUnderMouse()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            if (hit.collider.CompareTag("Tile"))
+            {
+                return hit.collider.gameObject;
+            }
+        }
+        return null;
+    }
+    public void HighlightReachableTilesFrom(int startIndex, int maxCost, Color tileColor, string MoveOrSkill)
+    {
+        // 모든 타일 초기화
+        foreach (var tileObj in tileObjects.Values)
+        {
+            EachTile tile = tileObj.GetComponent<EachTile>();
+            tile.defaultColor = Color.white;
+            tile.cost = 0;
+            tile.canMove = false;
+            tileObj.GetComponent<SpriteRenderer>().color = tile.defaultColor;
+        }
+
+        Queue<(int index, int dist)> queue = new();
+        HashSet<int> visited = new();
+
+        queue.Enqueue((startIndex, 0));
+        visited.Add(startIndex);
+        if (MoveOrSkill == "LinearSkill") // 새로운 case
+        {
+            // 타일타입에서 길이 계산
+            int linearLength = maxCost - 10; // tileType - 10
+
+            Vector3Int playerCoord = GetCoordFromIndex(startIndex);
+
+            foreach (var dir in HexSkill.Directions)
+            {
+                Vector3Int curCoord = playerCoord;
+
+                for (int i = 1; i <= linearLength; i++)
+                {
+                    curCoord += dir;
+
+                    if (coordToIndex.TryGetValue(curCoord, out int nextIndex))
+                    {
+                        GameObject tileObj = tileObjects[nextIndex];
+                        EachTile tile = tileObj.GetComponent<EachTile>();
+
+                        tile.cost = i;
+                        tile.canMove = true;
+                        tile.defaultColor = tileColor;
+                        tileObj.GetComponent<SpriteRenderer>().color = tileColor;
+                    }
+                    else
+                    {
+                        // 맵 바깥 나감 → 이 방향 중단
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            while (queue.Count > 0)
+            {
+                var (currentIndex, dist) = queue.Dequeue();
+                if (dist > maxCost) continue;
+
+                GameObject tileObj = tileObjects[currentIndex];
+                EachTile tile = tileObj.GetComponent<EachTile>();
+
+                bool isStartTile = currentIndex == startIndex;
+                bool isPlayerTile = false;
+
+                // Move일 경우 현재 플레이어들이 위치한 타일인지 체크
+                if (MoveOrSkill == "Move")
+                {
+                    foreach (var pl in LocalState.Instance.localPlayers.Values)
+                    {
+                        if (currentIndex == pl.curpos)
+                        {
+                            isPlayerTile = true;
+                            break;
+                        }
+                    }
+                }
+
+                // 타일 초기화 조건:
+                // - Skill일 때 → currentIndex != startIndex면 칠함
+                // - Move일 때 → currentIndex != startIndex && 해당 타일이 플레이어 위치가 아니면 칠함
+                bool shouldHighlight = false;
+
+                if (MoveOrSkill == "Skill")
+                {
+                    shouldHighlight = !isStartTile;
+                }
+                else if (MoveOrSkill == "Move")
+                {
+                    shouldHighlight = !isStartTile && !isPlayerTile;
+                }
+
+                if (shouldHighlight)
+                {
+                    tile.cost = dist;
+                    tile.canMove = true;
+                    tile.defaultColor = tileColor;
+                    tileObj.GetComponent<SpriteRenderer>().color = tileColor;
+                }
+
+                // BFS 탐색 계속 진행
+                Vector3Int currentCoord = GetCoordFromIndex(currentIndex);
+                foreach (var dir in HexSkill.Directions)
+                {
+                    Vector3Int nextCoord = currentCoord + dir;
+                    if (coordToIndex.TryGetValue(nextCoord, out int nextIndex) && !visited.Contains(nextIndex))
+                    {
+                        visited.Add(nextIndex);
+                        queue.Enqueue((nextIndex, dist + 1));
+                    }
+                }
+            }
+        }
+    }
+
+    public void ResetAllTiles()
+    {
+        foreach (var tileObj in tileObjects.Values)
+        {
+            EachTile tile = tileObj.GetComponent<EachTile>();
+            tile.defaultColor = Color.white;
+            tile.cost = 0;
+            tile.canMove = false;
+            tileObj.GetComponent<SpriteRenderer>().color = tile.defaultColor;
+        }
+    }
 }

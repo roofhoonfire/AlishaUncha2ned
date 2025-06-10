@@ -119,13 +119,21 @@ public class CardDragHandler : MonoBehaviour,
                 CardModeState.Instance.curAction.rumblePoint = thisCardData.rumblePoint;
                 CardModeState.Instance.curAction.cardcode = thisCardData.code;
                 CardModeState.Instance.curAction.animations = thisCardData.animations;
-                CardModeState.Instance.curAction.actionClock = Mathf.Max(1, thisCardData.actionClock + CardModeState.Instance.actionClockBuffer);
+                CardModeState.Instance.curAction.actionClock = Mathf.Max(1, thisCardData.actionClock + CardModeState.Instance.actionClockBuffer + LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].actionClockManuplate);
                 CardModeState.Instance.curAction.cardname = thisCardData.name;
                 CardModeState.Instance.curAction.zoneIndex = thisCardData.zoneIndex;
                 CardModeState.Instance.curAction.tileType = thisCardData.tileType;
                 CardModeState.Instance.curAction.effects.AddRange(CardDEffectDatabase.GetEffects(thisCardData.code));
+                CardModeState.Instance.curAction.damage = thisCardData.damage;
                 CardDragDropRendering();
+
+
+                //
+                LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].actionClockManuplate = 0;
+
+
                 CardModeState.Instance.StopSelectCardLoop(CardModeState.Instance.curAction);
+               // CardModeState.Instance.InitBuffer(); // 여기에!
             }
             else if (thisCardData.cardType == 1) {
                 if (LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy < thisCardData.energy)
@@ -137,7 +145,7 @@ public class CardDragHandler : MonoBehaviour,
                 }
                 else
                 {
-                    LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy -= thisCardData.energy;
+                    LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy -= thisCardData.energy; 
                     CardModeState.Instance.curAction.effects.AddRange(CardDEffectDatabase.GetEffects(thisCardData.code));
                     CardDragDropRendering();
                     Destroy(gameObject);
@@ -160,11 +168,11 @@ public class CardDragHandler : MonoBehaviour,
                         if (e.hookType == HookType.Support)
                         {
                             e.Apply(0, null, 0, null, null, null);
-                            Debug.Log("ImSupport added");
+                            Debug.Log("ImSupport 즉발");
                         }
                         else
                         {
-                            CardModeState.Instance.curAction.effects.Add(e);
+                            CardModeState.Instance.curAction.effects.Add(e); //에너지 줄이는 용도인듯 ;\
                             Debug.Log("support added");
                         }
                     }

@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using TMPro; // 반드시 있어야 함
+
 using UnityEngine.Rendering;
 
 
@@ -17,6 +19,7 @@ public class CardModeState : MonoBehaviour
     // Buffer
     public ActionData curAction;
     public int actionClockBuffer = 0;
+    public List<GameObject> spawnedCards = new List<GameObject>();
 
     public bool isActive = false;
     private Coroutine _selectCardCoroutine;
@@ -48,14 +51,58 @@ public class CardModeState : MonoBehaviour
     {
         PopulateCards();//손패 쫘자작
 
-        InitBuffer();
+       InitBuffer();
+
+        ActionClockManipulated();
 
         if (_selectCardCoroutine == null)
             _selectCardCoroutine = StartCoroutine(SelectCardLoop());
 
 
     }
-    private void InitBuffer()
+    
+    
+    private void ActionClockManipulated()
+    {
+        //애니메도 넣으면 좋다 
+        int actor = PhotonNetwork.LocalPlayer.ActorNumber;
+        int delta = LocalState.Instance.localPlayers[actor].actionClockManuplate;
+
+        if (delta == 0)
+            return;
+
+        foreach (var card in spawnedCards)
+        {
+            if (card == null) continue;
+
+            Transform timeClockTransform = card.transform.Find("TimeClock");
+            if (timeClockTransform == null)
+            {
+                Debug.LogWarning("TimeClock 자식 오브젝트가 없습니다.");
+                continue;
+            }
+
+            TextMeshProUGUI tmp = timeClockTransform.GetComponent<TextMeshProUGUI>();
+            if (tmp == null)
+            {
+                Debug.LogWarning("TimeClock 오브젝트에 TextMeshProUGUI가 없습니다.");
+                continue;
+            }
+
+            // 현재 텍스트가 숫자일 때만 처리
+            if (int.TryParse(tmp.text, out int originalValue))
+            {
+                int newValue = Mathf.Max(1, originalValue + delta);
+                tmp.text = newValue.ToString();
+            }
+            else
+            {
+                Debug.LogWarning($"TimeClock 텍스트가 숫자가 아닙니다: {tmp.text}");
+            }
+        }
+    }
+    
+    public void InitBuffer()
     {
         // Reset buffers
         curAction = new ActionData();
@@ -106,12 +153,8 @@ public class CardModeState : MonoBehaviour
     }
     public void PopulateCards()
     {
+        spawnedCards.Clear(); // 이전 것들 제거
 
-        //애니메이션도 넣고
-
-        //이거 로직 나중에 많이 뜯어 고치자
-
-        // 1) 로컬 플레이어 덱 가져오기
         var actor = PhotonNetwork.LocalPlayer.ActorNumber;
         var deck = LocalState.Instance.localPlayers[actor].DeckCodes;
         int deckIndex = LocalState.Instance.localPlayers[actor].deckIndexStart;
@@ -119,16 +162,13 @@ public class CardModeState : MonoBehaviour
         if (deckIndex >= deck.Count)
             deckIndex = 0;
 
-        // 2) 뽑을 카드의 끝 인덱스 계산 (deckIndex + 5, 또는 deck.Count 중 작은 값)
         int endIndex = Mathf.Min(deckIndex + 5, deck.Count);
 
-        // 3) Instantiate 반복
         for (int i = deckIndex; i < endIndex; i++)
         {
-            // 빈 카드 오브젝트 생성
             var cardGO = Instantiate(cardPrefab, cardContentArea);
+            spawnedCards.Add(cardGO); // 여기서 참조 저장
 
-            // 메타 정보 적용
             var info = cardGO.GetComponent<EachCardInfo>();
             if (info == null)
             {
@@ -140,7 +180,8 @@ public class CardModeState : MonoBehaviour
             info.cardData = CardCSVLoader.Instance.GetCardByCode(code);
             info.ApplyCardData();
         }
-        LocalState.Instance.localPlayers[actor].deckIndexStart = endIndex ;
+
+        LocalState.Instance.localPlayers[actor].deckIndexStart = endIndex;
     }
 
 

@@ -27,9 +27,20 @@ public static class SkillTileDatabase
              new(1, -1, 0), new(2, -2, 0)
         },
 
-        new List<Vector3Int> {
-              new(0, 0, 0),
+        new List<Vector3Int> { //¡∂æ««— ≈ı√¥
+            new (0,0,0),
         },
 
+        new List<Vector3Int> //∞¯¡ﬂ∞≠Ω¿
+        {
+              new(0, 0, 0),
+              new(1, 0, -1),
+              new(-1, 0, 1),
+              new(0, 1, -1),
+              new(0, -1, 1),
+              new(1, -1, 0),
+              new(-1, 1, 0),
+
+        }
     };
 }

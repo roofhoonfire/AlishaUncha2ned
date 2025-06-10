@@ -6,16 +6,12 @@ using UnityEngine;
 
 public class CardMetaLoader : MonoBehaviour
 {
- 
+    // 이 클래스는 그대로 두면 됨
 }
 
-
-
-
-public static class CardMetaDatabase //이름은 데이터 베이스지만 실제 메타 데이터는 SO형태로 CardCSVLoader의 SO 변수에 들어감
+public static class CardMetaDatabase // 이름은 데이터 베이스지만 실제 메타 데이터는 SO형태로 CardCSVLoader의 SO 변수에 들어감
 {
     public static string csvResourceName = "cardsMeta";
-
 
     public static CardSO LoadMetaFromCSV()
     {
@@ -49,7 +45,7 @@ public static class CardMetaDatabase //이름은 데이터 베이스지만 실제 메타 데이터
     private static Card ParseLine(string line, int lineNumber)
     {
         var cols = line.Split(',');
-        if (cols.Length < 12)
+        if (cols.Length < 14) // damage 추가로 총 14개 필요
         {
             Debug.LogWarning($"[CardCSVLoader] {lineNumber}번째 줄 열 부족: {cols.Length}개");
             return null;
@@ -66,14 +62,14 @@ public static class CardMetaDatabase //이름은 데이터 베이스지만 실제 메타 데이터
                 animations = LoadAnimations(cols[4]),
                 actionClock = TryParseInt(cols[5], 0),
                 rumblePoint = TryParseInt(cols[6], 0),
-                defense = TryParseInt(cols[7], 0),
-                disappear = TryParseInt(cols[8], 0),
-                mana = TryParseInt(cols[9], 0),
-                tileType = TryParseInt(cols[10], 0),
-                zoneIndex = TryParseInt(cols[11], 0),
-                energy = TryParseInt(cols[12], 0),
-                cardText = cols[13].Trim(),
-                
+                damage = TryParseInt(cols[7], 0),    // ★ damage 추가됨
+                defense = TryParseInt(cols[8], 0),
+                disappear = TryParseInt(cols[9], 0),
+                mana = TryParseInt(cols[10], 0),
+                tileType = TryParseInt(cols[11], 0),
+                zoneIndex = TryParseInt(cols[12], 0),
+                energy = TryParseInt(cols[13], 0),
+                cardText = cols.Length > 14 ? cols[14].Trim() : string.Empty, // 혹시 cardText 컬럼이 빠졌으면 빈 문자열 처리
             };
         }
         catch (Exception e)

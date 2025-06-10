@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Battle.unity
     guid: 50ad9f29c8216944da4feea9a9119148
+  - enabled: 0
+    path: Assets/Scenes/CameraTest.unity
+    guid: 0bfebfd260f74454da091887ee64e54c
   m_configObjects: {}

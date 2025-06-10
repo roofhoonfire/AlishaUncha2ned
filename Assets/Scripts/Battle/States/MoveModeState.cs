@@ -56,61 +56,69 @@ public class MoveModeState : MonoBehaviour
         int myActorNum = Photon.Pun.PhotonNetwork.LocalPlayer.ActorNumber;
         int startIndex = LocalState.Instance.localPlayers[myActorNum].curpos;
         int energy = LocalState.Instance.localPlayers[myActorNum].energy;
-        
+
+        GridManagement.Instance.HighlightReachableTilesFrom(
+            startIndex,
+            energy,
+            Color.cyan,
+            "Move"// 이동 가능 타일
+        );
         // 모든 타일 초기화
-        foreach (var tileObj in GridManagement.Instance.tileObjects.Values)
-        {
-            EachTile tile = tileObj.GetComponent<EachTile>();
-            tile.defaultColor = Color.white;
-            tile.cost = 0;
-            tile.canMove = false;
-            tileObj.GetComponent<SpriteRenderer>().color = tile.defaultColor;
-        }
 
-        Queue<(int index, int dist)> queue = new Queue<(int, int)>();
-        HashSet<int> visited = new HashSet<int>();
+        /*  foreach (var tileObj in GridManagement.Instance.tileObjects.Values)
+          {
+              EachTile tile = tileObj.GetComponent<EachTile>();
+              tile.defaultColor = Color.white;
+              tile.cost = 0;
+              tile.canMove = false;
+              tileObj.GetComponent<SpriteRenderer>().color = tile.defaultColor;
+          }
 
-        queue.Enqueue((startIndex, 0));
-        visited.Add(startIndex);
+          Queue<(int index, int dist)> queue = new Queue<(int, int)>();
+          HashSet<int> visited = new HashSet<int>();
 
-        while (queue.Count > 0)
-        {
-            var (currentIndex, dist) = queue.Dequeue();
-            if (dist > energy)
-                continue;
+          queue.Enqueue((startIndex, 0));
+          visited.Add(startIndex);
 
-            if (currentIndex == startIndex)
-            {
-                // 시작 타일은 색을 다르게 표시
-                var startTileObj = GridManagement.Instance.tileObjects[currentIndex];
-                EachTile startTile = startTileObj.GetComponent<EachTile>();
-                startTile.defaultColor = Color.green;
-                startTile.canMove = false;
-                startTileObj.GetComponent<SpriteRenderer>().color = startTile.defaultColor;
-            }
-            else
-            {
-                var tileObj = GridManagement.Instance.tileObjects[currentIndex];
-                EachTile tile = tileObj.GetComponent<EachTile>();
-                tile.defaultColor = Color.cyan;
-                tile.cost = dist;
-                tile.canMove = true;
-                tileObj.GetComponent<SpriteRenderer>().color = tile.defaultColor;
-            }
-            
+          while (queue.Count > 0)
+          {
+              var (currentIndex, dist) = queue.Dequeue();
+              if (dist > energy)
+                  continue;
 
-            Vector3Int currentCoord = GridManagement.Instance.GetCoordFromIndex(currentIndex);
+              if (currentIndex == startIndex)
+              {
+                  // 시작 타일은 색을 다르게 표시
+                  var startTileObj = GridManagement.Instance.tileObjects[currentIndex];
+                  EachTile startTile = startTileObj.GetComponent<EachTile>();
+                  startTile.defaultColor = Color.green;
+                  startTile.canMove = false;
+                  startTileObj.GetComponent<SpriteRenderer>().color = startTile.defaultColor;
+              }
+              else
+              {
+                  var tileObj = GridManagement.Instance.tileObjects[currentIndex];
+                  EachTile tile = tileObj.GetComponent<EachTile>();
+                  tile.defaultColor = Color.cyan;
+                  tile.cost = dist;
+                  tile.canMove = true;
+                  tileObj.GetComponent<SpriteRenderer>().color = tile.defaultColor;
+              }
 
-            foreach (var dir in directions)
-            {
-                Vector3Int nextCoord = currentCoord + dir;
-                if (GridManagement.Instance.coordToIndex.TryGetValue(nextCoord, out int nextIndex) && !visited.Contains(nextIndex))
-                {
-                    visited.Add(nextIndex);
-                    queue.Enqueue((nextIndex, dist + 1));
-                }
-            }
-        }
+
+              Vector3Int currentCoord = GridManagement.Instance.GetCoordFromIndex(currentIndex);
+
+              foreach (var dir in directions)
+              {
+                  Vector3Int nextCoord = currentCoord + dir;
+                  if (GridManagement.Instance.coordToIndex.TryGetValue(nextCoord, out int nextIndex) && !visited.Contains(nextIndex))
+                  {
+                      visited.Add(nextIndex);
+                      queue.Enqueue((nextIndex, dist + 1));
+                  }
+              }
+          }*/
+
     }
     private IEnumerator SelectDestLoop()
     {
@@ -125,31 +133,26 @@ public class MoveModeState : MonoBehaviour
 
         if (_selectDestCoroutine != null)
         {
-            foreach (var tileObj in GridManagement.Instance.tileObjects.Values)
-            {
-                EachTile tile = tileObj.GetComponent<EachTile>();
-                tile.defaultColor = Color.white;
-                tile.cost = 0;
-                tile.canMove = false;
-                tileObj.GetComponent<SpriteRenderer>().color = tile.defaultColor;
-            }
+            GridManagement.Instance.ResetAllTiles();
             StopCoroutine(_selectDestCoroutine);
             _selectDestCoroutine = null;
         }
     }
     void SelectDest()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         int destinationIndex;
-        int distance; 
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        int distance;
+
+        GameObject hoveredObj = GridManagement.Instance.GetTileUnderMouse();
+
+        if (hoveredObj != null)
         {
-            GameObject hoveredObj = hit.collider.gameObject;
             EachTile currentTile = hoveredObj.GetComponent<EachTile>();
 
             if (currentTile != null && currentTile.canMove)
             {
                 alim.SetActive(true);
+
                 // 이전 hover 색 원복 (선택된 타일은 유지)
                 if (hoveredTile != null && hoveredTile != selectedTile)
                     hoveredTile.GetComponent<SpriteRenderer>().color = hoveredTile.defaultColor;
@@ -157,26 +160,36 @@ public class MoveModeState : MonoBehaviour
                 // 현재 hover 타일 색 노란색으로 변경
                 if (currentTile != selectedTile)
                     hoveredObj.GetComponent<SpriteRenderer>().color = Color.yellow;
+
                 distance = currentTile.cost;
                 alim.GetComponent<TextMeshProUGUI>().text = $"이동까지 {distance} 행동 소모";
                 hoveredTile = currentTile;
-                
+
                 // 클릭 처리
                 if (Input.GetMouseButtonDown(0))
                 {
+                    if (currentTile.canMove == false)
+                    {
+                        alim.GetComponent<TextMeshProUGUI>().text = $"해당 위치로는 이동할 수 없다";
+
+                    }
                     destinationIndex = currentTile.tileIndex;
-                    
+
+
+                  
+
                     StopSelectDestLoop();
-              
-                    ActionData action = new ActionData();
-                    action.actionId = 0;
-                    action.destindex = destinationIndex; //렌더링할 때는 이값
-                    CardEffect moveEffect = new CardEffect(HookType.Activate, EffectType.Move, destinationIndex, 0); //이동 계산은 이펙트로
+
+                    ActionData action = new ActionData
+                    {
+                        actionId = 0,
+                        destindex = destinationIndex
+                    };
+                    CardEffect moveEffect = new CardEffect(HookType.Activate, EffectType.Move, destinationIndex, 0);
                     action.effects.Add(moveEffect);
 
-
                     Overmind.Instance?.SubmitSelection(action, distance);
-                    
+
                     isActive = false;
                     hoveredTile = null;
                     selectedTile = null;
@@ -193,8 +206,6 @@ public class MoveModeState : MonoBehaviour
                 hoveredTile = null;
             }
         }
-     
-
     }
 
     /* IEnumerator ExitMoveModeAfterFrame()

@@ -28,6 +28,10 @@ public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 
 
     public bool isStunned = false;
 
+    public int actionClockManuplate = 0;
+    public int defenseManuplate = 0;
+    public int timeBombSetinTomMotion = 0;
+
 
     public PlayerData(int actorNumber, List<string> deckCodes, int initialHP = 100)
     {
@@ -46,12 +50,13 @@ public class ActionData //여기 뭐 추가할 거면 carddragHandler로 수정�
 {
 
     public int actionId; //0 이면 이동 1이면 카드.. 등
-    public int destindex; // 이동 일 경우 목적지 인덱스를 저장
+    public int destindex = -10; // 이동 일 경우 목적지 인덱스를 저장// 액션이 destIndex가 있을 경우 해당 위치로 이동 (플레이어 딕셔너리 저장은 따로)//즉 렌더링 용 변수이다 
     public int defense;
+    public int damage;
     public int rumblePoint;
     public int actionClock;
     public string cardcode;
-    public int plusAlpha; //플러스 알파는 액션 단위로 관리해야함
+    public int plusAlpha; //플러스 알파는 액션 단위로 관리해야함// 이거 이제 없애도 됨 //물론 바꾸긴 해야겟디만 ㅎ
     public List <int> flags = new List<int> () ;//
     public bool isfirstStrikeSuccess = false; //이것도 사실상 의미가 없어졌지만, 일단 냅두자
     public string cardname;
@@ -522,7 +527,7 @@ public class Overmind : MonoBehaviourPunCallbacks
         if (action.actionId == 0)
             return;
         action.hasOtherExecutedSinceInsertion = false;
-        action.InitializeEffects();
+     //   action.InitializeEffects();
         players[actorNum].defense = action.defense;
 
     }
@@ -592,7 +597,7 @@ public class Overmind : MonoBehaviourPunCallbacks
 
         yield return afterHook((actorNum, action), HookType.Activate);
 
-        GuardOrCounter.ProcessHook(HookType.Counter, GetOtherPlayerNumber(actorNum), myrightNextAction, actorNum, null, null);
+        GuardOrCounter.ProcessHook(HookType.Counter, GetOtherPlayerNumber(actorNum), myrightNextAction, actorNum, action, null);
         yield return afterHook((GetOtherPlayerNumber(actorNum), GuardOrCounter), HookType.Counter);
 
         //nth 액션이랑 비교해서 순서대로 실행하기 
@@ -693,6 +698,8 @@ public class Overmind : MonoBehaviourPunCallbacks
     [PunRPC]
     void RPC_ReceiveSelection(int actorNumber, string actionjson, int cost)
     {
+
+        players[actorNumber].actionClockManuplate = 0;
         var action = JsonConvert.DeserializeObject<ActionData>(actionjson);
         pendingSelections[actorNumber] = (action, cost);
     }
@@ -857,9 +864,11 @@ public class Overmind : MonoBehaviourPunCallbacks
     [PunRPC]
     void RPC_ReceiveTile(int actorNum, string tileListJson)
     {
-        List<int> deser =  JsonConvert.DeserializeObject<List<int>>(tileListJson);
-        pendingTiles.Add((actorNum, deser));
 
+        Debug.Log($"[Master] RPC_ReceiveTile 호출됨! actorNum={actorNum}, tileList={tileListJson}");
+        List<int> deser = JsonConvert.DeserializeObject<List<int>>(tileListJson);
+        pendingTiles.Add((actorNum, deser));
+        Debug.Log($"[Master] pendingTiles.Count={pendingTiles.Count}");
 
     }
 
@@ -869,7 +878,7 @@ public class Overmind : MonoBehaviourPunCallbacks
     {
         int opCost = GetMinOpponentRemainingCost(Nowhooker.actorNum);
 
-        if (!Nowhooker.action.effects.Any(effect => effect.hookType == h))
+        if (!Nowhooker.action.effects.Any(effect => effect.hookType == h)) //이거 왜 들어갔더라 시발.. 이제 슬 기억이 나지 않는다. . .   .
             yield break;
         //대처 처리 함수 길어서 함수로 묶음 , 액션 큐를 훑으면서 발동된 액션 외의 액터 넘버의 액션들에 대해 카운터 호출
         //   MasterCounterEveryResultCalc(next.action, next.actorNumber);

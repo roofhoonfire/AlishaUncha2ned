@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
@@ -24,12 +25,13 @@ public class Card
     public int tileType;
     public int zoneIndex;
     public int energy;
+    public int damage;
 
     public string cardText;
 }
 public enum HookType { Activate, Priority, IQA, Counter, Guard ,BeforeRumble, RumbleWin, RumbleLose, Combo, Support }
-public enum EffectType { Damage, Move, Heal, StackDamage,  GetDefense, DamageMeBangMoo, AddDamage, OpNextActionisMoveFlagOn,
-    whenDamagedFlagOn, NotRumbleFlagOn, ReplaceNextOpsMovetoStun, StunRecovery, SelectActionClockChange, UseEnergy}
+public enum EffectType { Damage, whenAttackedFlagOn, Move, Heal, StackDamage,  GetDefense, DamageMeBangMoo, AddDamage, MoveToSelectedTile, OpNextActionisMoveFlagOn,
+    whenDamagedFlagOn, NotRumbleFlagOn, ReplaceNextOpsMovetoStun, StunRecovery, SelectActionClockChange, UseEnergy, ReduceMyNextTurnActionClock}
 
 
 public class CardEffect
@@ -72,11 +74,11 @@ public class CardEffect
             case EffectType.Damage:
                 // actorId가 공격자, opponent.ownerId가 피해 대상이라 가정
                 CardAction.Instance.DealDamage(actorNum, oppActorNum, myAction, amount, myAction.effectTiles, rightnextopponent, rightnowOP);
-                Debug.Log($"플레이어 {actorNum}이 플레이어{oppActorNum}에게 {amount}의 피해를 입힌다");
+                Debug.Log($"플레이어 {actorNum}이 플레이어{oppActorNum}에게 {myAction.damage}의 피해를 입힌다");
                 break;
             case EffectType.StackDamage: //피해 저장하는 대처 같은 넘
                 CardAction.Instance.StackDamage(actorNum, myAction);
-                Debug.Log($"플레이어 {actorNum}이 {myAction.plusAlpha}의 피해를 저장한다");
+                Debug.Log($"플레이어 {actorNum}의 데미지 업데이트 : {myAction.damage}");
                 break;
             case EffectType.GetDefense:
                 CardAction.Instance.GetDefense(actorNum, myAction, amount);
@@ -93,15 +95,7 @@ public class CardEffect
                 Debug.Log($"플레이어 {actorNum}이 {amount}를 추가 피해 하려고한다");
                 break;
 
-            case EffectType.whenDamagedFlagOn:
-                if (Overmind.Instance.players[actorNum].prevHP == Overmind.Instance.players[actorNum].HP)
-                {
-                    Debug.Log($"플레이어 {actorNum}이 처맞지 않았기 때문에 플래그는 추가 되지 않는다");
-                    break;
-                }
-                CardAction.Instance.FlagOn(actorNum, myAction, amount);
-                Debug.Log($"플레이어 {actorNum}이 처맞았기 때문에 플래그 {amount}가 추가된다");
-                break;
+    
 
             case EffectType.NotRumbleFlagOn:
                 if (rightnowOP == null) { 
@@ -140,6 +134,64 @@ public class CardEffect
             case EffectType.UseEnergy:
                 Overmind.Instance.players[actorNum].energy -= amount;
                 Debug.Log($"[플레이어 {actorNum}] energy now {Overmind.Instance.players[actorNum].energy} ");
+                break;
+            case EffectType.ReduceMyNextTurnActionClock:
+                
+                CardAction.Instance.ReduceMyNExtTurnActionClock(actorNum, amount);
+                Debug.Log($"플레리어 {actorNum}의 다음 턴 메인 액션의 캐스팅이이 {amount}만큼 줄어든다]");
+                break;
+
+            case EffectType.MoveToSelectedTile:
+                int tileIndex = myAction.effectTiles[amount]; //어마운트 번째 인덱스의 타일로 슝좍한다~
+                myAction.destindex = tileIndex; 
+                CardAction.Instance.MoveToSelectedTile(actorNum, tileIndex);
+                Debug.Log($"공중 강습이다!");
+
+                break;
+            case EffectType.whenAttackedFlagOn:
+                bool found = false;
+                foreach (var tile in rightnowOP.effectTiles)
+                {
+                    if (tile == LocalState.Instance.localPlayers[actorNum].curpos)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (found)
+                {
+                    CardAction.Instance.FlagOn(actorNum, myAction, amount);
+                    Debug.Log($"플레이어 {actorNum}이 처맞았기 때문에 플래그 {amount}가 추가된다");
+                }
+                else
+                {
+                    Debug.Log($"플레이어 {actorNum}의 위치는 공격 범위에 없으므로 플래그 추가 안 함");
+                }
+                break;
+
+            case EffectType.whenDamagedFlagOn:
+                bool damaged = false;
+                foreach (var tile in rightnowOP.effectTiles)
+                {
+                    if (tile == LocalState.Instance.localPlayers[actorNum].curpos)
+                    {
+                        //액션마다 데미지를 넣자 
+                        if (rightnowOP.damage > myAction.defense)
+                            damaged = true;
+                        break;
+                    }
+                }
+
+                if (damaged)
+                {
+                    CardAction.Instance.FlagOn(actorNum, myAction, amount);
+                    Debug.Log($"플레이어 {actorNum}이 피해를 입었기 때무네 때문에 플래그 {amount}가 추가된다");
+                }
+                else
+                {
+                    Debug.Log($"플레이어 {actorNum}의 위치는 공격 범위에 없으므로 플래그 추가 안 함");
+                }
                 break;
 
         }
