@@ -74,9 +74,23 @@ public class LocalState : MonoBehaviour
                 localData.isStunned = masterData.isStunned;
                 localData.actionClockManuplate = masterData.actionClockManuplate;
                 localData.defenseManuplate  = masterData.defenseManuplate;
-                localData.timeBombSetinTomMotion    =       masterData  .timeBombSetinTomMotion; 
-                // 덱 정보도 완전히 교체
-               // localData.DeckCodes = new List<string>(masterData.DeckCodes);
+                localData.timeBombSetinTomMotion    =       masterData  .timeBombSetinTomMotion;
+                localData.boundIndex = masterData.boundIndex;
+
+
+                //수치 업뎃//
+                localData.defaultMove = masterData.defaultMove; 
+                localData.defaultMoveCast   = masterData.defaultMoveCast;   
+
+
+
+                //손패 업뎃
+                localData.DeckCodes = new List<string>(masterData.DeckCodes);
+
+                localData.hands = new List<string>(masterData.hands);
+
+                localData.trash = new List<string>(masterData.trash);
+
             }
             else
             {
@@ -117,7 +131,11 @@ public class LocalState : MonoBehaviour
                 player.HP
             )
             {
-                curpos = player.curpos
+                curpos = player.curpos,
+                hands = player.hands,
+                trash = player.trash,
+
+                
             };
         }
 
@@ -198,6 +216,8 @@ public class LocalState : MonoBehaviour
 
     public void StartChooseMovePhase(int actorNumber)
     {
+
+        Debug.Log($"이번턴의 제약은 {localPlayers[actorNumber].Bounds[localPlayers[actorNumber].boundIndex]}");
         // 이미 대기 중이면 중단
         if (_chooseMoveRoutine != null)
             StopCoroutine(_chooseMoveRoutine);
@@ -449,6 +469,12 @@ public class LocalState : MonoBehaviour
 
         // 그중 최솟값 반환
         return opponentCosts.Min();
+    }
+
+    public void SelectJuju(int actorNum, string boundCode)
+    {
+        JujuSelectModeState.Instance.SetActive(true, actorNum, boundCode);
+
     }
    
 }

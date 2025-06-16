@@ -11,13 +11,13 @@ using JetBrains.Annotations;
 using System.Reflection;
 using Unity.VisualScripting;
 using UnityEditor;
+using System.Runtime.ExceptionServices;
 
 public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 SyncPartial 업뎃 해야함
 {
     public int ActorNumber;
     public int prevHP;
     public int HP;//currentHp
-    public List<string> DeckCodes;
     public int curpos;
     public int deckIndexStart; //몇번째 카드 부터 
     public int deckIndexEnd; //이 덱 정보는 지금 로컬에서만 관리되고 마스터로 보내주진않음 
@@ -32,6 +32,38 @@ public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 
     public int defenseManuplate = 0;
     public int timeBombSetinTomMotion = 0;
 
+    public List<string> Bounds ; //바운드 아이디의 리스투이돵돠라돵돵
+    public int boundIndex = 0;
+
+
+
+    //수치관련//
+
+    public int defaultMove = 3;
+    public int defaultMoveCast = 99;
+
+
+    //summary//
+    public int damageDealtThisCycle = 0;
+    public int actionUsedHowmany = 0;
+    public List<int> actionClockDiffer = new ();
+    public bool moved = false;
+
+    //summary//
+    //덱관련//
+
+    public List<string> DeckCodes;
+    public List<string> hands;
+    public List<string> trash;
+    public int handsJangSoo = 5;
+
+    //summary//
+    //주술 관련
+
+    public List<string> JujuCode;
+
+
+
 
     public PlayerData(int actorNumber, List<string> deckCodes, int initialHP = 100)
     {
@@ -43,6 +75,9 @@ public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 
         defense = 0;
         energy = 3;
 
+        //기찮으므로로로로루뢰뢰
+        Bounds = new List<string> {"b1", "b3", "b4","b5","b6","b7","b8" };
+        JujuCode = new List<string> { "j1", "j2", "j3", "j4" };
     }
 }
 
@@ -128,6 +163,7 @@ public class ActionData //여기 뭐 추가할 거면 carddragHandler로 수정�
             {
                 Overmind.Instance.players[actorNum].defense = myRightNextMove.defense;
             }
+            
         }
     }
 }
@@ -290,6 +326,21 @@ public class Overmind : MonoBehaviourPunCallbacks
                 deck[i] = deck[j];
                 deck[j] = tmp;
             }
+
+            player.hands = new List<string>();
+            player.trash = new List<string>();
+
+            // 4) handsJangSoo 만큼 카드를 hands에 넣고 deck에서 제거
+            int drawCount = Math.Min(player.handsJangSoo, player.DeckCodes.Count);
+
+            for (int i = 0; i < drawCount; i++)
+            {
+                string drawnCard = player.DeckCodes[0];
+                player.DeckCodes.RemoveAt(0);
+                player.hands.Add(drawnCard);
+            }
+
+            Debug.Log($"[InitGame] Player {player.ActorNumber}: hands({player.hands.Count}), deck({player.DeckCodes.Count})");
         }
     }
 
@@ -326,6 +377,12 @@ public class Overmind : MonoBehaviourPunCallbacks
             PhotonNetwork.LocalPlayer.ActorNumber);
     }
 
+
+
+
+
+
+
     [PunRPC]
     public void RPC_NotifySyncComplete(int actorNumber)
     {
@@ -343,7 +400,12 @@ public class Overmind : MonoBehaviourPunCallbacks
     IEnumerator FaceOff()
     {
         faceOffCount++;
-        UpdateCycleState(0);
+        yield return UpdateCycleState(0);
+        //주술을 선택한 후에 기다려야하기 때문에~~
+
+       
+
+
         // Begin selection for all players
         pendingSelections.Clear();
         foreach (int actor in players.Keys)
@@ -453,7 +515,10 @@ public class Overmind : MonoBehaviourPunCallbacks
 
                 //다음 액션 뽑고
                 var next = actionQueue[0];
-                UpdateCycleState(next.actorNumber);
+                yield return UpdateCycleState(next.actorNumber);
+              
+
+
                 actionQueue.RemoveAt(0);
 
                 //선공 대처 결정
@@ -576,6 +641,7 @@ public class Overmind : MonoBehaviourPunCallbacks
     IEnumerator MasterActionCalc(int actorNum, ActionData GuardOrCounter, ActionData action, ActionData myrightNextAction)
     {
 
+        
         // GuardOrCounter는 현재 행동하는 액터의 상대 액터의 큐에 삽입되있는 바로 다음 액션임
         //action이 지금 발동되는 액션
         
@@ -590,7 +656,15 @@ public class Overmind : MonoBehaviourPunCallbacks
 
             action.ProcessHook(HookType.Activate, actorNum, GuardOrCounter, GetOtherPlayerNumber(actorNum), null, myrightNextAction);//다음 플레이어의 액션을 넘겨주는건 추가 함수 작성하자
 
+            
+        //제약 체크 용//
+        if (action.actionId == 0)
 
+        {
+
+            players[actorNum].moved = true;
+            Debug.Log($"제약 : 플레이어 {actorNum}는 움직엿다잉");
+        }
 
             //
             
@@ -675,10 +749,16 @@ public class Overmind : MonoBehaviourPunCallbacks
     //이게 로컬 스테이트에서 실행되어야한다
     public void SubmitSelection(ActionData action, int cost)
     {
-        string json = JsonConvert.SerializeObject(action);
 
+        //이거근데 핸드 트래쉬 덱은 불필요한 지랄임 어차피 다 들어감
+        int actorNum = PhotonNetwork.LocalPlayer.ActorNumber;
+        var playerData = LocalState.Instance.localPlayers[actorNum];
+        string actionjson = JsonConvert.SerializeObject(action);
+        string handjson = JsonConvert.SerializeObject(playerData.hands);
+        string trashjson = JsonConvert.SerializeObject(playerData.trash);
+        string deckjson = JsonConvert.SerializeObject(playerData.DeckCodes);
         photonView.RPC(nameof(RPC_ReceiveSelection), RpcTarget.MasterClient,
-            PhotonNetwork.LocalPlayer.ActorNumber, json, cost);
+            actorNum, actionjson, cost, handjson,trashjson, deckjson);
     }
 
     public void SubmintRenderingDone(int actorNumber)
@@ -696,12 +776,49 @@ public class Overmind : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    void RPC_ReceiveSelection(int actorNumber, string actionjson, int cost)
+    void RPC_ReceiveSelection(int actorNumber, string actionjson, int cost, string handjson, string trashjson, string deckjson)
     {
 
         players[actorNumber].actionClockManuplate = 0;
         var action = JsonConvert.DeserializeObject<ActionData>(actionjson);
+        var hand = JsonConvert.DeserializeObject<List<string>>(handjson);
+
+        var trash = JsonConvert.DeserializeObject<List<string>>(trashjson);
+        var deck = JsonConvert.DeserializeObject<List<string>>(deckjson);
+
+        //신경 쓰이면 뉴 리스트로 해도 된다 하지만 어차피  ㅋ 
+        players[actorNumber].DeckCodes = deck;
+        players[actorNumber].hands = hand;
+        players[actorNumber].trash = trash;
+
+
+
+
+
         pendingSelections[actorNumber] = (action, cost);
+        if(action.actionId != 0)
+        {
+            //summary//
+            //제약 체크 용도//
+            ////
+            players[actorNumber].actionUsedHowmany++;
+
+            int opActorNum = GetOtherPlayerNumber(actorNumber);
+
+            int maxRemainingCost = actionQueue
+                .Where(entry => entry.actorNumber == opActorNum)
+                 .Select(entry => entry.remainingCost)
+                .DefaultIfEmpty(0) // 없을 때 0 리턴
+                .Max();
+
+            int diff = Mathf.Abs(maxRemainingCost - action.actionClock);
+
+
+            players[actorNumber].actionClockDiffer.Add(diff);
+
+            Debug.Log($"제약 : 플레이어 {actorNumber}의 {players[actorNumber].actionUsedHowmany}와 {players[actorNumber].actionClockDiffer}");
+        }
+        
     }
 
     [PunRPC]
@@ -800,9 +917,9 @@ public class Overmind : MonoBehaviourPunCallbacks
                     howmany++;
            }
        }
-        
+        Debug.Log("타일선택하라고 RPC를 모두 잘 보냈다 후후");
         yield return new WaitUntil(() => pendingTiles.Count == howmany);
-
+        Debug.Log("근데 여기가 안온다 씨발");
 
 
         foreach (var (actorNum, tiles) in pendingTiles)
@@ -934,10 +1051,16 @@ public class Overmind : MonoBehaviourPunCallbacks
 
     }
 
+    public void  SyncDone()
+    {
+        syncCount++;
+
+    }
+
     [PunRPC]
     void RPC_SyncDone(int actorNumber)
     {
-        syncCount++;
+        SyncDone();
 
     }
 
@@ -1295,12 +1418,12 @@ public class Overmind : MonoBehaviourPunCallbacks
         string queueJson = JsonConvert.SerializeObject(simpleQueue);
         return queueJson;
     }
-    private void UpdateCycleState(int newState) {
+    IEnumerator UpdateCycleState(int newState) {
 
         if (cycleState == -1)
         {
             cycleState = newState;
-            return;
+            yield break;
         }
 
         if (cycleState != newState)
@@ -1322,10 +1445,27 @@ public class Overmind : MonoBehaviourPunCallbacks
                 players[newState].energy++;
                 players[newState].canMove = true;
             }
+
+
+
+            //여기서 cycleState에 대해서 boundchecker호출!@!
+
+            if(cycleState != 0)
+            {
+
+                BoundChecker.BoundCheck(cycleState);
+                yield return new WaitUntil(() => syncCount == 2);
+
+                syncCount = 0;
+
+            }
+
+            BoundChecker.BoundParamReset();
+
         }
         else
         {
-            if (newState == 0)
+            if (newState == 0) //페이스오프 이후 즉시 격돌한 경우  
             {
                 players[1].energy++;
                 players[1].canMove = true;
@@ -1334,5 +1474,95 @@ public class Overmind : MonoBehaviourPunCallbacks
             }
         }
             cycleState = newState;
+    }
+
+
+
+
+    public void CallRPCJuju(int actorNum, string boundCode)
+    {
+        photonView.RPC(nameof(RPC_SelectJuju), RpcTarget.All, actorNum, boundCode);
+
+
+    }
+
+
+
+
+
+    [PunRPC]
+
+
+    void RPC_SelectJuju(int actorNum, string boundCode)
+    {
+        if (actorNum == PhotonNetwork.LocalPlayer.ActorNumber)
+        {
+            LocalState.Instance.SelectJuju(actorNum, boundCode);
+        }
+
+
+
+        else
+        {
+            SubmitJuju(actorNum);
+
+
+        }
+    }
+
+
+    [PunRPC]
+    void RPC_ReceiveJuju(string playerJson, int actorNum    )
+    {
+
+
+
+        var data = JsonConvert.DeserializeObject<PlayerData>(playerJson);
+
+        players[actorNum].HP = data.HP;
+        players[actorNum].curpos = data.curpos;
+        players[actorNum].defense = data.defense; //레이스 컨디션 . . 
+        players[actorNum].prevHP = data.prevHP;
+        players[actorNum].energy = data.energy;
+        players[actorNum].canMove = data.canMove;
+        players[actorNum].isStunned = data.isStunned;
+        players[actorNum].actionClockManuplate = data.actionClockManuplate;
+        players[actorNum].defenseManuplate = data.defenseManuplate;
+        players[actorNum].timeBombSetinTomMotion = data.timeBombSetinTomMotion;
+        players[actorNum].boundIndex = data.boundIndex;
+
+
+        //수치 업뎃//
+        players[actorNum].defaultMove = data.defaultMove;
+        players[actorNum].defaultMoveCast = data.defaultMoveCast;
+
+
+
+        //손패 업뎃
+        players[actorNum].DeckCodes = new List<string>(data.DeckCodes);
+
+        players[actorNum].hands = new List<string>(data.hands);
+
+        players[actorNum].trash = new List<string>(data.trash);
+
+        syncCount++;
+
+
+    }
+
+    public void SubmitJuju(int actorNum)
+
+
+
+    {
+
+        var playerData = LocalState.Instance.localPlayers[actorNum];
+        string playerJson = JsonConvert.SerializeObject(playerData);
+
+        photonView.RPC(nameof(RPC_ReceiveJuju), RpcTarget.MasterClient, playerJson, actorNum );
+
+        
+
+
     }
 }

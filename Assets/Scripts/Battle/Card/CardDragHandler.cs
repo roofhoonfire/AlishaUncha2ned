@@ -43,6 +43,7 @@ public class CardDragHandler : MonoBehaviour,
     // Tile highlighting
     private List<int> prevHighlighted = new List<int>();
 
+    private int actorNum;
     
     private void Awake()
     {
@@ -60,9 +61,9 @@ public class CardDragHandler : MonoBehaviour,
         if (zone != null)
             dropZone = zone.GetComponent<RectTransform>();
 
-        int actor = PhotonNetwork.LocalPlayer.ActorNumber;
-        myChara = LocalState.Instance?.PlayerObDic[actor];
-        playerCoord = GridManagement.Instance.GetCoordFromIndex(LocalState.Instance.localPlayers[actor].curpos);
+        actorNum =  PhotonNetwork.LocalPlayer.ActorNumber;
+        myChara = LocalState.Instance?.PlayerObDic[actorNum];
+        playerCoord = GridManagement.Instance.GetCoordFromIndex(LocalState.Instance.localPlayers[actorNum].curpos);
 
     
     }
@@ -112,6 +113,8 @@ public class CardDragHandler : MonoBehaviour,
 
         else //카드 내려놓기
         {
+            var player = LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber];
+
             if (thisCardData.cardType == 0)
             {
                 CardModeState.Instance.curAction.actionId = 1;
@@ -128,39 +131,69 @@ public class CardDragHandler : MonoBehaviour,
                 CardDragDropRendering();
 
 
-                //
+                //이건 매 턴마다 초기화 되는 것이 맞기 때문!!//
+                //저것도 디펄트 값을 player에 넣어놔서 초기화 되게꿈 하자 흐하핳!//
                 LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].actionClockManuplate = 0;
 
+
+                if (player.hands.Contains(thisCardData.code))
+                {
+                    player.hands.Remove(thisCardData.code);
+                    player.trash.Add(thisCardData.code);
+
+                    Debug.Log($"[CardPlayed] Card '{thisCardData.code}' moved from Hand to Trash.");
+                }
+                else
+                {
+                    Debug.LogWarning($"[CardPlayed] Tried to remove '{thisCardData.code}' but it was not in Hand!");
+                }
 
                 CardModeState.Instance.StopSelectCardLoop(CardModeState.Instance.curAction);
                // CardModeState.Instance.InitBuffer(); // 여기에!
             }
             else if (thisCardData.cardType == 1) {
-                if (LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy < thisCardData.energy)
+              /*  if (LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy < thisCardData.energy)
                 {
                     Debug.Log("Not enogh energ");
                     rectTransform.DOAnchorPos(originalAnchoredPos, 0.25f).SetEase(Ease.OutQuad);
                     transform.DOScale(originalScale, 0.25f).SetEase(Ease.OutQuad);
                     uiImage.sprite = defaultSprite;
-                }
-                else
-                {
+                }*/
+               //else
+                //{
                     LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy -= thisCardData.energy; 
                     CardModeState.Instance.curAction.effects.AddRange(CardDEffectDatabase.GetEffects(thisCardData.code));
+                    
                     CardDragDropRendering();
+                   
+                    //발동한 카드 손패에서 제거 코드
+                    if (player.hands.Contains(thisCardData.code))
+                    {
+                        player.hands.Remove(thisCardData.code);
+                        //player.trash.Add(thisCardData.code);
+
+                        Debug.Log($"[CardPlayed] Card '{thisCardData.code}' moved from Hand to Trash.");
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[CardPlayed] Tried to remove '{thisCardData.code}' but it was not in Hand!");
+                    }
+                    
+                    
                     Destroy(gameObject);
-                }
+                //}
             }
+            //나중에 에너지 관련 싹다 없애면됨 ㅎ. 
             else if (thisCardData.cardType == 2)
             {
-                if (LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy < thisCardData.energy)
-                {
-                    Debug.Log("Not enogh energ");
-                    rectTransform.DOAnchorPos(originalAnchoredPos, 0.25f).SetEase(Ease.OutQuad);
-                    transform.DOScale(originalScale, 0.25f).SetEase(Ease.OutQuad);
-                    uiImage.sprite = defaultSprite;
-                }
-                else {
+               // if (LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy < thisCardData.energy)
+               // {
+                 //   Debug.Log("Not enogh energ");
+                   // rectTransform.DOAnchorPos(originalAnchoredPos, 0.25f).SetEase(Ease.OutQuad);
+                    //transform.DOScale(originalScale, 0.25f).SetEase(Ease.OutQuad);
+                    //uiImage.sprite = defaultSprite;
+               // }
+               // else {
                     var effectsList = CardDEffectDatabase.GetEffects(thisCardData.code);
                     LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy -= thisCardData.energy;
                     foreach (var e in effectsList)
@@ -177,8 +210,23 @@ public class CardDragHandler : MonoBehaviour,
                         }
                     }
                     CardDragDropRendering();
+
+
+                    //발동한 카드 손패에서 제거 코드
+                    if (player.hands.Contains(thisCardData.code))
+                    {
+                        player.hands.Remove(thisCardData.code);
+                        //player.trash.Add(thisCardData.code);
+
+                        Debug.Log($"[CardPlayed] Card '{thisCardData.code}' moved from Hand to Trash.");
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[CardPlayed] Tried to remove '{thisCardData.code}' but it was not in Hand!");
+                    }
+
                     Destroy(gameObject);
-                }
+                //}
                 
             }
             

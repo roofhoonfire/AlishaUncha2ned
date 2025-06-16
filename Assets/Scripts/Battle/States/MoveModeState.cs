@@ -15,6 +15,7 @@ public class MoveModeState : MonoBehaviour
     private EachTile selectedTile = null;
     private Coroutine _selectDestCoroutine;
     public GameObject alim;
+    private int actorNum;
     private static readonly Vector3Int[] directions = new Vector3Int[]
     {
         new Vector3Int(-1, 0, 1),  // 좌상
@@ -53,13 +54,13 @@ public class MoveModeState : MonoBehaviour
     }
     private void TilePreprocessing()
     {
-        int myActorNum = Photon.Pun.PhotonNetwork.LocalPlayer.ActorNumber;
-        int startIndex = LocalState.Instance.localPlayers[myActorNum].curpos;
-        int energy = LocalState.Instance.localPlayers[myActorNum].energy;
+        actorNum = Photon.Pun.PhotonNetwork.LocalPlayer.ActorNumber;
+        int startIndex = LocalState.Instance.localPlayers[actorNum].curpos;
+        int energy = LocalState.Instance.localPlayers[actorNum].energy;
 
         GridManagement.Instance.HighlightReachableTilesFrom(
             startIndex,
-            energy,
+            LocalState.Instance.localPlayers[actorNum].defaultMove,
             Color.cyan,
             "Move"// 이동 가능 타일
         );
@@ -187,8 +188,10 @@ public class MoveModeState : MonoBehaviour
                     };
                     CardEffect moveEffect = new CardEffect(HookType.Activate, EffectType.Move, destinationIndex, 0);
                     action.effects.Add(moveEffect);
+                    int actualCost = Mathf.Min(distance, LocalState.Instance.localPlayers[actorNum].defaultMoveCast);
 
-                    Overmind.Instance?.SubmitSelection(action, distance);
+                    
+                    Overmind.Instance?.SubmitSelection(action, actualCost);
 
                     isActive = false;
                     hoveredTile = null;

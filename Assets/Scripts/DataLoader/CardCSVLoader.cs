@@ -32,6 +32,11 @@ public class CardCSVLoader : MonoBehaviour //이자식은 카드의 메타데이터 //나중에
         runtimeCardSO = CardMetaDatabase.LoadMetaFromCSV(); //메타 데이터 로드
 
         Debug.Log($"[CardCSVLoader] 런타임 카드 SO 생성 완료 - 총 {runtimeCardSO.cards.Length}장");
+
+
+        BoundLoader.LoadBoundsFromCSV(Resources.Load<TextAsset>("Bound"));
+
+        JujuLoader.LoadJujuFromCSV(Resources.Load<TextAsset>("Juju"));
     }
 
     public Card GetCardByCode(string code)

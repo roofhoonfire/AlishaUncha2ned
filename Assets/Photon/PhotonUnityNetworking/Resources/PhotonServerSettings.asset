@@ -55,6 +55,9 @@ MonoBehaviour:
   - RPC_ChooseTile
   - RPC_ReceiveTile
   - RPC_JustCostRendering
+  - ReceiveJuju
+  - RPC_SelectJuju
+  - RPC_ReceiveJuju
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

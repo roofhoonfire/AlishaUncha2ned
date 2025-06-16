@@ -1,0 +1,9 @@
+#boundId,boundName,Sprite,Text,boundPoint,amount,boundType
+b1,집중마크,,이번 싸이클이 끝날 때 상대와의 거리가 1이어야 합니다 ,2,1,DistanceShouldBe
+b2,미래 예지,,이번 싸이클에서 액션은 피격 범위를 미리 선택해야 합니다,2,0,PreTile
+b3,자신만만,,이번 싸이클의 마지막 액션은 방어도가 0이어야 합니다,2,0,DefenseShouldBe
+b4,파시피스트,,이번 싸이클에서 상대에게 피해를 줘선 안됩니다,2,0,DamageShouldBe
+b5,과소비,,이번 싸이클에서 2장의 액션을 발동해야합니다,2,2,CardUsedShouldBe
+b6,히트앤런,,이번 싸이클이 끝날 때 이동을 예약해놔라 ,2,0,LastActionShouldBe
+b7,페어인어프,,이번 싸이클 동안 상대의 다음 액션과 차이가 3 이상인 액션만 내려야 합니다,2,3,ActionClockDifferenceShouldBe
+b8,요지부동,,이번 싸이클 동안 움직여선 안됩니다,2,0,YouShouldHaveMoved

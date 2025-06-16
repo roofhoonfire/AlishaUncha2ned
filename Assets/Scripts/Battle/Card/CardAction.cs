@@ -104,8 +104,13 @@ public class CardAction : MonoBehaviour
             if (tile == Overmind.Instance.players[OppActorNum].curpos)
             {
                 Overmind.Instance.players[OppActorNum].prevHP = Overmind.Instance.players[OppActorNum].HP;
-                if (myaction.damage - reduceDamage>0)
+                if (myaction.damage - reduceDamage > 0)
+                {
                     Overmind.Instance.players[OppActorNum].HP -= (myaction.damage - reduceDamage);
+                    //summary//
+                    //데미지 제약 체커//
+                    Overmind.Instance.players[actorNum].damageDealtThisCycle += (myaction.damage - reduceDamage);
+                }
                 break;
 
             }

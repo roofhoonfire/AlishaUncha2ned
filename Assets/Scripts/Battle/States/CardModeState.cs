@@ -156,6 +156,55 @@ public class CardModeState : MonoBehaviour
         spawnedCards.Clear(); // 이전 것들 제거
 
         var actor = PhotonNetwork.LocalPlayer.ActorNumber;
+        var player = LocalState.Instance.localPlayers[actor];
+
+        // 부족한 만큼 덱에서 뽑기
+        int neededCount = player.handsJangSoo - player.hands.Count;
+
+        for (int i = 0; i < neededCount; i++)
+        {
+            if (player.DeckCodes.Count == 0)
+            {
+                // 덱이 비었으면 trash에서 refill 시도
+                RefillDeckFromTrash(player);
+
+                // refill 후에도 비어 있으면 더 이상 뽑을 수 없음
+                if (player.DeckCodes.Count == 0)
+                {
+                    Debug.LogWarning("[PopulateCards] Deck is empty even after refill.");
+                    break;
+                }
+            }
+            // 덱에서 한 장 뽑아서 hands에 추가
+            string drawnCard = player.DeckCodes[0];
+            player.DeckCodes.RemoveAt(0);
+            player.hands.Add(drawnCard);
+        }
+
+        // hands의 카드 코드들로 카드 오브젝트 Instantiate
+        foreach (string code in player.hands)
+        {
+            var cardGO = Instantiate(cardPrefab, cardContentArea);
+            spawnedCards.Add(cardGO); // 참조 저장
+
+            var info = cardGO.GetComponent<EachCardInfo>();
+            if (info == null)
+            {
+                Debug.LogWarning("EachCardInfo 컴포넌트가 없습니다!");
+                continue;
+            }
+
+            info.cardData = CardCSVLoader.Instance.GetCardByCode(code);
+            info.ApplyCardData();
+        }
+
+        Debug.Log($"[PopulateCards] Player {actor}: Hands = {player.hands.Count}, Deck = {player.DeckCodes.Count}");
+
+
+
+        /* spawnedCards.Clear(); // 이전 것들 제거
+
+        var actor = PhotonNetwork.LocalPlayer.ActorNumber;
         var deck = LocalState.Instance.localPlayers[actor].DeckCodes;
         int deckIndex = LocalState.Instance.localPlayers[actor].deckIndexStart;
 
@@ -182,6 +231,7 @@ public class CardModeState : MonoBehaviour
         }
 
         LocalState.Instance.localPlayers[actor].deckIndexStart = endIndex;
+   */
     }
 
 
@@ -196,4 +246,42 @@ public class CardModeState : MonoBehaviour
             Destroy(child.gameObject);
         }
     }
+
+
+
+    //여기서 주술 카드는 안뽑게 만들어야함 ㅎ ㅎ .ㅎ .ㅎ .ㅎ .ㅎ .
+    private void RefillDeckFromTrash(PlayerData player)
+    {
+        if (player.trash.Count == 0)
+        {
+            Debug.Log("[RefillDeckFromTrash] Trash is empty, cannot refill deck.");
+            return;
+        }
+
+        // Trash → DeckCodes로 이동
+        player.DeckCodes.AddRange(player.trash);
+        player.trash.Clear();
+
+        // Shuffle
+        Shuffle(player.DeckCodes);
+
+        Debug.Log($"[RefillDeckFromTrash] Deck refilled with {player.DeckCodes.Count} cards.");
+
+
+    }
+
+    private void Shuffle(List<string> list)
+    {
+        System.Random rng = new System.Random();
+        int n = list.Count;
+
+        for (int i = n - 1; i > 0; i--)
+        {
+            int j = rng.Next(i + 1);
+            string tmp = list[i];
+            list[i] = list[j];
+            list[j] = tmp;
+        }
+    }
+
 }

@@ -79,7 +79,7 @@ public static class CardMetaDatabase // 이름은 데이터 베이스지만 실제 메타 데이�
         }
     }
 
-    private static Sprite LoadSprite(string spritePath)
+    public static Sprite LoadSprite(string spritePath)
     {
         if (string.IsNullOrWhiteSpace(spritePath))
             return null;

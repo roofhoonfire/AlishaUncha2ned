@@ -26,7 +26,7 @@ public static class CardDEffectDatabase
 
             if (!effectDataBase.ContainsKey(cardId))
                 effectDataBase[cardId] = new List<CardEffect>();
-           effectDataBase[cardId].Add(new CardEffect(hook, et, amt,pla)); //이거 주석 왜 되잇냐
+           effectDataBase[cardId].Add(new CardEffect(hook, et, amt,pla)); //이거 주석 왜 되잇냐 // <==먼소리지 
         }
     }
 
@@ -37,7 +37,7 @@ public static class CardDEffectDatabase
 
 
 
-    private static int TryParseInt(string value, int defaultValue) //이거 Csvloader.cs에 중복, 나중에 합치던가
+    public static int TryParseInt(string value, int defaultValue) //이거 Csvloader.cs에 중복, 나중에 합치던가
     {
         return int.TryParse(value, out int result) ? result : defaultValue;
     }
