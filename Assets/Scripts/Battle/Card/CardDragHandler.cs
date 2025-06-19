@@ -63,7 +63,7 @@ public class CardDragHandler : MonoBehaviour,
 
         actorNum =  PhotonNetwork.LocalPlayer.ActorNumber;
         myChara = LocalState.Instance?.PlayerObDic[actorNum];
-        playerCoord = GridManagement.Instance.GetCoordFromIndex(LocalState.Instance.localPlayers[actorNum].curpos);
+        playerCoord = GridManagement.Instance.GetCoordFromIndex(LocalRenderingStatic.localRenderingDatas[actorNum].curpos);
 
     
     }
@@ -113,89 +113,54 @@ public class CardDragHandler : MonoBehaviour,
 
         else //카드 내려놓기
         {
-            var player = LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber];
-
+            var apData = CardModeState.Instance.apDataRef;
             if (thisCardData.cardType == 0)
             {
                 CardModeState.Instance.curAction.actionId = 1;
-                CardModeState.Instance.curAction.defense = thisCardData.defense;
+                CardModeState.Instance.curAction.defense = Mathf.Max(0,thisCardData.defense +apData.tempDef+apData.permDef ) ;
                 CardModeState.Instance.curAction.rumblePoint = thisCardData.rumblePoint;
                 CardModeState.Instance.curAction.cardcode = thisCardData.code;
                 CardModeState.Instance.curAction.animations = thisCardData.animations;
-                CardModeState.Instance.curAction.actionClock = Mathf.Max(1, thisCardData.actionClock + CardModeState.Instance.actionClockBuffer + LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].actionClockManuplate);
+                CardModeState.Instance.curAction.actionClock = Mathf.Max(apData.CastingMinumum, thisCardData.actionClock + apData.permCast+apData.tempCast);
                 CardModeState.Instance.curAction.cardname = thisCardData.name;
                 CardModeState.Instance.curAction.zoneIndex = thisCardData.zoneIndex;
                 CardModeState.Instance.curAction.tileType = thisCardData.tileType;
                 CardModeState.Instance.curAction.effects.AddRange(CardDEffectDatabase.GetEffects(thisCardData.code));
-                CardModeState.Instance.curAction.damage = thisCardData.damage;
-                CardDragDropRendering();
+                CardModeState.Instance.curAction.damage = Mathf.Max(0,thisCardData.damage + apData.tempDam + apData.permDam);
 
-
-                //이건 매 턴마다 초기화 되는 것이 맞기 때문!!//
-                //저것도 디펄트 값을 player에 넣어놔서 초기화 되게꿈 하자 흐하핳!//
-                LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].actionClockManuplate = 0;
-
-
-                if (player.hands.Contains(thisCardData.code))
-                {
-                    player.hands.Remove(thisCardData.code);
-                    player.trash.Add(thisCardData.code);
-
-                    Debug.Log($"[CardPlayed] Card '{thisCardData.code}' moved from Hand to Trash.");
-                }
-                else
-                {
-                    Debug.LogWarning($"[CardPlayed] Tried to remove '{thisCardData.code}' but it was not in Hand!");
-                }
-
+                btmPacketAdd(thisCardData.code);
                 CardModeState.Instance.StopSelectCardLoop(CardModeState.Instance.curAction);
-               // CardModeState.Instance.InitBuffer(); // 여기에!
             }
             else if (thisCardData.cardType == 1) {
-              /*  if (LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy < thisCardData.energy)
-                {
-                    Debug.Log("Not enogh energ");
-                    rectTransform.DOAnchorPos(originalAnchoredPos, 0.25f).SetEase(Ease.OutQuad);
-                    transform.DOScale(originalScale, 0.25f).SetEase(Ease.OutQuad);
-                    uiImage.sprite = defaultSprite;
-                }*/
-               //else
-                //{
-                    LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy -= thisCardData.energy; 
+              
+                  //  LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy -= thisCardData.energy; 
                     CardModeState.Instance.curAction.effects.AddRange(CardDEffectDatabase.GetEffects(thisCardData.code));
-                    
-                    CardDragDropRendering();
-                   
-                    //발동한 카드 손패에서 제거 코드
-                    if (player.hands.Contains(thisCardData.code))
-                    {
-                        player.hands.Remove(thisCardData.code);
-                        //player.trash.Add(thisCardData.code);
 
-                        Debug.Log($"[CardPlayed] Card '{thisCardData.code}' moved from Hand to Trash.");
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"[CardPlayed] Tried to remove '{thisCardData.code}' but it was not in Hand!");
-                    }
-                    
-                    
-                    Destroy(gameObject);
+                //  CardDragDropRendering();
+
+                //발동한 카드 손패에서 제거 코드
+                /*      if (player.hands.Contains(thisCardData.code))
+                      {
+                          player.hands.Remove(thisCardData.code);
+                          //player.trash.Add(thisCardData.code);
+
+                          Debug.Log($"[CardPlayed] Card '{thisCardData.code}' moved from Hand to Trash.");
+                      }
+                      else
+                      {
+                          Debug.LogWarning($"[CardPlayed] Tried to remove '{thisCardData.code}' but it was not in Hand!");
+                      }
+
+                  */
+                btmPacketAdd(thisCardData.code);
+
+                Destroy(gameObject);
                 //}
             }
             //나중에 에너지 관련 싹다 없애면됨 ㅎ. 
             else if (thisCardData.cardType == 2)
             {
-               // if (LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy < thisCardData.energy)
-               // {
-                 //   Debug.Log("Not enogh energ");
-                   // rectTransform.DOAnchorPos(originalAnchoredPos, 0.25f).SetEase(Ease.OutQuad);
-                    //transform.DOScale(originalScale, 0.25f).SetEase(Ease.OutQuad);
-                    //uiImage.sprite = defaultSprite;
-               // }
-               // else {
                     var effectsList = CardDEffectDatabase.GetEffects(thisCardData.code);
-                    LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy -= thisCardData.energy;
                     foreach (var e in effectsList)
                     {
                         if (e.hookType == HookType.Support)
@@ -209,23 +174,9 @@ public class CardDragHandler : MonoBehaviour,
                             Debug.Log("support added");
                         }
                     }
-                    CardDragDropRendering();
+                btmPacketAdd(thisCardData.code);
 
-
-                    //발동한 카드 손패에서 제거 코드
-                    if (player.hands.Contains(thisCardData.code))
-                    {
-                        player.hands.Remove(thisCardData.code);
-                        //player.trash.Add(thisCardData.code);
-
-                        Debug.Log($"[CardPlayed] Card '{thisCardData.code}' moved from Hand to Trash.");
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"[CardPlayed] Tried to remove '{thisCardData.code}' but it was not in Hand!");
-                    }
-
-                    Destroy(gameObject);
+                Destroy(gameObject);
                 //}
                 
             }
@@ -233,14 +184,7 @@ public class CardDragHandler : MonoBehaviour,
             
         }
     }
-    private void CardDragDropRendering()
-    {
-        
-        //다른 드래그 드랍애니메이션도
-        LocalState.Instance.mydefense.text = thisCardData.defense.ToString();
-
-
-    }
+    
     public void OnPointerClick(PointerEventData eventData)
     {
         PlayClickScaleAnimation();
@@ -279,5 +223,12 @@ public class CardDragHandler : MonoBehaviour,
                 indices.Add(idx);
         }
         return indices;
+    }
+
+    private void btmPacketAdd(string code)
+    {
+
+        LocalState.Instance.btmPacket.usedCard.Add(code);
+
     }
 }

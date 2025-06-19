@@ -9,6 +9,7 @@ using TMPro;
 using System.Reflection.Emit;
 using System.Linq;
 using UnityEditor.Rendering;
+using Newtonsoft.Json;
 
 public class LocalState : MonoBehaviour
 {
@@ -22,7 +23,8 @@ public class LocalState : MonoBehaviour
     public List<(int actorNumber,  int remainingCost)> localActionQueue =new List<(int actorNumber, int remainingCost)>();
 
     private Coroutine _chooseMoveRoutine;
- 
+    public BacktoMaster btmPacket;
+
 
     private int previousHPMe = 100; //플레이어 데이터에 붙은 prev는 싸이클 체커용이라 별개임
 
@@ -34,7 +36,7 @@ public class LocalState : MonoBehaviour
     public TextMeshPro opdefense;
 
     public TextMeshProUGUI opponencostRemainTxt;
-
+    public TextMeshProUGUI mycostRemainTxt;
 
     public GameObject alim; // 나중엔 걍 애니메이션으로 퉁쳐잇~
   
@@ -67,7 +69,6 @@ public class LocalState : MonoBehaviour
                 PlayerData localData = localPlayers[actorNumber];
                 localData.HP = masterData.HP;
                 localData.curpos = masterData.curpos;
-                localData.defense = masterData.defense;
                 localData.prevHP = masterData.prevHP;
                 localData.energy = masterData.energy;
                 localData.canMove = masterData.canMove;
@@ -118,38 +119,40 @@ public class LocalState : MonoBehaviour
     /// 전체 로컬 상태를 초기화합니다.
     /// (예: Battle 씬 진입 시 초기 동기화용)
     /// </summary>
-    public void SyncAll(Dictionary<int, PlayerData> copiedData)
+    public void GameStart(Dictionary<int, LocalRenderingData> copiedData)
     {
-        localPlayers.Clear();
-
+        LocalRenderingStatic.localRenderingDatas.Clear();
+        List<LocalRenderingData> copies = new List<LocalRenderingData>();
+        int i = 0;
         foreach (var kvp in copiedData)
         {
-            var player = kvp.Value;
-            localPlayers[player.ActorNumber] = new PlayerData(
-                player.ActorNumber,
-                new List<string>(player.DeckCodes),
-                player.HP
-            )
+            LocalRenderingData copied = new LocalRenderingData()
             {
-                curpos = player.curpos,
-                hands = player.hands,
-                trash = player.trash,
-
-                
+                actorNum = kvp.Key,
+                curpos = kvp.Value.curpos,
+                hp = kvp.Value.hp,
+                defense = kvp.Value.defense,
+                bounds = new List<string>(kvp.Value.bounds), // 참조형 필드는 복제
+                remainingCost = kvp.Value.remainingCost,
+                boundIndex = kvp.Value.boundIndex,
             };
+
+            LocalRenderingStatic.localRenderingDatas[kvp.Key] = copied;
+            copies.Add( LocalRenderingStatic.localRenderingDatas[kvp.Key]);
+
+            i++;
         }
 
         Debug.Log("LocalState: 전체 플레이어 상태 초기화됨");
         //d아래는 디버깅 용이다 나중에 지우기
-        foreach (var kvp in localPlayers)
-        {
-            var player = kvp.Value;
-            string deckStr = string.Join(", ", player.DeckCodes);
-            Debug.Log($"ActorNumber: {player.ActorNumber}, HP: {player.HP}, Pos: {player.curpos}, Deck: [{deckStr}]");
-        }
+        
+        //게임 시작 연출 하나 집어넣기 ;
+
 
         CharaObInit();
-        PlayerStateUIRendering();
+        LocalRenderingManager.Instance.Rendering_GameStart(copies[0], copies[1]);
+
+       //PlayerStateUIRendering();
     }
 
 
@@ -158,7 +161,7 @@ public class LocalState : MonoBehaviour
     {
         //여기서 렌더링 정보 다하기 . 스킨 보는 방향 등.
         //셀렉션 바 연결
-        foreach (var pinfo in localPlayers)
+        foreach (var pinfo in LocalRenderingStatic.localRenderingDatas)
 
 
         {
@@ -166,21 +169,22 @@ public class LocalState : MonoBehaviour
             GameObject temp = Instantiate(charaprefab);
             GameObject mcChecker = temp.transform.Find("MyChara")?.gameObject;
 
+            
+            //렌더링 용 커넥션 변수
             CharaInfo charinfo  = temp.GetComponent<CharaInfo>();
+          
+            
             temp.transform.position = summonpoint.transform.position;
-            charinfo.actorNum = pinfo.Value.ActorNumber;
+            charinfo.actorNum = pinfo.Value.actorNum;
 
-            if (PhotonNetwork.LocalPlayer.ActorNumber == pinfo.Value.ActorNumber)
+            if (PhotonNetwork.LocalPlayer.ActorNumber == pinfo.Value.actorNum)
             {
-                myHP = charinfo.Hp;
-                mydefense = charinfo.Def;
+                LocalRenderingManager.Instance.myHP = charinfo.Hp;
+                LocalRenderingManager.Instance.mydefense = charinfo.Def;
                 mcChecker.SetActive(true);
                SelectionBarManager.Instance.CM =  temp.GetComponent<Transform>().Find("CM");
                SelectionBarManager.Instance.MM = temp.GetComponent<Transform>().Find("MM");
                SelectionBarManager.Instance.JM = temp.GetComponent<Transform>().Find("JM");
-                if (SelectionBarManager.Instance.CM == null) Debug.LogError("CM 못 찾음!");
-                if (SelectionBarManager.Instance.MM == null) Debug.LogError("MM 못 찾음!");
-                if (SelectionBarManager.Instance.JM == null) Debug.LogError("JM 못 찾음!");
                 SelectionBarManager.Instance.CM.gameObject.SetActive(false);
                 SelectionBarManager.Instance.MM.gameObject.SetActive(false);
                 SelectionBarManager.Instance.JM.gameObject.SetActive(false);
@@ -189,11 +193,11 @@ public class LocalState : MonoBehaviour
             }
             else
             {
-                opHP = charinfo.Hp;
-                opdefense = charinfo.Def;
+                LocalRenderingManager.Instance.opHP = charinfo.Hp;
+                LocalRenderingManager.Instance.opdefense = charinfo.Def;
                 mcChecker.SetActive(false);
             }
-            PlayerObDic.Add(pinfo.Value.ActorNumber, temp);
+            PlayerObDic.Add(pinfo.Value.actorNum, temp);
             
         }
 
@@ -223,29 +227,57 @@ public class LocalState : MonoBehaviour
             StopCoroutine(_chooseMoveRoutine);
 
         // 키 입력 대기 코루틴 시작
-        _chooseMoveRoutine = StartCoroutine(ChooseMoveInputLoop());
+     //   _chooseMoveRoutine = StartCoroutine(ChooseMoveInputLoop());
 
     }
 
-    private IEnumerator ChooseMoveInputLoop()
+    public void Start_NormChoose_Phase(int actorNumber, string apjson)
     {
+        ActionPacketData apData = JsonConvert.DeserializeObject<ActionPacketData>(apjson);
+        var playerData = LocalRenderingStatic.localRenderingDatas[actorNumber];
+        Debug.Log($"이번턴의 제약은 {playerData.bounds[playerData.boundIndex]}");
+        // 이미 대기 중이면 중단
+        if (_chooseMoveRoutine != null)
+            StopCoroutine(_chooseMoveRoutine);
+
+        // 키 입력 대기 코루틴 시작
+          _chooseMoveRoutine = StartCoroutine(ChooseMoveInputLoop(apData));
+
+    }
+
+    public void Start_FaceDown_Phase(int actorNumber, string apjson)
+    {
+        ActionPacketData apData = JsonConvert.DeserializeObject<ActionPacketData>(apjson);  
+        if (_chooseMoveRoutine != null)
+            StopCoroutine(_chooseMoveRoutine);
+
+        // 키 입력 대기 코루틴 시작
+        _chooseMoveRoutine = StartCoroutine(ChooseMoveInputLoop(apData));
+
+    }
+    private IEnumerator ChooseMoveInputLoop(ActionPacketData apData)
+    {
+        InitBacktoMaster();
 
         SelectionBarManager.Instance.SetActive();
         // 대기 상태
+       
+        //여기서 n초 기다려야 셀렉션 바 삐꾸 안날듯 
+       //페이스 다운 페이즈에서 호출시 m 은 불가하게 
         while (true)
         {
             if (Input.GetKeyDown(KeyCode.M) && 
-                LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].canMove
+                apData.canMove
                 )
             {
                 // M 키 눌리면 MoveModeState의 반복 로직 시작
-                MoveModeState.Instance.SetActive(true);
+                MoveModeState.Instance.SetActive(true, apData);
                 break;
             }
             else if (Input.GetKeyDown(KeyCode.C))
             {
            
-              CardModeState.Instance.SetActive(true);
+              CardModeState.Instance.SetActive(true, apData);
               break;
            }
 
@@ -258,6 +290,15 @@ public class LocalState : MonoBehaviour
 
     }
 
+
+    //마스터한테 돌려줄 것들을 담는 패키지를 초기화한다
+    private void InitBacktoMaster()
+    {
+        btmPacket = new BacktoMaster();
+        btmPacket.usedCard = new List<string>();
+
+
+    }
 
 
     public void PlayActionRendering(int actorNum, ActionData action, int opCost, HookType h) //여기에 상대 액숀도받아 와서 남은 시간 체크
@@ -280,7 +321,7 @@ public class LocalState : MonoBehaviour
 
             }
             Debug.Log($"플레이어 {actorNum}의 {action.cardname}의 {h} ");
-            AlertDialogue.Instance.StartDialogue(action, actorNum, h, DialogueType.Activate);
+            AlertDialogue.Instance.StartDialogue(action, actorNum, h, 0,DialogueType.Activate);
         }
 
         OpponentCostRendering(h);
@@ -448,8 +489,6 @@ public class LocalState : MonoBehaviour
             //}
 
         //연출 주고 싶으면 prevdefense 값 셋팅해서 바뀌면 애니메 뚜루룽~
-        mydefense.text = localPlayers[myactorNum].defense.ToString();
-        opdefense.text = localPlayers[actorNumOp].defense.ToString();
         //체력 바뀐거 렌더링해줏3
 
 
@@ -471,10 +510,12 @@ public class LocalState : MonoBehaviour
         return opponentCosts.Min();
     }
 
-    public void SelectJuju(int actorNum, string boundCode)
+    public void SelectJuju(int actorNum, string boundCode, List<string> jujucodes)
     {
-        JujuSelectModeState.Instance.SetActive(true, actorNum, boundCode);
+        JujuSelectModeState.Instance.SetActive(true, actorNum, boundCode, jujucodes);
 
     }
    
+
+ 
 }

@@ -205,7 +205,7 @@ public class GridManagement : MonoBehaviour
                 // Move일 경우 현재 플레이어들이 위치한 타일인지 체크
                 if (MoveOrSkill == "Move")
                 {
-                    foreach (var pl in LocalState.Instance.localPlayers.Values)
+                    foreach (var pl in LocalRenderingStatic.localRenderingDatas.Values)
                     {
                         if (currentIndex == pl.curpos)
                         {

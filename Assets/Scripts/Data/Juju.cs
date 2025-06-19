@@ -25,21 +25,37 @@ public class Juju
     public int isUsed; //0이면 아직 안씀, 1이면 씀
     public string Text;
 
-    public void Apply()
+
+    public Juju() { }
+
+    public Juju(Juju other)
     {
-        var actorNum     = PhotonNetwork.LocalPlayer.ActorNumber; 
-        var localData = LocalState.Instance.localPlayers[actorNum];
+        jujuCode = other.jujuCode;
+        type = other.type;
+        jujuName = other.jujuName;
+        sprite = other.sprite; // Sprite는 리소스 공유이므로 얕은 복사로 충분
+        addingCard = other.addingCard;
+        boundPoint = other.boundPoint;
+        onlyOnce = other.onlyOnce;
+        require = other.require;
+        isUsed = other.isUsed;
+        Text = other.Text;
+    }
+
+    public void Apply(int actorNum)
+    {
+        var playerData = Overmind.Instance.players[actorNum];
         switch(type)
         {
 
             case JujuType.handAdd:
 
-                localData.hands.Add(addingCard);
+                playerData.hands.Add(addingCard);
                 break;
 
 
             case JujuType.Reinforce:
-                localData.defaultMoveCast = 0;
+                playerData.defaultMoveCast = 0;
                 break;
         }
 

@@ -44,10 +44,10 @@ public static class BoundChecker
         foreach (var playerData in playerDatas)
         {
 
-            playerData.Value.damageDealtThisCycle = 0;
-            playerData.Value.actionUsedHowmany = 0;
-            playerData.Value.actionClockDiffer.Clear();
-            playerData.Value.moved = false;
+            playerData.Value.constraintStats.damageDealtThisCycle = 0;
+            playerData.Value.constraintStats.actionUsedHowmany = 0;
+            playerData.Value.constraintStats.actionClockDiffer.Clear();
+            playerData.Value.constraintStats.moved = false;
 
 
         }

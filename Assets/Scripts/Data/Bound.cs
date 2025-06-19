@@ -58,22 +58,23 @@ public class Bound
 
             case BoundType.DefenseShouldBe:
 
+                ActionData result1 = Overmind.Instance.actionQueue.LastOrDefault(entry => entry.actorNumber == actorNum).action;
 
-                if (playerData[actorNum].defense == amount)
+                if (result1.defense == amount)
                     return true;
                 else
                     return false;
 
 
             case BoundType.DamageShouldBe:
-                var ddtc = playerData[actorNum].damageDealtThisCycle;
+                var ddtc = playerData[actorNum].constraintStats.damageDealtThisCycle;
                 if (ddtc== amount)
                     return true;
                 else return false;
 
 
             case BoundType.CardUsedShouldBe: //¾ÈµÊ
-                var cusb = playerData[actorNum].actionUsedHowmany;
+                var cusb = playerData[actorNum].constraintStats.actionUsedHowmany;
                 if (cusb == amount)
                     return true;
                 else return false;
@@ -81,7 +82,7 @@ public class Bound
 
             case BoundType.LastActionShouldBe: 
 
-                ActionData result = Overmind.Instance.actionQueue.FirstOrDefault(entry => entry.actorNumber == actorNum).action;
+                ActionData result = Overmind.Instance.actionQueue.LastOrDefault(entry => entry.actorNumber == actorNum).action;
                 if (result.actionId == amount)
                     return true;
                 else return false;
@@ -89,7 +90,7 @@ public class Bound
 
                 //amountÀÌ»óÀÎ °æ¿ì´Ù
             case BoundType.ActionClockDifferenceShouldBe: //¾ÈµÊ
-                bool result2 =playerData[actorNum].actionClockDiffer.All(val => val >= amount);
+                bool result2 =playerData[actorNum].constraintStats.actionClockDiffer.All(val => val >= amount);
 
 
                 return result2;
@@ -99,7 +100,7 @@ public class Bound
 
                 bool result3 = false;
 
-                if ((amount == 0 && playerData[actorNum].moved == false) || (amount == 1 && playerData[actorNum].moved == true))
+                if ((amount == 0 && playerData[actorNum].constraintStats.moved == false) || (amount == 1 && playerData[actorNum].constraintStats.moved == true))
                 {
                     result3 = true;
                 }

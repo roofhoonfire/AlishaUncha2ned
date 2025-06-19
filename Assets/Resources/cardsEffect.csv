@@ -15,11 +15,8 @@ c6,Activate,NotRumbleFlagOn,1,0
 c6,Activate,OpNextActionisMoveFlagOn,2,1
 c6,Activate,ReplaceNextOpsMovetoStun,4,2
 c7,Activate,AddDamage,20,0
-c7,Activate,UseEnergy,3,0
-c8,Activate,UseEnergy,3,0
 c8,Support,SelectActionClockChange,3,0
 c9,Activate,Damage,0,0
-c10,Activate,UseEnergy,4,0
 c10,Priority,ReduceMyNextTurnActionClock,-6,0
 c11,Activate,MoveToSelectedTile,0,0
 c11,Activate,Damage,25,0

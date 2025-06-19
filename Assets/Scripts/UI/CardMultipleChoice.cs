@@ -63,6 +63,7 @@ public class CardMultipleChoice : MonoBehaviour
     }
 
     
+    //이거 하고 다시 이쁘게 렌더링 해주덩가
     public IEnumerator AddActionClockBuffer(int amount)
     {
         var task = SelectInAmount(amount); // async Task<int> 호출
@@ -72,7 +73,7 @@ public class CardMultipleChoice : MonoBehaviour
         if (task.IsCompletedSuccessfully)
         {
             int result = task.Result;
-            CardModeState.Instance.actionClockBuffer += result;
+            CardModeState.Instance.apDataRef.tempCast += result;
         }
         else if (task.IsFaulted)
         {

@@ -39,93 +39,42 @@ public class MoveModeState : MonoBehaviour
     }
 
 
-    public void SetActive(bool active)
+    public void SetActive(bool active, ActionPacketData apData)
     {
         if (active == isActive) return; //이미중복 코루틴 시작 방지
         isActive = active;
-        if (isActive) StartSelectDestLoop();
+        if (isActive) StartSelectDestLoop(apData);
         else StopSelectDestLoop();
     }
-    private void StartSelectDestLoop()
+    private void StartSelectDestLoop(ActionPacketData apData)
     {
-        TilePreprocessing();
+        TilePreprocessing(apData);
         if (_selectDestCoroutine == null)
-            _selectDestCoroutine = StartCoroutine(SelectDestLoop());
+            _selectDestCoroutine = StartCoroutine(SelectDestLoop( apData));
     }
-    private void TilePreprocessing()
+    private void TilePreprocessing(ActionPacketData apData)
     {
-        actorNum = Photon.Pun.PhotonNetwork.LocalPlayer.ActorNumber;
-        int startIndex = LocalState.Instance.localPlayers[actorNum].curpos;
-        int energy = LocalState.Instance.localPlayers[actorNum].energy;
 
+
+        actorNum = Photon.Pun.PhotonNetwork.LocalPlayer.ActorNumber;
+
+        var data = LocalRenderingStatic.localRenderingDatas[actorNum];
+        int startIndex = data.curpos;
+       
         GridManagement.Instance.HighlightReachableTilesFrom(
             startIndex,
-            LocalState.Instance.localPlayers[actorNum].defaultMove,
+            apData.defaultMove,
             Color.cyan,
             "Move"// 이동 가능 타일
         );
-        // 모든 타일 초기화
-
-        /*  foreach (var tileObj in GridManagement.Instance.tileObjects.Values)
-          {
-              EachTile tile = tileObj.GetComponent<EachTile>();
-              tile.defaultColor = Color.white;
-              tile.cost = 0;
-              tile.canMove = false;
-              tileObj.GetComponent<SpriteRenderer>().color = tile.defaultColor;
-          }
-
-          Queue<(int index, int dist)> queue = new Queue<(int, int)>();
-          HashSet<int> visited = new HashSet<int>();
-
-          queue.Enqueue((startIndex, 0));
-          visited.Add(startIndex);
-
-          while (queue.Count > 0)
-          {
-              var (currentIndex, dist) = queue.Dequeue();
-              if (dist > energy)
-                  continue;
-
-              if (currentIndex == startIndex)
-              {
-                  // 시작 타일은 색을 다르게 표시
-                  var startTileObj = GridManagement.Instance.tileObjects[currentIndex];
-                  EachTile startTile = startTileObj.GetComponent<EachTile>();
-                  startTile.defaultColor = Color.green;
-                  startTile.canMove = false;
-                  startTileObj.GetComponent<SpriteRenderer>().color = startTile.defaultColor;
-              }
-              else
-              {
-                  var tileObj = GridManagement.Instance.tileObjects[currentIndex];
-                  EachTile tile = tileObj.GetComponent<EachTile>();
-                  tile.defaultColor = Color.cyan;
-                  tile.cost = dist;
-                  tile.canMove = true;
-                  tileObj.GetComponent<SpriteRenderer>().color = tile.defaultColor;
-              }
-
-
-              Vector3Int currentCoord = GridManagement.Instance.GetCoordFromIndex(currentIndex);
-
-              foreach (var dir in directions)
-              {
-                  Vector3Int nextCoord = currentCoord + dir;
-                  if (GridManagement.Instance.coordToIndex.TryGetValue(nextCoord, out int nextIndex) && !visited.Contains(nextIndex))
-                  {
-                      visited.Add(nextIndex);
-                      queue.Enqueue((nextIndex, dist + 1));
-                  }
-              }
-          }*/
+   
 
     }
-    private IEnumerator SelectDestLoop()
+    private IEnumerator SelectDestLoop(ActionPacketData apData)
     {
         while (isActive)
         {
-            SelectDest();     // 매 프레임 목적지 선택 로직
+            SelectDest(apData);     // 매 프레임 목적지 선택 로직
             yield return null;
         }
     }
@@ -139,7 +88,7 @@ public class MoveModeState : MonoBehaviour
             _selectDestCoroutine = null;
         }
     }
-    void SelectDest()
+    void SelectDest(ActionPacketData apData)
     {
         int destinationIndex;
         int distance;
@@ -188,10 +137,10 @@ public class MoveModeState : MonoBehaviour
                     };
                     CardEffect moveEffect = new CardEffect(HookType.Activate, EffectType.Move, destinationIndex, 0);
                     action.effects.Add(moveEffect);
-                    int actualCost = Mathf.Min(distance, LocalState.Instance.localPlayers[actorNum].defaultMoveCast);
+                    int actualCost = Mathf.Min(distance, apData.defaultMoveCast);
 
                     
-                    Overmind.Instance?.SubmitSelection(action, actualCost);
+                    Overmind.Instance?.SubmitSelection(action, actualCost, actorNum, LocalState.Instance.btmPacket);
 
                     isActive = false;
                     hoveredTile = null;

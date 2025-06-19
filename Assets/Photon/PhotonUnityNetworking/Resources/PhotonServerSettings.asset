@@ -58,6 +58,23 @@ MonoBehaviour:
   - ReceiveJuju
   - RPC_SelectJuju
   - RPC_ReceiveJuju
+  - RPC_InitGameSync
+  - RPC_InitGameSync_M2C
+  - RPC_InitGameSyncDone_C2M
+  - RPC_SelectJuju_M2C
+  - RPC_ReceiveJuju_C2M
+  - RPC_JujuSync_M2C
+  - RPC_FaceOff_ChooseAction_M2C
+  - RPC_JustSync_C2M
+  - RPC_Receive_Action_Selection_C2M
+  - RPC_Selection_Rendering_Sync_M2C
+  - RPC_Norm_ChooseTile_M2C
+  - RPC_Only_Sync_C2M
+  - RPC_Norm_Play_Action
+  - RPC_Norm_Play_Action_M2C
+  - RPC_After_Action_Selection_Sync_M2C
+  - RPC_Norm_ChooseAction_M2c
+  - RPC_Norm_ChooseAction_M2C
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

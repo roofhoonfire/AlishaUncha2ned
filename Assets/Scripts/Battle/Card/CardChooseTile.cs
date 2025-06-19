@@ -58,9 +58,9 @@ public class CardChooseTile : MonoBehaviour
    private IEnumerator SelectTileLoop(ActionData action)
     {
         int actor = PhotonNetwork.LocalPlayer.ActorNumber;
-        playerCoord = GridManagement.Instance.GetCoordFromIndex(LocalState.Instance.localPlayers[actor].curpos);
+        playerCoord = GridManagement.Instance.GetCoordFromIndex(LocalRenderingStatic.localRenderingDatas[actor].curpos);
         myChara = LocalState.Instance?.PlayerObDic[actor];
-        AlertDialogue.Instance.StartDialogue(action, actor, HookType.Activate, DialogueType.TileChoose);
+        AlertDialogue.Instance.StartDialogue(action, actor, HookType.Activate, 0,DialogueType.TileChoose);
 
 
         // ★ tileType이 -1이면 바로 종료

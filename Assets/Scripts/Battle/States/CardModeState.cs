@@ -24,6 +24,8 @@ public class CardModeState : MonoBehaviour
     public bool isActive = false;
     private Coroutine _selectCardCoroutine;
     // Start is called before the first frame update
+    public ActionPacketData apDataRef;
+
     void Awake()
     {
         if (Instance == null)
@@ -38,35 +40,42 @@ public class CardModeState : MonoBehaviour
     }
 
 
-    public void SetActive(bool active)
+    public void SetActive(bool active, ActionPacketData apData)
     {
         if (active == isActive) return; //이미중복 코루틴 시작 방지
         isActive = active;
-        if (isActive) StartSelectCardLoop();
+        if (isActive) StartSelectCardLoop(apData);
         else StopSelectCardLoop(null);
     }
 
 
-    private void StartSelectCardLoop()
+    private void StartSelectCardLoop(ActionPacketData apdata)
     {
-        PopulateCards();//손패 쫘자작
-
+        apDataRef = apdata;
+        PopulateCards(apdata);//손패 쫘자작
+        
        InitBuffer();
-
-        ActionClockManipulated();
+       ActionPacketUpgrade(apdata);
 
         if (_selectCardCoroutine == null)
             _selectCardCoroutine = StartCoroutine(SelectCardLoop());
 
 
     }
-    
-    
-    private void ActionClockManipulated()
+
+
+
+    // 코스트, 방어도 데미지 강화된거 렌더링 하는 함수 
+    private void ActionPacketUpgrade(ActionPacketData apData)
     {
         //애니메도 넣으면 좋다 
         int actor = PhotonNetwork.LocalPlayer.ActorNumber;
-        int delta = LocalState.Instance.localPlayers[actor].actionClockManuplate;
+        int delta = apData.permCast + apData.tempCast;
+
+
+        //여기에 방어도 코드도 넣으면 된다 
+        //지금은 넘어간다 귀찮으ㅡ므로
+
 
         if (delta == 0)
             return;
@@ -92,7 +101,7 @@ public class CardModeState : MonoBehaviour
             // 현재 텍스트가 숫자일 때만 처리
             if (int.TryParse(tmp.text, out int originalValue))
             {
-                int newValue = Mathf.Max(1, originalValue + delta);
+                int newValue = Mathf.Max(apData.CastingMinumum, originalValue + delta);
                 tmp.text = newValue.ToString();
             }
             else
@@ -107,7 +116,6 @@ public class CardModeState : MonoBehaviour
         // Reset buffers
         curAction = new ActionData();
         curAction.effects = new List<CardEffect>();
-        actionClockBuffer = 0;
     }
     private IEnumerator SelectCardLoop()
     {
@@ -148,41 +156,17 @@ public class CardModeState : MonoBehaviour
             isActive = false;
             ClearAllCards();
             LocalState.Instance.alim.SetActive(false);
-            Overmind.Instance.SubmitSelection(action, action.actionClock);
+            Overmind.Instance.SubmitSelection(action, action.actionClock, PhotonNetwork.LocalPlayer.ActorNumber, LocalState.Instance.btmPacket);
         }
     }
-    public void PopulateCards()
+    public void PopulateCards(ActionPacketData apData)
     {
         spawnedCards.Clear(); // 이전 것들 제거
 
-        var actor = PhotonNetwork.LocalPlayer.ActorNumber;
-        var player = LocalState.Instance.localPlayers[actor];
-
-        // 부족한 만큼 덱에서 뽑기
-        int neededCount = player.handsJangSoo - player.hands.Count;
-
-        for (int i = 0; i < neededCount; i++)
-        {
-            if (player.DeckCodes.Count == 0)
-            {
-                // 덱이 비었으면 trash에서 refill 시도
-                RefillDeckFromTrash(player);
-
-                // refill 후에도 비어 있으면 더 이상 뽑을 수 없음
-                if (player.DeckCodes.Count == 0)
-                {
-                    Debug.LogWarning("[PopulateCards] Deck is empty even after refill.");
-                    break;
-                }
-            }
-            // 덱에서 한 장 뽑아서 hands에 추가
-            string drawnCard = player.DeckCodes[0];
-            player.DeckCodes.RemoveAt(0);
-            player.hands.Add(drawnCard);
-        }
+     
 
         // hands의 카드 코드들로 카드 오브젝트 Instantiate
-        foreach (string code in player.hands)
+        foreach (string code in apData.hands)
         {
             var cardGO = Instantiate(cardPrefab, cardContentArea);
             spawnedCards.Add(cardGO); // 참조 저장
@@ -198,7 +182,7 @@ public class CardModeState : MonoBehaviour
             info.ApplyCardData();
         }
 
-        Debug.Log($"[PopulateCards] Player {actor}: Hands = {player.hands.Count}, Deck = {player.DeckCodes.Count}");
+        Debug.Log($"손패 생성완료 ");
 
 
 

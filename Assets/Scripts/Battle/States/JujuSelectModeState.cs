@@ -31,7 +31,7 @@ public class JujuSelectModeState : MonoBehaviour
         }
 
     }
-    public void StopSelectJujuLoop()
+    public void StopSelectJujuLoop(string jujuCode)
     {
         if (_selectJujuCoroutine != null)
         {
@@ -42,21 +42,27 @@ public class JujuSelectModeState : MonoBehaviour
        
         
             isActive = false;
-            ClearAllJuju();
-            Overmind.Instance.SubmitJuju(actorNum);
+        ClearAllJuju();
+
+        if (jujuCode!= null)
+        {
+            Overmind.Instance.Submit_Juju(actorNum, jujuCode);
+
+
+        }
     }
-    public void SetActive(bool active, int actorNum, string boundCode)
+    public void SetActive(bool active, int actorNum, string boundCode, List<string> jujucodes)
     {
         if (active == isActive) return; //이미중복 코루틴 시작 방지
         isActive = active;
-        if (isActive) StartSelectJujuLoop(boundCode);
-        else StopSelectJujuLoop();
+        if (isActive) StartSelectJujuLoop(boundCode,jujucodes);
+        else StopSelectJujuLoop(null);
     }
 
-    private void StartSelectJujuLoop(string boundCode)
+    private void StartSelectJujuLoop(string boundCode, List<string> jujucodes)
     {
         if (_selectJujuCoroutine == null) {
-            PopulateJuju(boundCode);
+            PopulateJuju(jujucodes);
 
             _selectJujuCoroutine = StartCoroutine(SelectJujuLoop());
         }
@@ -93,10 +99,11 @@ public class JujuSelectModeState : MonoBehaviour
                 {
                     if (clicked == juju || clicked.transform.IsChildOf(juju.transform))
                     {
-                        var data = JujuLoader.jujuDataBase[juju.GetComponent<EachJujuInfo>().jujuCode]; // 또는 저장해둔 map 사용
-                        data.Apply();
-                        
-                        StopSelectJujuLoop();
+                        //var data = JujuLoader.jujuDataBase[juju.GetComponent<EachJujuInfo>().jujuCode]; // 또는 저장해둔 map 사용
+                        //data.Apply();
+
+                        var jujuCode = juju.GetComponent<EachJujuInfo>().jujuCode;
+                        StopSelectJujuLoop(jujuCode);
                     }
                 }
             }
@@ -106,44 +113,27 @@ public class JujuSelectModeState : MonoBehaviour
 
     }
 
-    void PopulateJuju(string boundCode)
+    void PopulateJuju(List <string> jujucodes)
     {
         spawnedJuju.Clear();
 
-        var localData = LocalState.Instance.localPlayers[actorNum];
-        int boundPointThreshold = BoundLoader.boundDataBase[boundCode].boundPoint;
-
-        // 필터링
-        List<string> filteredJujuCodes = new List<string>();
-        foreach (var jujuCode in localData.JujuCode)
-        {
-            if (JujuLoader.jujuDataBase.TryGetValue(jujuCode, out var juju))
-            {
-                if (juju.boundPoint <= boundPointThreshold)
-                {
-                    filteredJujuCodes.Add(jujuCode);
-                }
-            }
-        }
-        Debug.Log($"총 {filteredJujuCodes.Count}개가 필터링 됫다 뭐가 나올지 궁금하군 후후");
-
-        // 셔플
-        ShuffleList(filteredJujuCodes);
+        
 
         // 최대 3개만 선택
-        int count = Mathf.Min(3, filteredJujuCodes.Count);
-
-        for (int i = 0; i < count; i++)
+        
+        for (int i = 0; i < jujucodes.Count; i++)
         {
-            string selectedCode = filteredJujuCodes[i];
-            Juju jujuData = JujuLoader.jujuDataBase[selectedCode];
+            string selectedCode = jujucodes[i];
+
+            //이건 어차피 렌더링 용이기 때문에 굳이 플레이어꺼를 갖다 쓸필요 없음
+            Juju jujuData = JujuLoader.jujuDataBase[selectedCode]; 
 
             GameObject jujuObj = Instantiate(jujuPrefab, jujuContentArea);
             spawnedJuju.Add(jujuObj);
              EachJujuInfo info = jujuObj.GetComponent<EachJujuInfo>();
             if (info != null)
             {
-                info.ApplyJujuData(jujuData);
+                info.ApplyJujuData(jujuData); //렌더링 코드임
             }
             else
             {
@@ -151,15 +141,7 @@ public class JujuSelectModeState : MonoBehaviour
             }
         }
     }
-        void ShuffleList<T>(List<T> list)
-        {
-            for (int i = list.Count - 1; i > 0; i--)
-            {
-                int j = Random.Range(0, i + 1);
-                (list[i], list[j]) = (list[j], list[i]);
-            }
-        }
-
+    
     public void ClearAllJuju()
     {
 
