@@ -14,14 +14,18 @@ using UnityEditor;
 using System.Runtime.ExceptionServices;
 using System.Net.Sockets;
 using UnityEngine.UIElements;
-
-
-
+using UnityEngine.Rendering.Universal;
 
 public enum apProp
 {
 
     defaultMove,defaultMoveCast,tempCast,permCast,tempDef,permDef,tempDam,permDam, CastingMinimum
+}
+
+public enum ExtraSelection
+{
+
+    Kawari
 }
 public class ConstraintStats
 {
@@ -29,6 +33,8 @@ public class ConstraintStats
     public int actionUsedHowmany = 0;
     public List<int> actionClockDiffer = new();
     public bool moved = false;
+    public List <int> thisCycleActionClocks = new();
+    public List<int> prevCycleActionClocks = new();
 }
 public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 SyncPartial 업뎃 해야함
 {
@@ -208,18 +214,16 @@ public class ActionData //여기 뭐 추가할 거면 carddragHandler로 수정�
         }
 
     }
-    public void Norm_ProcessHook(
-        HookType hook,
-        int hActorNum,
-        int hOpActorNum,
-        int ttActorNum,
-        ActionData ttAction,
-        ActionData hOpMainAction,
-        ActionData hMainAction)
-        //hMainAction은 이 훅을 Process하는 놈이
+    public IEnumerator Norm_ProcessHook(
+     HookType hook,
+     int hActorNum,
+     int hOpActorNum,
+     ActionData ttAction,
+     ActionData hOpMainAction,
+     ActionData hMainAction)
     {
         if (effects == null)
-            return;
+            yield break;
 
         foreach (var e in effects)
         {
@@ -227,26 +231,35 @@ public class ActionData //여기 뭐 추가할 거면 carddragHandler로 수정�
             if (e.hookType != hook)
                 continue;
 
-            // 선공 훅인데 이미 다른 행동이 실행된 적이 있으면 스킵 (flag 상관없이 적용)
+            // 선공 훅인데 이미 다른 행동이 실행된 적이 있으면 스킵
             if (e.hookType == HookType.Priority && hasOtherExecutedSinceInsertion)
                 continue;
 
-            // flag가 0이 아닌 경우, flags 리스트에 포함되어야 적용
-          
+            // flag 조건 확인
             if (e.flag != 0)
             {
                 if (flags == null || !flags.Contains(e.flag))
                     continue;
             }
-            //rightNowOp는 대처, 카운터, IQA시 사용되는 액션임
-            //
-            // 모든 조건 통과 시 효과 적용
-            e.Norm_Apply(hActorNum, hOpActorNum,  ttActorNum, this,  hOpMainAction, hMainAction, ttAction);
+
+            // 효과 적용 (여기서 애니메이션 대기 등 비동기 처리가 필요하다면 yield 가능)
+            yield return e.Norm_Apply(hActorNum, hOpActorNum, this, hOpMainAction, hMainAction, ttAction);
+
+            // flag 제거
             flags.Remove(e.flag);
-
+            // 영구 플래그 처리 필요하면 여기에 조건 추가
         }
-
     }
+
+
+
+
+
+
+
+
+
+
 }
 
 [RequireComponent(typeof(PhotonView))]
@@ -277,6 +290,7 @@ public class Overmind : MonoBehaviourPunCallbacks
 
     private int syncCount = 0;
 
+    public string extraSelectionJson;
     private int faceOffCount = 0;// 더 좋은 방법있음 나와보라그래
     
     public int cycleState = 0; // -1: Initial, 0: FaceOff, 1: Actor1, 2: Actor2
@@ -632,11 +646,11 @@ public class Overmind : MonoBehaviourPunCallbacks
                
                 // Find ready actions
 
-                //경우  1 : 격돌
+                //경우  1 : 쇼다운
                 if (readyCount > 1)
                 {
                     
-                    yield return HandleRumblePhase();
+                    yield return ShowDown();
 
                     if (actionQueue.Count <= 0) //연계카드가 없다면 무조건 이 경우일 것
                     {
@@ -645,30 +659,27 @@ public class Overmind : MonoBehaviourPunCallbacks
                     }
                     else //이건 연계의 케이스를 고려해서 짜두었다
                     {
-
                         int loneActor = actionQueue[0].actorNumber;
                         bool allSame = actionQueue.All(a => a.actorNumber == loneActor);
                         if (allSame)
                         {
                             // 2) 상대 플레이어 번호 구하기
-                            int otherActor = GetOtherPlayerNumber(loneActor);
+                            int actorNum = GetOtherPlayerNumber(loneActor);
 
-                            // 3) pendingSelections 초기화
                             pendingSelections.Clear();
 
-                            // 4) 상대에게 선택 요청
-                            photonView.RPC(nameof(RPC_BeginChooseMove), RpcTarget.All, otherActor, false, faceOffCount);
 
-                            // 5) 상대 응답 대기
-                            yield return new WaitUntil(() => pendingSelections.ContainsKey(otherActor));
-
-                            // 6) 응답 처리
-                            var selOther = pendingSelections[otherActor];
-                            pendingSelections.Remove(otherActor);
+                            Hand_Gen(actorNum);
+                            ActionPacketData var = ActionPacketConverter.FromPlayer(players[actorNum]);
+                            string apjson = JsonConvert.SerializeObject(var);
+                            photonView.RPC(nameof(RPC_Norm_ChooseAction_M2C), RpcTarget.All, actorNum, apjson);
+                            yield return new WaitUntil(() => pendingSelections.ContainsKey(actorNum));
+                            var newSel = pendingSelections[actorNum];
+                            pendingSelections.Remove(actorNum);
 
                             // 7) 액션 초기화 및 큐에 추가
-                            InitActionBeforeInsert(selOther.action, otherActor);
-                            actionQueue.Add((otherActor, selOther.action, selOther.cost));
+                            InitActionBeforeInsert(newSel.action, actorNum);
+                            actionQueue.Add((actorNum, newSel.action, newSel.cost));
                             actionQueue.Sort((a, b) =>
                                 a.remainingCost != b.remainingCost
                                     ? a.remainingCost.CompareTo(b.remainingCost)
@@ -732,7 +743,7 @@ public class Overmind : MonoBehaviourPunCallbacks
                 yield return Norm_Action_Calc(ttActorNum,  ttAction, ttOpMainAction, ttMainAction);//경계와 발동 처리는 여기서 진행한다
 
                 actionQueue.RemoveAt(0);
-
+              
 
                 // Request next move if no pending action
                 if (!actionQueue.Exists(a => a.actorNumber == ttActorNum))
@@ -746,21 +757,17 @@ public class Overmind : MonoBehaviourPunCallbacks
 
                     Hand_Gen(ttTuple.actorNumber);
                     ActionPacketData var = ActionPacketConverter.FromPlayer(players[ttTuple.actorNumber]);
-
-                    Player targetP = PhotonNetwork.CurrentRoom.Players[ttTuple.actorNumber];  //쇼다운RPC는 따로 만들기 혹은 매개변수로 조절 (연출용)
                     string apjson = JsonConvert.SerializeObject(var);
+                    Debug.Log($"늉늉플레이어 {ttTuple.actorNumber}의 이번 싸이클 값들 : " + string.Join(", ", players[ttTuple.actorNumber].constraintStats.thisCycleActionClocks));
 
-
-
+                    Debug.Log($"늉늉플레이어 {ttTuple.actorNumber}의 이전 싸이클 값들 : " + string.Join(", ", players[ttTuple.actorNumber].constraintStats.prevCycleActionClocks));
                     photonView.RPC(nameof(RPC_Norm_ChooseAction_M2C), RpcTarget.All, ttTuple.actorNumber, apjson);
                     yield return new WaitUntil(() => pendingSelections.ContainsKey(ttTuple.actorNumber));
 
 
                     var selNew = pendingSelections[ttTuple.actorNumber];
                     pendingSelections.Remove(ttTuple.actorNumber);
-
                     InitActionBeforeInsert(selNew.action, ttTuple.actorNumber);
-
                     actionQueue.Add((ttTuple.actorNumber, selNew.action, selNew.cost));
                     actionQueue.Sort((a, b) =>
                         a.remainingCost != b.remainingCost
@@ -786,7 +793,72 @@ public class Overmind : MonoBehaviourPunCallbacks
 
     }
 
-    IEnumerator MasterRumbleCalc(int actorNum, int actor2Num , ActionData action1, ActionData action2, ActionData nextaction1, ActionData nextaction2, int RumbleFlag)
+    IEnumerator Rumble_Multi_Action_Calc(int ttActorNum1, int ttActorNum2, ActionData ttAction1, ActionData ttAction2, ActionData ttMainAction1, ActionData ttMainAction2, int RumbleFlag)
+        {
+        // 1, 2 승자 존재: 승자 번호
+        // 3: 동시발동
+        // 4: 00후 처맞기
+        // 5: 처맞고 00하기하기
+        //6 : 아슬아슬 피하기
+        //7: 비김
+        //3 : 원래 안맞는 놈 , 두 플레이어 모두 이동 , 둘다 헛발질
+        //애니메이션 재생 순서가 중요한 경우
+        //00후 처맞기, 처맞고 00하기, 아슬아슬 피하기
+        //그 외에는 두 액션 모두 동시에 출력되도 됨, 
+       
+        // GuardOrCounter는 현재 행동하는 액터의 상대 액터의 큐에 삽입되있는 바로 다음 액션임
+        //action이 지금 발동되는 액션
+
+        if (ttAction2 != ttMainAction2) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
+        {
+            yield return ttMainAction2.Norm_ProcessHook(HookType.Guard, ttActorNum2, ttActorNum1, ttAction1, ttMainAction1, ttMainAction2);
+            yield return Norm_After_Hook((ttActorNum2, ttMainAction2), HookType.Guard); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
+        }
+
+
+        yield return ttAction1.Norm_ProcessHook(HookType.Activate, ttActorNum1, ttActorNum2, ttAction1, ttMainAction2, ttMainAction1);
+        yield return Norm_After_Hook((ttActorNum1, ttAction1), HookType.Activate);
+
+
+        //요부분만 노말 훅이아니라 럼블 훅으로 바꿔주면 될지도?
+
+
+        if (ttAction2 != ttMainAction2) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
+        {
+
+            yield return ttMainAction2.Norm_ProcessHook(HookType.Counter, ttActorNum2, ttActorNum1, ttAction1, ttMainAction1, ttMainAction2);
+            yield return Norm_After_Hook((ttActorNum2, ttMainAction2), HookType.Counter);
+        }
+
+
+
+        if (ttAction1 != ttMainAction1) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
+        {
+            yield return ttMainAction1.Norm_ProcessHook(HookType.Guard, ttActorNum1, ttActorNum2, ttAction2, ttMainAction2, ttMainAction1);
+            yield return Norm_After_Hook((ttActorNum1, ttMainAction1), HookType.Guard); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
+        }
+
+
+        yield return ttAction1.Norm_ProcessHook(HookType.Activate, ttActorNum2, ttActorNum1, ttAction2, ttMainAction1, ttMainAction2);
+        yield return Norm_After_Hook((ttActorNum2, ttAction2), HookType.Activate);
+
+
+        //요부분만 노말 훅이아니라 럼블 훅으로 바꿔주면 될지도?
+
+
+        if (ttAction1 != ttMainAction1) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
+        {
+
+            yield return ttMainAction1.Norm_ProcessHook(HookType.Counter, ttActorNum1, ttActorNum2, ttAction2, ttMainAction2, ttMainAction1);
+            yield return Norm_After_Hook((ttActorNum1, ttMainAction1), HookType.Counter);
+        }
+
+
+
+
+
+    }
+    IEnumerator Rumble_Single_Action_Calc(int ttActorNum, ActionData ttAction, ActionData ttOpAction, ActionData ttOpMainAction, ActionData ttMainAction, int RumbleFlag)
     {
         // 1, 2 승자 존재: 승자 번호
         // 3: 동시발동
@@ -798,63 +870,70 @@ public class Overmind : MonoBehaviourPunCallbacks
         //애니메이션 재생 순서가 중요한 경우
         //00후 처맞기, 처맞고 00하기, 아슬아슬 피하기
         //그 외에는 두 액션 모두 동시에 출력되도 됨, 
-
-        if (RumbleFlag < 3)
-        {
-
-            (int actor, ActionData action, ActionData nextmove) winner = (RumbleFlag == actorNum) ? (actorNum, action1, nextaction1) : (actor2Num, action2, nextaction2);
-            (int actor, ActionData action, ActionData nextmove) loser = (RumbleFlag == actorNum) ? (actor2Num, action2, nextaction2) : (actorNum, action1, nextaction1);
-
-
-            
-            winner.action.ProcessHook(HookType.Activate, winner.actor, loser.nextmove, loser.actor, loser.action, winner.nextmove);
-            yield return showDownAfterHook(actorNum, actor2Num, action1, action2, winner.actor, HookType.Activate);
-            yield return MasterForEveryIntheQueAfterCalc(winner.action, winner.actor, nextaction1, nextaction2);
-
-        }
-        else
-        {
-                action1.ProcessHook(HookType.Activate, actorNum, nextaction2, actor2Num, action2, nextaction1);
-                action2.ProcessHook(HookType.Activate, actor2Num, nextaction1, actorNum, action1, nextaction2);
-            
-            yield return showDownAfterHook(actorNum, actor2Num, action1, action2, RumbleFlag, HookType.Activate);
-
-            yield return MasterForEveryIntheQueAfterCalc(action1, actorNum, nextaction1, nextaction2);
-            yield return MasterForEveryIntheQueAfterCalc(action2, actor2Num, nextaction2, nextaction1);
-
-
-        }
-     
-        yield return null;
-    }
-    IEnumerator Norm_Action_Calc(int ttActorNum, ActionData ttAction,  ActionData ttOpMainAction,ActionData ttMainAction)
-    {
         int ttOpActorNum = GetOtherPlayerNumber(ttActorNum);
 
         // GuardOrCounter는 현재 행동하는 액터의 상대 액터의 큐에 삽입되있는 바로 다음 액션임
         //action이 지금 발동되는 액션
 
-        ttOpMainAction.Norm_ProcessHook(HookType.Guard, ttOpActorNum, ttActorNum, ttActorNum,  ttAction, ttMainAction, ttOpMainAction);
+        if (ttOpAction != ttOpMainAction) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
+        {      
+            yield return ttOpMainAction.Norm_ProcessHook(HookType.Guard, ttOpActorNum, ttActorNum, ttAction, ttMainAction, ttOpMainAction);
+            yield return Norm_After_Hook((ttOpActorNum, ttOpMainAction), HookType.Guard); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
+        }
+
+
+        yield return ttAction.Norm_ProcessHook(HookType.Activate, ttActorNum, ttOpActorNum, ttAction, ttOpMainAction, ttMainAction);
+        yield return Norm_After_Hook((ttActorNum, ttAction), HookType.Activate);
+
+
+        //요부분만 노말 훅이아니라 럼블 훅으로 바꿔주면 될지도?
+
+
+
+        if (ttOpAction != ttOpMainAction) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
+        {
+
+        yield return ttOpMainAction.Norm_ProcessHook(HookType.Counter, ttOpActorNum, ttActorNum, ttAction, ttMainAction, ttOpMainAction);
+        yield return Norm_After_Hook((ttOpActorNum, ttOpMainAction), HookType.Counter);
+        }
+        //nth 액션이랑 비교해서 순서대로 실행하기 
+        //여기선 action의 반대 플레이어가 카운터의 주체이므로 헷갈리지 말자 ㅎㅎ
+
+        //  yield return MasterForEveryIntheQueAfterCalc(action, actorNum, myrightNextAction, GuardOrCounter);
+
+        //애프터 액션 플래그 같은거 주면 될 듯 
+
+        // Turn_End_Call();
+    }
+    IEnumerator Norm_Action_Calc(int ttActorNum, ActionData ttAction,  ActionData ttOpMainAction,ActionData ttMainAction)
+    {
+
+        int ttOpActorNum = GetOtherPlayerNumber(ttActorNum);
+
+        // GuardOrCounter는 현재 행동하는 액터의 상대 액터의 큐에 삽입되있는 바로 다음 액션임
+        //action이 지금 발동되는 액션
+
+        yield return ttOpMainAction.Norm_ProcessHook(HookType.Guard, ttOpActorNum, ttActorNum, ttAction, ttMainAction, ttOpMainAction);
         yield return Norm_After_Hook((ttOpActorNum, ttOpMainAction), HookType.Guard); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
 
 
 
         //action.ProcessHook(HookType.Activate, actorNum, )
-        ttAction.Norm_ProcessHook(HookType.Priority, ttActorNum, ttOpActorNum, ttActorNum, ttAction, ttOpMainAction, ttMainAction);
-        ttAction.Norm_ProcessHook(HookType.Activate, ttActorNum, ttOpActorNum, ttActorNum, ttAction, ttOpMainAction, ttMainAction); 
+        yield return ttAction.Norm_ProcessHook(HookType.Priority, ttActorNum, ttOpActorNum, ttAction, ttOpMainAction, ttMainAction);
+        yield return ttAction.Norm_ProcessHook(HookType.Activate, ttActorNum, ttOpActorNum, ttAction, ttOpMainAction, ttMainAction); 
         yield return Norm_After_Hook((ttActorNum, ttAction), HookType.Activate);
 
-        ttOpMainAction.Norm_ProcessHook(HookType.Counter, ttOpActorNum, ttActorNum, ttActorNum, ttAction, ttMainAction, ttOpMainAction);
+        yield return  ttOpMainAction.Norm_ProcessHook(HookType.Counter, ttOpActorNum, ttActorNum, ttAction, ttMainAction, ttOpMainAction);
         yield return Norm_After_Hook((ttOpActorNum, ttOpMainAction), HookType.Counter);
 
         //nth 액션이랑 비교해서 순서대로 실행하기 
         //여기선 action의 반대 플레이어가 카운터의 주체이므로 헷갈리지 말자 ㅎㅎ
 
-      //  yield return MasterForEveryIntheQueAfterCalc(action, actorNum, myrightNextAction, GuardOrCounter);
+        //  yield return MasterForEveryIntheQueAfterCalc(action, actorNum, myrightNextAction, GuardOrCounter);
 
         //애프터 액션 플래그 같은거 주면 될 듯 
 
-       // Turn_End_Call();
+        // Turn_End_Call();
     }
 
 
@@ -1007,6 +1086,8 @@ public class Overmind : MonoBehaviourPunCallbacks
 
             int diff = Mathf.Abs(maxRemainingCost - action.actionClock);
             myPlayerData.constraintStats.actionClockDiffer.Add(diff);
+           myPlayerData.constraintStats.thisCycleActionClocks.Add(action.actionClock);
+
         }
         //이동은 발동 될 때가 아닌 낼 때 안되는 것  
         else
@@ -1037,15 +1118,8 @@ public class Overmind : MonoBehaviourPunCallbacks
         photonView.RPC(nameof(RPC_SyncDone), RpcTarget.MasterClient, actorNumber);
     }
 
-    [PunRPC]
-    void RPC_HandleRumble(int[] actors)
-    {
-        //액션끼리 격돌할 때만 처리한다
-
-        //액션과 이동이 격돌할 때 아슬아슬하게 피했을경우
-        //that was close!
-    }
-
+    
+    /*
     [PunRPC]
     void RPC_ReceiveSelection(int actorNumber, string actionjson, int cost, string handjson, string trashjson, string deckjson)
     {
@@ -1086,15 +1160,16 @@ public class Overmind : MonoBehaviourPunCallbacks
 
 
             players[actorNumber].constraintStats.actionClockDiffer.Add(diff);
+            players[actorNumber].constraintStats.thisCycleActionClocks.Add(action.actionClock);
 
             Debug.Log($"제약 : 플레이어 {actorNumber}의 {players[actorNumber].constraintStats.actionUsedHowmany}와 {players[actorNumber].constraintStats.actionClockDiffer}");
         }
         
     }
 
-
+    */
     //
-    [PunRPC]
+ /*   [PunRPC]
     void RPC_BeginChooseMove(int actorNumber, bool faceoff, int nthshowdon)
     {
 
@@ -1123,7 +1198,7 @@ public class Overmind : MonoBehaviourPunCallbacks
 
 
 
-    }
+    }*/
 
     [PunRPC]
     void RPC_FaceOff_ChooseAction_M2C(int actorNumber,  int nthFaceOff, string apjson)
@@ -1161,7 +1236,7 @@ public class Overmind : MonoBehaviourPunCallbacks
 
     }
 
-    IEnumerator showDownAfterHook(int actor1, int actor2, ActionData action1, ActionData action2, int showdownflag, HookType h)
+ /*   IEnumerator showDownAfterHook(int actor1, int actor2, ActionData action1, ActionData action2, int showdownflag, HookType h)
     {
 
         int actor1opCost = GetMinOpponentRemainingCost(actor1);
@@ -1198,15 +1273,9 @@ public class Overmind : MonoBehaviourPunCallbacks
 
         photonView.RPC(nameof(RPC_SyncDone), RpcTarget.MasterClient,
               PhotonNetwork.LocalPlayer.ActorNumber);
-    }
+    }*/
     IEnumerator Norm_chooseTile(int actornum, ActionData action)
     {
-
-        if(action.actionId != 1)
-        {
-            yield break;
-        }
-
         //lr패킷
         var keys = players.Keys.ToList();
 
@@ -1221,14 +1290,29 @@ public class Overmind : MonoBehaviourPunCallbacks
 
         LocalRenderingData var1 = RenderingConverter.FromPlayer(players[var1ActorNum]);
         LocalRenderingData var2 = RenderingConverter.FromPlayer(players[var2ActorNum]);
-       
+
         string var1json = JsonConvert.SerializeObject(var1);
         string var2json = JsonConvert.SerializeObject(var2);
+
+
+
+        photonView.RPC(nameof(RPC_Rendering_Before_ChooseTile_M2C), RpcTarget.All, var1json, var2json);
+        yield return new WaitUntil(() => syncCount == 2);
+        syncCount = 0;
+        
+
+
+        if (action.actionId != 1)
+        {
+            yield break;
+        }
+
+     
         //
 
         //액션제이선
        string actionJson = JsonConvert.SerializeObject(action);
-       photonView.RPC(nameof(RPC_Norm_ChooseTile_M2C), RpcTarget.All, actornum, actionJson, var1json, var2json);
+       photonView.RPC(nameof(RPC_Norm_ChooseTile_M2C), RpcTarget.All, actornum, actionJson);
          
         yield return new WaitUntil(() => pendingTiles.Count ==1);
 
@@ -1250,15 +1334,31 @@ public class Overmind : MonoBehaviourPunCallbacks
         pendingTiles.Clear();
     }
 
-    IEnumerator chooseTile ((int actornum, ActionData action)p1, (int actornum, ActionData action)p2)
+    IEnumerator Showdown_chooseTile ((int actornum, ActionData action)p1, (int actornum, ActionData action)p2)
     {
-       
-        List<(int actornum, ActionData action)> templist = new List<(int actorNum, ActionData action)>();
-        if (p1.action!=null) templist.Add(p1);
-        if (p2.action!=null) templist.Add(p2);
+
+        var templist = new List<(int actornum, ActionData action)>();
+        if (p1.action != null) templist.Add(p1);
+        if (p2.action != null) templist.Add(p2);
+
         int howmany = 0;
+        List<string> actionJsonList = new List<string>();
 
+        foreach (var (actNum, action) in templist)
+        {
+            if (action.actionId == 1)
+            {
+                var packet = new Dictionary<string, object>
+            {
+                { "actorNumber", actNum },
+                { "action", action }
+            };
+                actionJsonList.Add(JsonConvert.SerializeObject(packet));
+                howmany++;
+            }
+        }
 
+        // 렌더링 정보
         //lr패킷
         var keys = players.Keys.ToList();
 
@@ -1276,41 +1376,56 @@ public class Overmind : MonoBehaviourPunCallbacks
 
         string var1json = JsonConvert.SerializeObject(var1);
         string var2json = JsonConvert.SerializeObject(var2);
+        //
 
-        //lr패킷
+        // RPC 호출 (순서 상관없이 정보 포함)
+        photonView.RPC(nameof(RPC_ShowDown_ChooseTile_M2C),
+            RpcTarget.All,
+            actionJsonList.ToArray(), // string[]
+            var1json,
+            var2json
+        );
 
-
-        foreach (var p in templist)
-        {
-                if (p.action != null && p.action.actionId == 1) {
-                    string actionJson  = JsonConvert.SerializeObject(p.action);
-                    photonView.RPC(nameof(RPC_ChooseTile), RpcTarget.All, p.actornum, actionJson, var1json, var2json);
-                    howmany++;
-           }
-       }
         yield return new WaitUntil(() => pendingTiles.Count == howmany);
-       
+
         foreach (var (actorNum, tiles) in pendingTiles)
         {
             if (p1.actornum == actorNum)
-            {
                 p1.action.effectTiles = new List<int>(tiles);
-            }
             else if (p2.actornum == actorNum)
-            {
                 p2.action.effectTiles = new List<int>(tiles);
-            }
         }
-
-
-
-
 
         pendingTiles.Clear();
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     [PunRPC]
     void RPC_Norm_Play_Action_M2C(int actorNumber, string actionJson, string lrjson1, string lrjson2, HookType h)
     {
+        
         var action = JsonConvert.DeserializeObject<ActionData>(actionJson);
         var data1 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson1);
 
@@ -1320,21 +1435,68 @@ public class Overmind : MonoBehaviourPunCallbacks
 
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
     [PunRPC]
 
-    void RPC_Norm_ChooseTile_M2C(int actornum, string actioJson, string lrjson1, string lrjson2)
+    void RPC_Rendering_Before_ChooseTile_M2C(string lrjson1, string lrjson2)
+    {
+        //이동 때문에 이녀석이 불가피하게 되었다
+
+        var data1 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson1);
+
+        var data2 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson2);
+        LocalRenderingManager.Instance.Rendering_Before_Tile_Choose( data1, data2);
+
+    }
+
+    [PunRPC]
+
+    void RPC_Extra_Selection_M2C(ExtraSelection e, int actornum)
+    {
+
+        //else에서는 선택 아닌놈이 동기화 쏴주나..?
+
+
+        if (actornum != PhotonNetwork.LocalPlayer.ActorNumber)
+        {
+            //상대 생각중!
+
+        }
+
+        else
+        {
+
+            ExtraSelectionState.Instance.SetActive(true, e);
+        }
+
+    }
+
+    [PunRPC]
+
+    void RPC_Norm_ChooseTile_M2C(int actornum, string actioJson)
     {
         //일단 렌더링은 둘다 해주고 
 
 
         var action = JsonConvert.DeserializeObject<ActionData>(actioJson);
 
-        var data1 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson1);
+        // var data1 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson1);
 
-        var data2 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson2);
-        LocalRenderingManager.Instance.Rendering_Before_Tile_Choose(actornum, data1, data2, action);
+        //var data2 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson2);
+        //LocalRenderingManager.Instance.Rendering_Before_Tile_Choose(actornum, data1, data2, action);
         //
-
+        LocalRenderingManager.Instance.Rendering_Tile_Choose(actornum, action);
         if (actornum != PhotonNetwork.LocalPlayer.ActorNumber)
         {
             //상대 생각중!
@@ -1350,6 +1512,60 @@ public class Overmind : MonoBehaviourPunCallbacks
 
     }
 
+
+    public void ExtraSelection_Caller(ExtraSelection e, int actorNum)
+    {
+
+        photonView.RPC(nameof(RPC_Extra_Selection_M2C), RpcTarget.All, e, actorNum);
+
+    }
+
+
+
+  
+
+
+
+
+    [PunRPC]
+
+    void RPC_ShowDown_ChooseTile_M2C(string[] actionJsonList, string renderJson1, string renderJson2)
+    {
+        List<(int actorNum, ActionData action)> actionList = new List<(int, ActionData)>();
+
+        foreach (var actionJson in actionJsonList)
+        {
+            var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(actionJson);
+            int actorNumber = Convert.ToInt32(dict["actorNumber"]);
+            var action = JsonConvert.DeserializeObject<ActionData>(dict["action"].ToString());
+
+            actionList.Add((actorNumber, action));
+        }
+
+        // 렌더링 데이터도 마찬가지로
+        var r1 = JsonConvert.DeserializeObject<LocalRenderingData>(renderJson1);
+        var r2 = JsonConvert.DeserializeObject<LocalRenderingData>(renderJson2);
+
+       var myAction =  LocalRenderingManager.Instance.Rendering_Before_Tile_Choose_ShowDown(actionList, r1, r2);
+        //
+
+
+        //조건을 내 액션은 이동일 경우에는 암것도 안하는 걸로 해야한다리오리우스
+        if (myAction.actionId !=1)
+        {
+            //상대 생각중!
+
+
+        }
+        else
+        {
+            
+            CardChooseTile.Instance.SetActive(true, myAction);
+
+        }
+         
+    }
+
     [PunRPC]
     void RPC_Only_Sync_C2M()
     {
@@ -1358,42 +1574,31 @@ public class Overmind : MonoBehaviourPunCallbacks
     }
 
 
-    [PunRPC]
-
-    void RPC_ChooseTile(int actornum, string actioJson, string lrpacketjson)
-    {
-
-        
-        if (actornum != PhotonNetwork.LocalPlayer.ActorNumber)
-        {
-            //액터넘이 내가 아닌데, 이미 다른 코루틴이 실행중이라면 을 생각해서 좀해보셈
-
-            //이거 경우 잘 생각해서 기다리기 모션도 잘 만들어보쟈
-        }
-
-        else
-        {
-            var action = JsonConvert.DeserializeObject<ActionData>(actioJson);
-
-            CardChooseTile.Instance.SetActive(true, action);
-
-        }
-
-    }
+    
 
 
     public void SendTile(int actorNum, List<int> tiles)
     {
 
         string tilejson = JsonConvert.SerializeObject(tiles);
-        photonView.RPC(nameof(RPC_ReceiveTile),RpcTarget.MasterClient, actorNum,tilejson  );
+        photonView.RPC(nameof(RPC_ReceiveTile_C2M),RpcTarget.MasterClient, actorNum,tilejson  );
 
 
 
     }
-    
+    public void Send_Extra_Selection(string json)
+    {
+        photonView.RPC(nameof(RPC_Receive_Extra_Select_C2M), RpcTarget.MasterClient, json);
+    }
     [PunRPC]
-    void RPC_ReceiveTile(int actorNum, string tileListJson)
+    void RPC_Receive_Extra_Select_C2M(string esJson)
+    {
+        extraSelectionJson = esJson;
+         Debug.Log($"엑스트라 셀렉션이 잘 도착했다");
+
+    }
+    [PunRPC]
+    void RPC_ReceiveTile_C2M(int actorNum, string tileListJson)
     {
 
         Debug.Log($"[Master] RPC_ReceiveTile 호출됨! actorNum={actorNum}, tileList={tileListJson}");
@@ -1444,37 +1649,6 @@ public class Overmind : MonoBehaviourPunCallbacks
 
     }
 
-
-  /*  IEnumerator afterHook((int actorNum, ActionData action)Nowhooker, HookType h )
-    {
-        int opCost = GetMinOpponentRemainingCost(Nowhooker.actorNum);
-
-        if (!Nowhooker.action.effects.Any(effect => effect.hookType == h)) //이거 왜 들어갔더라 시발.. 이제 슬 기억이 나지 않는다. . .   .
-            yield break;
-        //대처 처리 함수 길어서 함수로 묶음 , 액션 큐를 훑으면서 발동된 액션 외의 액터 넘버의 액션들에 대해 카운터 호출
-        //   MasterCounterEveryResultCalc(next.action, next.actorNumber);
-
-
-
-        //오버마인드 player 딕셔너리를 로컬 player 딕셔너리로 복사
-        photonView.RPC(nameof(RPC_SyncUpdateState), RpcTarget.All, JsonConvert.SerializeObject(players), toSendActionQbutOnlyActorNumandCost());
-        yield return new WaitUntil(() => syncCount == 2);
-        syncCount = 0;
-
-        //발동된 애니메이션 결과 출력 . 코스트도 여기서 넘겨줌
-        //이제 코스트안넘겨도됨
-        string actionJson = JsonConvert.SerializeObject(Nowhooker.action);
-        photonView.RPC(nameof(RPC_PlayAction), RpcTarget.All, Nowhooker.actorNum, actionJson, opCost,h);
-        //여기서 출력되어야하는 애니메이션을 한번에 보여주면 됨 그냥(순차적으로)
-        //한번의 해프터 후커당 하나의 애니메이션이 출력된다고 생각해라 게이야 
-        yield return new WaitUntil(() => syncCount == 2); //나중에 수정하든가 
-        syncCount = 0;
-
-
-
-    }
-
-    */
 
 
 
@@ -1587,7 +1761,7 @@ public class Overmind : MonoBehaviourPunCallbacks
     /// <summary>
     /// 두 플레이어가 동시에 남은 Cost == 0이 되어 충돌할 때 호출
     /// </summary>
-    private IEnumerator HandleRumblePhase()
+    private IEnumerator ShowDown()
     {
         int showdownCircFlag = 0;
 
@@ -1602,77 +1776,64 @@ public class Overmind : MonoBehaviourPunCallbacks
         // 1) 맞붙는 두 액션 빼내기
         var first = actionQueue[0];
         var second = actionQueue[1];
-        actionQueue.RemoveRange(0, 2);
 
         var a1 = (actor: first.actorNumber, action: first.action);
         var a2 = (actor: second.actorNumber, action: second.action);
 
         // 2) BeforeRumble 훅 처리 (럼블 포인트 계산용)
 
-        // 3) 실제 격돌 판정
-        bool isMain1 = a1.action.actionId == 1;
-        bool isMain2 = a2.action.actionId == 1;
+        // 3) 이동인지 액션인지
+        bool isAction1 = a1.action.actionId == 1;
+        bool isAction2 = a2.action.actionId == 1;
 
 
-        //선공 불가 선언 및 쇼다운 외 다음 액션 있나 체크
-        ActionData a1soppmove = null;
-        ActionData a1soprightnextmove = null;
-        ActionData a2soppmove = null;
-        ActionData a2soprightnextmove = null;
+        ActionData a1ttAction = a1.action;
+        ActionData a2ttAction = a2.action;
+        ActionData a1MainAction = null;
+        ActionData a2MainAction = null;
 
-        int nextOpMoveChecker = 0;
-        //  if (next.action.actionId == 1)
-        //    {
-        for (int i = 0; i < actionQueue.Count; i++)
+        // 1. 큐 내 모든 액션의 hasOtherExecutedSinceInsertion = true
+        foreach (var tuple in actionQueue)
         {
-            if (actionQueue[i].actorNumber != a1.actor)
+            tuple.action.hasOtherExecutedSinceInsertion = true;
+        }
+
+        // 2. 메인 액션 판별 (asCombo == false)
+        foreach (var tuple in actionQueue)
+        {
+            if (!tuple.action.asCombo)
             {
-                nextOpMoveChecker++;
-
-                a1soppmove = actionQueue[i].action;
-
-                if (nextOpMoveChecker == 1)
+                if (tuple.actorNumber == a1.actor)
                 {
-                    a1soprightnextmove = a1soppmove;
+                    a1MainAction = tuple.action;
                 }
-                if (a2.action.actionId == 1)
-                    a1soppmove.hasOtherExecutedSinceInsertion = true; //즉 단순 이동으로는 선공을 끊을 수 없다 ㅎ
+                else if (tuple.actorNumber == a2.actor)
+                {
+                    a2MainAction = tuple.action;
+                }
             }
         }
 
-        nextOpMoveChecker = 0;
 
-        for (int i = 0; i < actionQueue.Count; i++)
-        {
-            if (actionQueue[i].actorNumber != a2.actor)
-            {
-                nextOpMoveChecker++;
+        
+        yield return Showdown_chooseTile((a1.actor, a1.action), (a2.actor,a2.action));
 
-                a2soppmove = actionQueue[i].action;
+               //추가사항//
 
-                if (nextOpMoveChecker == 1)
-                {
-                    a2soprightnextmove = a2soppmove;
-                }
-                if (a1.action.actionId == 1)
-                    a2soppmove.hasOtherExecutedSinceInsertion = true; //즉 단순 이동으로는 선공을 끊을 수 없다 ㅎ
-            }
-        }
+        //여기에 두 캐릭터 컷신 뙁 하며 나오면서 맞붙는 연출 쏴주는 RPC 작성하기 ㅎ ㅎ//
 
-        yield return chooseTile((a1.actor, a1.action), (a2.actor,a2.action));
-
-
+        //추가사항//
 
         // 두 액션 모두 메인액션인 경우만 진짜 격돌
-        if (isMain1 && isMain2)
+        if (isAction1 && isAction2)
         {
 
 
             MasterBeforeRumbleCalc(a1.actor, a1.action, a2.action);
             MasterBeforeRumbleCalc(a2.actor, a2.action, a1.action);
             //각각의 럼블포인트 계산
-            int rumble1 = isMain1 ? a1.action.rumblePoint : int.MinValue;
-            int rumble2 = isMain2 ? a2.action.rumblePoint : int.MinValue;
+            int rumble1 = isAction1 ? a1.action.rumblePoint : int.MinValue;
+            int rumble2 = isAction2 ? a2.action.rumblePoint : int.MinValue;
 
             // 3.1 진짜 격돌: 서로의 범위 안에 있는지 확인
             bool inRange1 = IsInEffectRange(a1.actor, a1.action, a2.actor);
@@ -1685,18 +1846,19 @@ public class Overmind : MonoBehaviourPunCallbacks
                 {
 
                     showdownCircFlag = a1.actor;
-                    yield return MasterRumbleCalc(a1.actor, a2.actor,  a1.action, a2.action, a2soprightnextmove, a1soprightnextmove, showdownCircFlag);
+                    yield return Rumble_Single_Action_Calc(a1.actor, a1.action,a2.action, a2MainAction, a1MainAction,  showdownCircFlag);
                 }
                 else if (rumble2 > rumble1)
                 {
                     showdownCircFlag = a2.actor;
-                    yield return MasterRumbleCalc(a1.actor, a2.actor, a1.action, a2.action, a2soprightnextmove, a1soprightnextmove, showdownCircFlag);
+                    yield return Rumble_Single_Action_Calc(a2.actor, a2.action, a1.action, a1MainAction, a2MainAction, showdownCircFlag);
                 }
                 else
                 {
 
                     showdownCircFlag = 7;
-                    yield return MasterRumbleCalc(a1.actor, a2.actor, a1.action, a2.action, a2soprightnextmove, a1soprightnextmove, showdownCircFlag);
+                    //비기면 그냥 튕겨나가자 .. 아무 일도 일어나지 않고
+                    //yield return Rumble_Action_Calc(a1.actor, a2.actor, a1.action, a2.action, a2soprightnextmove, a1soprightnextmove, showdownCircFlag);
 
                 }
 
@@ -1706,30 +1868,31 @@ public class Overmind : MonoBehaviourPunCallbacks
             //applyunilateralhit 이랑 어차피 동작이 똑같음
             else if (inRange1)
             {
-
+                //생각해보면 안맞추면 발동된다는게 너무 개사기 같아서 
                 showdownCircFlag = 5;
-                yield return MasterRumbleCalc(a1.actor, a2.actor, a1.action, a2.action, a2soprightnextmove, a1soprightnextmove, showdownCircFlag);
+                yield return Rumble_Single_Action_Calc(a1.actor, a1.action, a2.action, a2MainAction, a1MainAction, showdownCircFlag);
 
             }
 
             else if (inRange2)
             {
 
-
+                //생각해보면 안맞추면 발동된다는게 너무 개사기 같아서 
                 showdownCircFlag = 4;
-                yield return MasterRumbleCalc(a1.actor, a2.actor, a1.action, a2.action, a2soprightnextmove, a1soprightnextmove, showdownCircFlag);
+                yield return Rumble_Single_Action_Calc(a2.actor, a2.action, a1.action, a1MainAction, a2MainAction, showdownCircFlag);
 
             }
             else {
                 //둘다 빗나감
                 showdownCircFlag = 3;
-                yield return MasterRumbleCalc(a1.actor, a2.actor, a1.action, a2.action, a2soprightnextmove, a1soprightnextmove, showdownCircFlag);
+                //뭔가 젖병신같음 ㅋ
+                //yield return MasterRumbleCalc(a1.actor, a2.actor, a1.action, a2.action, a2soprightnextmove, a1soprightnextmove, showdownCircFlag);
 
             }
         }
         else
         {
-            if (isMain1 ^ isMain2) // 한명은 이동 한명은 액션인 경우이다
+            if (isAction1 ^ isAction2) // 한명은 이동 한명은 액션인 경우이다
             {
                 int prevPos = players[a1.actor].curpos;
                 if (a1.action.actionId == 0)//이동 , 액션 순서
@@ -1772,35 +1935,24 @@ public class Overmind : MonoBehaviourPunCallbacks
                     }
                 }
 
-                yield return MasterRumbleCalc(a1.actor, a2.actor, a1.action, a2.action, a2soprightnextmove, a1soprightnextmove, showdownCircFlag);
+                yield return Rumble_Multi_Action_Calc(a1.actor, a2.actor, a1.action, a2.action, a1MainAction, a2MainAction, showdownCircFlag);
 
 
             }
             else //둘다 평화로운 이동이다 
             {
                 showdownCircFlag = 3;
-                yield return MasterRumbleCalc(a1.actor, a2.actor, a1.action, a2.action, a2soprightnextmove, a1soprightnextmove, showdownCircFlag);
+                yield return Rumble_Multi_Action_Calc(a1.actor, a2.actor, a1.action, a2.action, a1MainAction, a2MainAction, showdownCircFlag);
 
 
             }
         }
 
-        // 4) 결과 동기화 & 애니메이션 RPC
-       /* photonView.RPC(nameof(RPC_SyncUpdateState), RpcTarget.All, JsonConvert.SerializeObject(players));
-        yield return new WaitUntil(() => syncCount == 2);
-        syncCount = 0;
 
-        string json1 = JsonConvert.SerializeObject(a1.action);
-        string json2 = JsonConvert.SerializeObject(a2.action);
-        photonView.RPC(nameof(RPC_PlayShowDownAction), RpcTarget.All,
-            a1.actor, json1, a2.actor, json2,
-            showdownCircFlag,          // 승자 ActorNumber 또는 -1
-            GetMaxOpponentRemainingCost(a1.actor),   // 다음 Cost1
-            GetMaxOpponentRemainingCost(a2.actor));  // 다음 Cost2
+        actionQueue.RemoveRange(0, 2);
 
-        yield return new WaitUntil(() => syncCount == 2);
-        syncCount = 0;
-    */}
+
+    }
 
     /// <summary>두 액션이 서로의 효과 범위에 들어왔는지 체크</summary>
     private bool IsInEffectRange(int sourceActor, ActionData sourceAction, int targetActor)
@@ -1880,7 +2032,7 @@ public class Overmind : MonoBehaviourPunCallbacks
                             syncCount = 0;
             }
 
-            BoundChecker.BoundParamReset();
+         //  BoundChecker.BoundParamReset();
 
         }
         else

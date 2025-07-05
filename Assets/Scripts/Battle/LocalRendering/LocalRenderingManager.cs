@@ -163,12 +163,24 @@ public class LocalRenderingManager : MonoBehaviour
 
     }
 
-    public void Rendering_Before_Tile_Choose(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action)
-        {
+    public void Rendering_Before_Tile_Choose(LocalRenderingData data1, LocalRenderingData data2)
+    {
+
+
+        List<RenderDiff> diffs = CopyandDifferences(data1, data2);
+        StartCoroutine(AnimateStatChange("remainingCost", diffs));
+        ApplyDiffsToLocalRenderingData(diffs);
+
+        Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
+
+
+    }
+    public void Rendering_Tile_Choose(int actorNum, ActionData action)
+    {
 
 
 
-        if(actorNum != PhotonNetwork.LocalPlayer.ActorNumber)
+        if (actorNum != PhotonNetwork.LocalPlayer.ActorNumber)
         {
             AlertDialogue.Instance.StartDialogue(action, 0, 0, 0, DialogueType.TileChoose);
 
@@ -180,10 +192,38 @@ public class LocalRenderingManager : MonoBehaviour
         }
 
 
+
+    }
+    public ActionData Rendering_Before_Tile_Choose_ShowDown( List <(int actorNum, ActionData action)> actionList,  LocalRenderingData data1, LocalRenderingData data2)
+    {
+        int myActorNum = PhotonNetwork.LocalPlayer.ActorNumber;
+
+        var myActionTuple = actionList.FirstOrDefault(pair => pair.actorNum == myActorNum);
+
+        if (myActionTuple.action == null)
+        {
+            Debug.LogError($"로컬 플레이어의 액션을 찾을 수 없습니다. (ActorNumber: {myActorNum})");
+            return null;
+        }
+
+        ActionData myAction = myActionTuple.action;
+
+        if (myAction.actionId ==1)
+        {
+            AlertDialogue.Instance.StartDialogue(myAction, 0, 0, 0, DialogueType.TileChoose);
+
+        }
+        else
+        {
+            AlertDialogue.Instance.StartDialogue(null, 0, 0, 0, DialogueType.Wait);
+        }
+
+
         List<RenderDiff> diffs = CopyandDifferences(data1, data2);
         StartCoroutine(AnimateStatChange("remainingCost", diffs));
         ApplyDiffsToLocalRenderingData(diffs);
 
+        return myAction;
     }
 
     private IEnumerator AnimateStatChange(string fieldName, List<RenderDiff> diffs)

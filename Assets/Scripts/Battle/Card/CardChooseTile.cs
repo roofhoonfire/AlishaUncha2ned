@@ -192,7 +192,7 @@ public class CardChooseTile : MonoBehaviour
         throw new System.ArgumentOutOfRangeException(nameof(deg), deg, "지원되지 않는 각도입니다.");
     }
 
-    private void HighlightTiles(List<Vector3Int> coordsToHighlight)
+    public void HighlightTiles(List<Vector3Int> coordsToHighlight)
     {
         foreach (var kvp in GridManagement.Instance.tileObjects)
         {

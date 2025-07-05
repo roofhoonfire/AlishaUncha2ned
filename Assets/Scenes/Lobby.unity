@@ -502,6 +502,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   localDeckLoader: {fileID: 1149971053}
   globalaction: 0
+  syncCount: 0
   cycleState: 0
 --- !u!114 &365383672
 MonoBehaviour:

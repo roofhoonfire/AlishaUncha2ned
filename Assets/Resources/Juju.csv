@@ -1,4 +1,4 @@
-﻿#code,type,name,sprite,animation,addingCard,boundPoint,onlyOnce,require,isUsed,cardText
+#code,type,name,sprite,animation,addingCard,boundPoint,onlyOnce,require,isUsed,cardText
 j1,handAdd,마무리 일격,,,c7,1,0,none,,메인 액션에 피해를 20추가하는 “마무리 일격”을 손 패에 추가합니다
 j2,handAdd,속임수 주사위,,,c8,2,0,none,,캐스팅을 +-3 조절할 수 있는 “속임수 주사위”를 손 패에 추가합니다
 j3,handAdd,시동이 걸리는군,,,c10,2,0,none,,시동이 걸리는 멋진 카드를 손 패에 추가합니다

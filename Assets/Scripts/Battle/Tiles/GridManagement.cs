@@ -139,7 +139,163 @@ public class GridManagement : MonoBehaviour
         }
         return null;
     }
+
     public void HighlightReachableTilesFrom(int startIndex, int maxCost, Color tileColor, string MoveOrSkill)
+    {
+        // 모든 타일 초기화
+        foreach (var tileObj in tileObjects.Values)
+        {
+            EachTile tile = tileObj.GetComponent<EachTile>();
+            tile.defaultColor = Color.white;
+            tile.cost = 0;
+            tile.canMove = false;
+            tileObj.GetComponent<SpriteRenderer>().color = tile.defaultColor;
+        }
+
+        Queue<(int index, int dist)> queue = new();
+        HashSet<int> visited = new();
+
+        queue.Enqueue((startIndex, 0));
+        visited.Add(startIndex);
+
+        if (MoveOrSkill == "LinearSkill")
+        {
+            int linearLength = maxCost - 10;
+            Vector3Int playerCoord = GetCoordFromIndex(startIndex);
+
+            foreach (var dir in HexSkill.Directions)
+            {
+                Vector3Int curCoord = playerCoord;
+
+                for (int i = 1; i <= linearLength; i++)
+                {
+                    curCoord += dir;
+
+                    if (coordToIndex.TryGetValue(curCoord, out int nextIndex))
+                    {
+                        GameObject tileObj = tileObjects[nextIndex];
+                        EachTile tile = tileObj.GetComponent<EachTile>();
+
+                        tile.cost = i;
+                        tile.canMove = true;
+                        tile.defaultColor = tileColor;
+                        tileObj.GetComponent<SpriteRenderer>().color = tileColor;
+                    }
+                    else
+                    {
+                        break; // 맵 바깥
+                    }
+                }
+            }
+        }
+        else if (MoveOrSkill == "Kawari")
+        {
+            // "좌상(4)", "좌하(2)", "우상(5)", "우하(1)" 방향만 허용
+            int[] allowedDirs = { 1, 2, 4, 5 };
+
+            while (queue.Count > 0)
+            {
+                var (currentIndex, dist) = queue.Dequeue();
+                if (dist > maxCost) continue;
+
+                GameObject tileObj = tileObjects[currentIndex];
+                EachTile tile = tileObj.GetComponent<EachTile>();
+
+                bool isStartTile = currentIndex == startIndex;
+                bool isPlayerTile = false;
+
+                foreach (var pl in LocalRenderingStatic.localRenderingDatas.Values)
+                {
+                    if (currentIndex == pl.curpos)
+                    {
+                        isPlayerTile = true;
+                        break;
+                    }
+                }
+
+                bool shouldHighlight = !isStartTile && !isPlayerTile;
+
+                if (shouldHighlight)
+                {
+                    tile.cost = dist;
+                    tile.canMove = true;
+                    tile.defaultColor = tileColor;
+                    tileObj.GetComponent<SpriteRenderer>().color = tileColor;
+                }
+
+                Vector3Int currentCoord = GetCoordFromIndex(currentIndex);
+                foreach (int dirIdx in allowedDirs)
+                {
+                    Vector3Int nextCoord = currentCoord + HexSkill.Directions[dirIdx];
+                    if (coordToIndex.TryGetValue(nextCoord, out int nextIndex) && !visited.Contains(nextIndex))
+                    {
+                        visited.Add(nextIndex);
+                        queue.Enqueue((nextIndex, dist + 1));
+                    }
+                }
+            }
+        }
+        else
+        {
+            while (queue.Count > 0)
+            {
+                var (currentIndex, dist) = queue.Dequeue();
+                if (dist > maxCost) continue;
+
+                GameObject tileObj = tileObjects[currentIndex];
+                EachTile tile = tileObj.GetComponent<EachTile>();
+
+                bool isStartTile = currentIndex == startIndex;
+                bool isPlayerTile = false;
+
+                if (MoveOrSkill == "Move")
+                {
+                    foreach (var pl in LocalRenderingStatic.localRenderingDatas.Values)
+                    {
+                        if (currentIndex == pl.curpos)
+                        {
+                            isPlayerTile = true;
+                            break;
+                        }
+                    }
+                }
+
+                bool shouldHighlight = false;
+
+                if (MoveOrSkill == "Skill")
+                {
+                    shouldHighlight = !isStartTile;
+                }
+                else if (MoveOrSkill == "Move")
+                {
+                    shouldHighlight = !isStartTile && !isPlayerTile;
+                }
+
+                if (shouldHighlight)
+                {
+                    tile.cost = dist;
+                    tile.canMove = true;
+                    tile.defaultColor = tileColor;
+                    tileObj.GetComponent<SpriteRenderer>().color = tileColor;
+                }
+
+                Vector3Int currentCoord = GetCoordFromIndex(currentIndex);
+                foreach (var dir in HexSkill.Directions)
+                {
+                    Vector3Int nextCoord = currentCoord + dir;
+                    if (coordToIndex.TryGetValue(nextCoord, out int nextIndex) && !visited.Contains(nextIndex))
+                    {
+                        visited.Add(nextIndex);
+                        queue.Enqueue((nextIndex, dist + 1));
+                    }
+                }
+            }
+        }
+    }
+
+
+    //위에꺼 안되면 아래의 봉인을 푼다 
+    /*public void HighlightReachableTilesFrom(int startIndex, int maxCost, Color tileColor, string MoveOrSkill)
     {
         // 모든 타일 초기화
         foreach (var tileObj in tileObjects.Values)
@@ -250,7 +406,9 @@ public class GridManagement : MonoBehaviour
                 }
             }
         }
-    }
+    }*/
+
+
 
     public void ResetAllTiles()
     {

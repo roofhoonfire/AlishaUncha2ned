@@ -5036,6 +5036,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1334487629}
   - component: {fileID: 1334487631}
+  - component: {fileID: 1334487640}
   - component: {fileID: 1334487630}
   - component: {fileID: 1334487632}
   - component: {fileID: 1334487633}
@@ -5229,6 +5230,18 @@ MonoBehaviour:
   mycostRemainTxt: {fileID: 726422197}
   myBound: {fileID: 137304237}
   OpBound: {fileID: 1758977989}
+--- !u!114 &1334487640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334487628}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d39b12d9e55714c4ebc8da235d034fd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1334508145
 GameObject:
   m_ObjectHideFlags: 0

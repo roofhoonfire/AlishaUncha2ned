@@ -1,7 +1,10 @@
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -31,7 +34,8 @@ public class Card
 }
 public enum HookType { Activate, Priority, IQA, Counter, Guard ,BeforeRumble, RumbleWin, RumbleLose, Combo, Support }
 public enum EffectType { Damage, whenAttackedFlagOn, Move, Heal, StackDamage,  GetDefense, DamageMeBangMoo, AddDamage, MoveToSelectedTile, OpNextActionisMoveFlagOn,
-    whenDamagedFlagOn, NotRumbleFlagOn, ReplaceNextOpsMovetoStun, StunRecovery, SelectActionClockChange, UseEnergy, ReduceMyNextTurnActionClock}
+    whenDamagedFlagOn, NotRumbleFlagOn, ExtraSelect_Kawari, ReplaceNextOpsMovetoStun, StunRecovery, SelectActionClockChange, UseEnergy, TrueDamage, MakeItTrue, PrevCycleClockFlagOn,  ReduceMyNextTurnActionClock
+}
 
 
 public class CardEffect
@@ -50,64 +54,68 @@ public class CardEffect
     }
 
     //데미지 계산시의 수비는 모두 MainAction 시리즈
-    public void Norm_Apply(int hActorNum, int hOpActorNum, int ttActorNUm, ActionData hAction,  ActionData hOpMainAction, ActionData hMainAction, ActionData ttAction)
+    public IEnumerator Norm_Apply(
+    int hActorNum,
+    int hOpActorNum,
+    ActionData hAction,
+    ActionData hOpMainAction,
+    ActionData hMainAction,
+    ActionData ttAction)
     {
-
-        //if (rumbleOp != null)
-        //{
-        //   isRumble = true;
-        //}
-        // else
-        // {
-        //   isRumble = false;
-        //}
         switch (effectType)
         {
-
             case EffectType.Move:
-                // Overmind.Instance.players[actorNum].canMove = false;
-                CardAction.Instance.MoveChara(hActorNum, amount);
-                Debug.Log($"플레이어 {hActorNum}이 {amount}로 이동한다");
-
+                CardAction.Instance.MoveChara(hActorNum, hAction.destindex);
+                Debug.Log($"플레이어 {hActorNum}이 {hAction.destindex}로 이동한다");
                 break;
-
 
             case EffectType.Damage:
-                // actorId가 공격자, opponent.ownerId가 피해 대상이라 가정
-                CardAction.Instance.DealDamage(hActorNum, hOpActorNum, hAction, amount, hAction.effectTiles, hOpMainAction);
+                CardAction.Instance.DealDamage(hActorNum, hOpActorNum, hAction, hAction.effectTiles, hOpMainAction);
                 Debug.Log($"플레이어 {hActorNum}이 플레이어{hOpActorNum}에게 {hAction.damage}의 피해를 입힌다");
                 break;
-            case EffectType.StackDamage: //피해 저장하는 대처 같은 넘
+
+            case EffectType.TrueDamage:
+                CardAction.Instance.TrueDamage(hActorNum, hOpActorNum, hAction, hAction.effectTiles);
+                Debug.Log($"플레이어 {hActorNum}이 플레이어{hOpActorNum}에게 {hAction.damage}의 고정 피해를 입힌다");
+                break;
+
+            case EffectType.MakeItTrue:
+                CardAction.Instance.MakeItTrue(hAction, hOpMainAction);
+                Debug.Log($"플레이어 {hActorNum}의 피해 {hAction.damage}는 이제 고정뎀이다 ㄷㄷ");
+                break;
+
+            case EffectType.StackDamage:
                 CardAction.Instance.StackDamage(hActorNum, hAction);
                 Debug.Log($"플레이어 {hActorNum}의 데미지 업데이트 : {hAction.damage}");
                 break;
+
             case EffectType.GetDefense:
                 CardAction.Instance.GetDefense(hActorNum, hAction, amount);
                 Debug.Log($"플레이어 {hActorNum}이 {amount}의 방어도를 추가한다");
-
                 break;
+
             case EffectType.DamageMeBangMoo:
                 CardAction.Instance.DamageMeBangMoo(hActorNum, amount);
                 Debug.Log($"플레이어 {hActorNum}이 {amount}의 고정 데미지를 스스로 입는다 ㅋㅋ 병신");
-
                 break;
+
             case EffectType.AddDamage:
                 CardAction.Instance.AddDamage(hActorNum, hAction, amount);
                 Debug.Log($"플레이어 {hActorNum}이 {amount}를 추가 피해 하려고한다");
                 break;
 
-           
             case EffectType.OpNextActionisMoveFlagOn:
                 if (hOpMainAction.actionId == 0)
                 {
                     CardAction.Instance.FlagOn(hActorNum, hAction, amount);
                     Debug.Log($"상대의 다음 행동이 이동이므로 플래그 {amount}가 추가된다");
-                    break;
                 }
-
-                Debug.Log($"이동이 아니기 때문에 플래그 {amount}가 추가되지 아늠");
-
+                else
+                {
+                    Debug.Log($"이동이 아니기 때문에 플래그 {amount}가 추가되지 않음");
+                }
                 break;
+
             case EffectType.ReplaceNextOpsMovetoStun:
                 CardAction.Instance.StunOp(amount, hOpActorNum);
                 Debug.Log($"크하하 플레이어 {hOpActorNum}은 이제 {amount}동안 기절이다 꼴 좋군!");
@@ -117,75 +125,101 @@ public class CardEffect
                 CardAction.Instance.StunRecovery(hActorNum);
                 Debug.Log($"크하하 플레이어 {hActorNum}은 기절로 부터 회복했다");
                 break;
+
             case EffectType.SelectActionClockChange:
                 CardMultipleChoice.Instance.ChoiceStart(amount);
                 Debug.Log($"Immediate support card만 가질수 있는 특성이다, Local에서 호출된다");
                 break;
+
             case EffectType.UseEnergy:
                 Overmind.Instance.players[hActorNum].energy -= amount;
-                Debug.Log($"[플레이어 {hActorNum}] energy now {Overmind.Instance.players[hActorNum].energy} ");
+                Debug.Log($"[플레이어 {hActorNum}] energy now {Overmind.Instance.players[hActorNum].energy}");
                 break;
-            case EffectType.ReduceMyNextTurnActionClock:
 
+            case EffectType.ReduceMyNextTurnActionClock:
                 CardAction.Instance.NextTurn_CastingChange(hActorNum, amount);
                 Debug.Log($"플레리어 {hActorNum}의 다음 턴 메인 액션의 캐스팅이 {amount}만큼 줄어든다]");
                 break;
 
             case EffectType.MoveToSelectedTile:
-                int tileIndex = hAction.effectTiles[amount]; //어마운트 번째 인덱스의 타일로 슝좍한다~
+                int tileIndex = hAction.effectTiles[amount];
                 hAction.destindex = tileIndex;
                 CardAction.Instance.MoveToSelectedTile(hActorNum, tileIndex);
                 Debug.Log($"공중 강습이다!");
-
                 break;
-            case EffectType.whenAttackedFlagOn:
-                bool found = false;
-                foreach (var tile in ttAction.effectTiles)
-                {
-                    if (tile == Overmind.Instance.players[hActorNum].curpos)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
 
-                if (found)
+            case EffectType.whenAttackedFlagOn:
                 {
-                    CardAction.Instance.FlagOn(hActorNum, hAction, amount);
-                    Debug.Log($"플레이어 {hActorNum}이 처맞았기 때문에 플래그 {amount}가 추가된다");
-                }
-                else
-                {
-                    Debug.Log($"플레이어 {hActorNum}의 위치는 공격 범위에 없으므로 플래그 추가 안 함");
+                    bool found = false;
+                    foreach (var tile in ttAction.effectTiles)
+                    {
+                        if (tile == Overmind.Instance.players[hActorNum].curpos)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found)
+                    {
+                        CardAction.Instance.FlagOn(hActorNum, hAction, amount);
+                        Debug.Log($"플레이어 {hActorNum}이 처맞았기 때문에 플래그 {amount}가 추가된다");
+                    }
+                    else
+                    {
+                        Debug.Log($"플레이어 {hActorNum}의 위치는 공격 범위에 없으므로 플래그 추가 안 함");
+                    }
                 }
                 break;
 
             case EffectType.whenDamagedFlagOn:
-                bool damaged = false;
-                foreach (var tile in ttAction.effectTiles)
                 {
-                    if (tile == Overmind.Instance.players[hActorNum].curpos)
+                    bool damaged = false;
+                    foreach (var tile in ttAction.effectTiles)
                     {
-                        //액션마다 데미지를 넣자 
-                        if (ttAction.damage > hMainAction.defense)
-                            damaged = true;
-                        break;
+                        if (tile == Overmind.Instance.players[hActorNum].curpos)
+                        {
+                            if (ttAction.damage > hMainAction.defense)
+                                damaged = true;
+                            break;
+                        }
                     }
-                }
 
-                if (damaged)
-                {
-                    CardAction.Instance.FlagOn(hActorNum, hAction, amount);
-                    Debug.Log($"플레이어 {hActorNum}이 피해를 입었기 때무네 때문에 플래그 {amount}가 추가된다");
-                }
-                else
-                {
-                    Debug.Log($"플레이어 {hActorNum}의 위치는 공격 범위에 없으므로 플래그 추가 안 함");
+                    if (damaged)
+                    {
+                        CardAction.Instance.FlagOn(hActorNum, hAction, amount);
+                        Debug.Log($"플레이어 {hActorNum}이 피해를 입었기 때문에 플래그 {amount}가 추가된다");
+                    }
+                    else
+                    {
+                        Debug.Log($"플레이어 {hActorNum}의 위치는 공격 범위에 없으므로 플래그 추가 안 함");
+                    }
                 }
                 break;
 
+            case EffectType.PrevCycleClockFlagOn:
+                if (Overmind.Instance.players[hActorNum].constraintStats.prevCycleActionClocks.Sum() >= amount)
+                {
+                    CardAction.Instance.FlagOn(hActorNum, hAction, 22);
+                }
+                break;
+
+            case EffectType.ExtraSelect_Kawari:
+                Overmind.Instance.extraSelectionJson = null;
+                Overmind.Instance.ExtraSelection_Caller(ExtraSelection.Kawari, hActorNum);
+                Debug.Log("바꿔치기 술법의 발동이다!");
+                yield return new WaitUntil (() => Overmind.Instance.extraSelectionJson != null);
+                hAction.destindex = JsonConvert.DeserializeObject<int>(Overmind.Instance.extraSelectionJson);
+                
+                Overmind.Instance.extraSelectionJson =null;
+                //여기서 json 컨버터로 stirng 인트로 바꾼담에 action의 dest에 박아 넣어주면됨
+                break;
         }
+
+        // 지금은 yield가 필요 없지만, 확장성을 위해 여기 추가
+        yield break;
     }
+
     public void Apply(int actorNum, ActionData myAction,  int oppActorNum, ActionData rightnextopponent , ActionData rightnowOP, ActionData myrightnextAction)
     {
 

@@ -75,6 +75,12 @@ MonoBehaviour:
   - RPC_After_Action_Selection_Sync_M2C
   - RPC_Norm_ChooseAction_M2c
   - RPC_Norm_ChooseAction_M2C
+  - RPC_ShowDown_ChooseTile_M2C
+  - RPC_Rendering_Before_ChooseTile_M2c
+  - RPC_Rendering_Before_ChooseTile_M2C
+  - RPC_Extra_Selection_M2C
+  - RPC_Receive_Extra_Select_C2M
+  - RPC_ReceiveTile_C2M
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

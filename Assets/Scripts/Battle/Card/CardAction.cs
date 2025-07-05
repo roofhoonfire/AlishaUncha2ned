@@ -27,6 +27,7 @@ public class CardAction : MonoBehaviour
 
 
     }
+
     public void StunOp( int amount, int hOpActorNum)
     {
 
@@ -74,10 +75,10 @@ public class CardAction : MonoBehaviour
         myaction.flags.Add(amount);
 
     }
-    public void DealDamage(int hActorNum,int hOpActorNum, ActionData hAction, int amount, List<int> effectTiles,
+    public void DealDamage(int hActorNum,int hOpActorNum, ActionData hAction,  List<int> effectTiles,
         ActionData hOpMainAction) //이새낀 어차피 데미지 스텝만 처리하니까 단순하게
     {
-        int realdamage = amount + hAction.damage;
+        int realdamage =  hAction.damage;
         int reduceDamage = hOpMainAction.defense ;
         
 
@@ -99,6 +100,33 @@ public class CardAction : MonoBehaviour
             
         }
     }
+    public void MakeItTrue(ActionData hAction,ActionData hOpMainAction) //이새낀 어차피 데미지 스텝만 처리하니까 단순하게
+    {
+        hAction.damage += hOpMainAction.defense;
+    }
+    public void TrueDamage(int hActorNum, int hOpActorNum, ActionData hAction,  List<int> effectTiles) //이새낀 어차피 데미지 스텝만 처리하니까 단순하게
+    {
+        int realdamage = hAction.damage;
+        
+        foreach (var tile in effectTiles)
+        {
+            if (tile == Overmind.Instance.players[hOpActorNum].curpos)
+            {
+                Overmind.Instance.players[hOpActorNum].prevHP = Overmind.Instance.players[hOpActorNum].HP;
+                if (hAction.damage  > 0)
+                {
+                    Overmind.Instance.players[hOpActorNum].HP -= (realdamage );
+                    //summary//
+                    //데미지 제약 체커//
+                    Overmind.Instance.players[hActorNum].constraintStats.damageDealtThisCycle += (hAction.damage);
+                }
+                break;
+
+            }
+
+        }
+    }
+
 
     public void AddDamage(int hActorNum, ActionData hAction, int amount)
     {
@@ -114,7 +142,7 @@ public class CardAction : MonoBehaviour
     }
 
     public void GetDefense(int hActorNum, ActionData hAction, int amount) {
-        hAction.defense += amount;
+        hAction.defense = Mathf.Max(0, hAction.defense + amount);
       //  Overmind.Instance.players[actorNum].defense += amount;
     }
 
@@ -129,9 +157,7 @@ public class CardAction : MonoBehaviour
 
      public void NextTurn_CastingChange(int actorNum, int amount)
     {
-        //이거 그냥 players 딕셔너리에 변수하나 둬서 beginchoose 할 때 체크 하고
-        //있으면 거기서 초기화 하고, buffer에 데이터 추가하는 식으로 가야할 드 ㅅ
-        //
+       //실제 다음 턴 캐스팅은 apProp에서 관리하므로 이게 맞다
         Overmind.Instance.players[actorNum].forActionPacket[apProp.tempCast] += amount;
     }
 
