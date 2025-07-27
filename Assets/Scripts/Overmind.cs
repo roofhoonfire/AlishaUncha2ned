@@ -15,11 +15,12 @@ using System.Runtime.ExceptionServices;
 using System.Net.Sockets;
 using UnityEngine.UIElements;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.Analytics;
 
 public enum apProp
 {
 
-    defaultMove,defaultMoveCast,tempCast,permCast,tempDef,permDef,tempDam,permDam, CastingMinimum
+    defaultMove,defaultMoveCast,tempCast,permCast,tempDef,permDef,tempDam,permDam, CastingMinimum, elem_fire, elem_ice, elem_wind, elem_earth
 }
 
 public enum ExtraSelection
@@ -46,10 +47,10 @@ public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 
     public int deckIndexEnd; //이 덱 정보는 지금 로컬에서만 관리되고 마스터로 보내주진않음 
     //즉 방어도 렌더링은 카드 내릴때, 한번 처음 해주고 그 뒤엔 localUIRendering에서 맘껏 건들면될듯 ;;
     public int energy;
-    public bool canMove = true; 
-
+    public bool canMove = true;
+    public bool isInvincible = false;
     public bool isStunned = false;
-
+    public bool isStealthed = false;
     public int actionClockManuplate = 0;
     public int defenseManuplate = 0;
     public int timeBombSetinTomMotion = 0;
@@ -72,8 +73,7 @@ public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 
     //액션 패킷 강화용도
 
     public Dictionary<apProp, int> forActionPacket;
-
-
+    public List<apProp> forActionPacket_elem_List;
 
 
 
@@ -127,20 +127,23 @@ public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 
             {apProp.permDam,0},
             {apProp.tempDam,0},
             {apProp.CastingMinimum,1},
+          
+
         };
-    
-    
-    
-    
-    
-    
+        forActionPacket_elem_List = new List<apProp>();
+
+
+
+
+
+
     }
 }
 
 public class ActionData //여기 뭐 추가할 거면 carddragHandler로 수정해야함
 {
 
-    public int actionId; //0 이면 이동 1이면 카드.. 등
+    public int actionId; //0 이면 이동 1이면 카드, 99면 도트 뎀 
     public int destindex = -10; // 이동 일 경우 목적지 인덱스를 저장// 액션이 destIndex가 있을 경우 해당 위치로 이동 (플레이어 딕셔너리 저장은 따로)//즉 렌더링 용 변수이다 
     public int defense;
     public int damage;
@@ -156,7 +159,7 @@ public class ActionData //여기 뭐 추가할 거면 carddragHandler로 수정�
     public List<AnimationClip> animations;//사실상 필요가 없어졌다
     public bool asCombo = false;    
     public List<CardEffect> effects = new();
-
+    public int Dot_to; //도트 딜이 노리는 액터넘버
     public List<int> effectTiles = new();
 
 
@@ -244,11 +247,12 @@ public class ActionData //여기 뭐 추가할 거면 carddragHandler로 수정�
 
             // 효과 적용 (여기서 애니메이션 대기 등 비동기 처리가 필요하다면 yield 가능)
             yield return e.Norm_Apply(hActorNum, hOpActorNum, this, hOpMainAction, hMainAction, ttAction);
+          //  flags.Remove(e.flag);
 
             // flag 제거
-            flags.Remove(e.flag);
             // 영구 플래그 처리 필요하면 여기에 조건 추가
         }
+
     }
 
 
@@ -367,23 +371,7 @@ public class Overmind : MonoBehaviourPunCallbacks
         Debug.Log($"Overmind: Actor {actorNumber} 덱 코드 저장 - [{string.Join(", ", codes)}]");
     }
 
-    /// <summary>
-    /// 특정 플레이어의 PlayerData를 가져옵니다.
-    /// </summary>
-    public PlayerData GetPlayerData(int actorNumber)
-    {
-        players.TryGetValue(actorNumber, out var data);
-        return data;
-    }
-
-
-    /// <summary>
-    /// 이 오브젝트가 MasterClient에서 실행되고 있는지 여부를 반환합니다.
-    /// </summary>
-    public bool IsRunningOnMaster()
-    {
-        return PhotonNetwork.IsMasterClient;
-    }
+    
 
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -492,20 +480,6 @@ public class Overmind : MonoBehaviourPunCallbacks
         }
     }
 
-    [PunRPC]
-    void RPC_SyncUpdateState(string json, string qjson) //로칼 딕셔너리를 업뎃해줄것임
-    {
-        var data = JsonConvert.DeserializeObject<Dictionary<int, PlayerData>>(json);
-
-
-        var receivedq = JsonConvert
-            .DeserializeObject<List<Dictionary<string, int>>>(qjson);
-        LocalState.Instance?.SyncPartial(data, receivedq); //부분 업데이트 함수
-        
-        // 마스터 포함 모든 클라이언트가 완료 보고
-        photonView.RPC(nameof(RPC_SyncDone), RpcTarget.MasterClient,
-            PhotonNetwork.LocalPlayer.ActorNumber);
-    }
   
 
     public void Hand_Gen(int actorNum)
@@ -641,16 +615,57 @@ public class Overmind : MonoBehaviourPunCallbacks
                 TimeGoesOn();
 
                 int readyCount = 0;
-               while (readyCount < actionQueue.Count && actionQueue[readyCount].remainingCost == 0)
-                    readyCount++;
-               
+                int tempIndex = 0;
+
+                // 도트 뎀 처리 및, 이번 턴 어느 액션 발동 체크 
+                while (tempIndex < actionQueue.Count)
+                {
+                    if (actionQueue[tempIndex].remainingCost != 0)
+                    {
+                        tempIndex++;
+                        continue;
+                    }
+
+                    if (actionQueue[tempIndex].action.actionId == 99)
+                    {
+                        var dotAction = actionQueue[tempIndex].action;
+                        var dotActorNum = dotAction.Dot_to;
+
+                        yield return dotAction.Norm_ProcessHook(HookType.Dot, dotActorNum, GetOtherPlayerNumber(dotActorNum), dotAction, null, null);
+                        yield return Dot_After_Hook((dotActorNum, dotAction), HookType.Dot);
+
+                        actionQueue.RemoveAt(tempIndex);
+                        // tempIndex는 증가하지 않음: RemoveAt 했으니 다음 요소가 자동으로 당겨짐
+                    }
+                    else
+                    {
+                        readyCount++;
+                        tempIndex++;
+                    }
+                }
                 // Find ready actions
+
+
+
+
+
+                //readyCount 0이면 다시 continue로 코드 추가하깅 ㅎ
+                if(readyCount == 0)
+                {
+                    continue;
+                }
+
+
+
+
 
                 //경우  1 : 쇼다운
                 if (readyCount > 1)
                 {
-                    
+                    //액션 발동 되는 곳1
                     yield return ShowDown();
+                    Turn_End_Call();
+
 
                     if (actionQueue.Count <= 0) //연계카드가 없다면 무조건 이 경우일 것
                     {
@@ -741,7 +756,7 @@ public class Overmind : MonoBehaviourPunCallbacks
                 yield return Norm_chooseTile(ttTuple.actorNumber, ttTuple.action);
                 //액션 결과 마스터 내부에서 연산해서 player데이터 바꾸는 함수
                 yield return Norm_Action_Calc(ttActorNum,  ttAction, ttOpMainAction, ttMainAction);//경계와 발동 처리는 여기서 진행한다
-
+                Turn_End_Call();
                 actionQueue.RemoveAt(0);
               
 
@@ -943,59 +958,17 @@ public class Overmind : MonoBehaviourPunCallbacks
     {
         foreach (var p in players)
         {
-            p.Value.prevHP = p.Value.HP;
+            // p.Value.prevHP = p.Value.HP;
+            p.Value.isInvincible = false;
 
         }
 
 
     }
-    
-    IEnumerator  MasterForEveryIntheQueAfterCalc(ActionData nowbaldong, int actorNum, ActionData countersopnextaction, ActionData mynextMove)
-    {
-
-       // if (nowbaldong.actionId == 0)
-         //   return;
-        for (int i = 0; i < actionQueue.Count; i++) //방어도 방어력. 고민하기
-        {
-            if ((actionQueue[i].actorNumber != actorNum))
-            {
-
-                foreach (var e in actionQueue[i].action.effects)
-                {
-                    if (e.hookType == HookType.IQA)
-                    {
-
-                       yield return  MasterIntheQueAfterCalc(actionQueue[i].actorNumber, actionQueue[i].action, countersopnextaction, mynextMove);//대처발동;
-                    }
+   
 
 
-                }
-            }
-        }
-
-    }
-    IEnumerator MasterIntheQueAfterCalc(int actorNum, ActionData action, ActionData countersopnextaction, ActionData myrightnextmove)
-    {
-        //카드의 경우
-        if (action.actionId == 1)
-        {
-
-
-            //여기서 넘겨주는 훅타입은 호출에 필요한 훅타입이여! 여기는 발동 부의 체커니까
-            //action.ProcessHook(HookType.Activate, actorNum, )
-
-            action.ProcessHook(HookType.IQA, actorNum, countersopnextaction, GetOtherPlayerNumber(actorNum),null,myrightnextmove);//다음 플레이어의 액션을 넘겨주는건 추가 함수 작성하자
-            
-            if (action.effects.Any(effect => effect.hookType == HookType.IQA))
-            
-                yield return Norm_After_Hook((actorNum, action), HookType.IQA);
-
-
-        }
-
-    }
-
-    public void MasterBeforeRumbleCalc(int actorNum, ActionData myaction, ActionData opaction)
+    /*public void MasterBeforeRumbleCalc(int actorNum, ActionData myaction, ActionData opaction)
     {
         //카드의 경우
         if (myaction.actionId == 1)
@@ -1006,11 +979,12 @@ public class Overmind : MonoBehaviourPunCallbacks
             //action.ProcessHook(HookType.Activate, actorNum, )
 
             myaction.ProcessHook(HookType.BeforeRumble, actorNum, null, GetOtherPlayerNumber(actorNum),opaction, null);//다음 플레이어의 액션을 넘겨주는건 추가 함수 작성하자
+//            yield return myaction.Norm_ProcessHook(HookType.BeforeRumble, ttActorNum2, ttActorNum1, ttAction1, ttMainAction1, ttMainAction2);
 
         }
 
     }
-
+    */
 
     //이게 로컬 스테이트에서 실행되어야한다
     public void SubmitSelection(ActionData action, int cost, int actorNum, BacktoMaster btmPacket)
@@ -1119,86 +1093,7 @@ public class Overmind : MonoBehaviourPunCallbacks
     }
 
     
-    /*
-    [PunRPC]
-    void RPC_ReceiveSelection(int actorNumber, string actionjson, int cost, string handjson, string trashjson, string deckjson)
-    {
-
-        players[actorNumber].actionClockManuplate = 0;
-        var action = JsonConvert.DeserializeObject<ActionData>(actionjson);
-        var hand = JsonConvert.DeserializeObject<List<string>>(handjson);
-
-        var trash = JsonConvert.DeserializeObject<List<string>>(trashjson);
-        var deck = JsonConvert.DeserializeObject<List<string>>(deckjson);
-
-        //신경 쓰이면 뉴 리스트로 해도 된다 하지만 어차피  ㅋ 
-        players[actorNumber].DeckCodes = deck;
-        players[actorNumber].hands = hand;
-        players[actorNumber].trash = trash;
-
-
-
-
-
-        pendingSelections[actorNumber] = (action, cost);
-        if(action.actionId != 0)
-        {
-            //summary//
-            //제약 체크 용도//
-            ////
-            players[actorNumber].constraintStats.actionUsedHowmany++;
-
-            int opActorNum = GetOtherPlayerNumber(actorNumber);
-
-            int maxRemainingCost = actionQueue
-                .Where(entry => entry.actorNumber == opActorNum)
-                 .Select(entry => entry.remainingCost)
-                .DefaultIfEmpty(0) // 없을 때 0 리턴
-                .Max();
-
-            int diff = Mathf.Abs(maxRemainingCost - action.actionClock);
-
-
-            players[actorNumber].constraintStats.actionClockDiffer.Add(diff);
-            players[actorNumber].constraintStats.thisCycleActionClocks.Add(action.actionClock);
-
-            Debug.Log($"제약 : 플레이어 {actorNumber}의 {players[actorNumber].constraintStats.actionUsedHowmany}와 {players[actorNumber].constraintStats.actionClockDiffer}");
-        }
-        
-    }
-
-    */
-    //
- /*   [PunRPC]
-    void RPC_BeginChooseMove(int actorNumber, bool faceoff, int nthshowdon)
-    {
-
-        if (faceoff)
-        {
-            //로컬 쇼다운 렌더링 함수 고고씽
-
-            LocalState.Instance?.FaceOffRendering(nthshowdon);
-        }
-        //내 아이디면 LocalState.Instance?.StartChooseMovePhase(actorNumber);
-        //어차피 쇼다운에서는 특정 액터에게만 뿌리므로 그렇다!
-        if (actorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
-        {
-            LocalState.Instance?.StartChooseMovePhase(actorNumber);
-        }
-        //니아이디면 남의 선택 기다리는 애니메
-        else
-        {
-
-            //기다리는 함수 렌도링
-            //기다리는 함수 구현 아이디어
-            //playaction RPC들어옴과 동시에 localplayer가 waiting 중이었다면
-            //해당 코루틴을 끝내버리기 . 
-        }
-
-
-
-
-    }*/
+  
 
     [PunRPC]
     void RPC_FaceOff_ChooseAction_M2C(int actorNumber,  int nthFaceOff, string apjson)
@@ -1236,44 +1131,6 @@ public class Overmind : MonoBehaviourPunCallbacks
 
     }
 
- /*   IEnumerator showDownAfterHook(int actor1, int actor2, ActionData action1, ActionData action2, int showdownflag, HookType h)
-    {
-
-        int actor1opCost = GetMinOpponentRemainingCost(actor1);
-        int actor2opCost = GetMinOpponentRemainingCost(actor2);
-
-        
-
-        //오버마인드 player 딕셔너리를 로컬 player 딕셔너리로 복사
-        photonView.RPC(nameof(RPC_SyncUpdateState), RpcTarget.All, JsonConvert.SerializeObject(players), toSendActionQbutOnlyActorNumandCost());
-        yield return new WaitUntil(() => syncCount == 2);
-        syncCount = 0;
-        Debug.Log("쇼다운 후 싱크완료");
-
-        //발동된 애니메이션 결과 출력 . 코스트도 여기서 넘겨줌
-        string actionJson1 = JsonConvert.SerializeObject(action1);
-        string actionJson2 = JsonConvert.SerializeObject(action2);
-
-        //2개의 애니메이션을 한번에 보여주는 코드 일뿐! 헷갈릴거 없다 장훈 쿤
-        photonView.RPC(nameof(RPC_PlayShowDownAction), RpcTarget.All, actor1, actionJson1, actor2, actionJson2, showdownflag, actor1opCost, actor2opCost, h);
-        
-
-        yield return new WaitUntil(() => syncCount == 4); //나중에 수정하든가 
-        syncCount = 0;
-
-
-
-    }
-
-    [PunRPC]
-    void RPC_JustCostRendering(HookType h)
-    {
-
-        LocalState.Instance.OpponentCostRendering(h);
-
-        photonView.RPC(nameof(RPC_SyncDone), RpcTarget.MasterClient,
-              PhotonNetwork.LocalPlayer.ActorNumber);
-    }*/
     IEnumerator Norm_chooseTile(int actornum, ActionData action)
     {
         //lr패킷
@@ -1435,6 +1292,18 @@ public class Overmind : MonoBehaviourPunCallbacks
 
     }
 
+    [PunRPC]
+    void RPC_Dot_Play_Action_M2C(int actorNumber, string actionJson, string lrjson1, string lrjson2, HookType h)
+    {
+
+        var action = JsonConvert.DeserializeObject<ActionData>(actionJson);
+        var data1 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson1);
+
+        var data2 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson2);
+
+        LocalRenderingManager.Instance.Rendering_Dot_Action(actorNumber, data1, data2, action, h);
+
+    }
 
 
 
@@ -1566,13 +1435,6 @@ public class Overmind : MonoBehaviourPunCallbacks
          
     }
 
-    [PunRPC]
-    void RPC_Only_Sync_C2M()
-    {
-        SyncDone();
-
-    }
-
 
     
 
@@ -1635,7 +1497,7 @@ public class Overmind : MonoBehaviourPunCallbacks
         //lr 패킷
 
 
-        int opCost = GetMinOpponentRemainingCost(Nowhooker.actorNum);
+
 
         //여기서 출력되어야하는 애니메이션을 한번에 보여주면 됨 그냥(순차적으로)
         //한번의 해프터 후커당 하나의 애니메이션이 출력된다고 생각해라 게이야 
@@ -1645,7 +1507,43 @@ public class Overmind : MonoBehaviourPunCallbacks
          yield return new WaitUntil(() => syncCount == 2); //나중에 수정하든가 
         syncCount = 0;
 
+    }
 
+
+    IEnumerator Dot_After_Hook((int actorNum, ActionData action) Nowhooker, HookType h)
+    {
+        if (!Nowhooker.action.effects.Any(effect => effect.hookType == h)) //이번 액션에 해당 훅없으면 스킵.
+            yield break;
+
+        //lr 패킷
+        var keys = players.Keys.ToList();
+
+        if (keys.Count < 2)
+        {
+            Debug.LogError("플레이어 수가 2명 미만입니다.");
+            yield break;
+        }
+
+        int var1ActorNum = keys[0];
+        int var2ActorNum = keys[1];
+
+        LocalRenderingData var1 = RenderingConverter.FromPlayer(players[var1ActorNum]);
+        LocalRenderingData var2 = RenderingConverter.FromPlayer(players[var2ActorNum]);
+
+        string var1json = JsonConvert.SerializeObject(var1);
+        string var2json = JsonConvert.SerializeObject(var2);
+        //lr 패킷
+
+
+
+
+        //여기서 출력되어야하는 애니메이션을 한번에 보여주면 됨 그냥(순차적으로)
+        //한번의 해프터 후커당 하나의 애니메이션이 출력된다고 생각해라 게이야 
+        string actionJson = JsonConvert.SerializeObject(Nowhooker.action);
+        photonView.RPC(nameof(RPC_Dot_Play_Action_M2C), RpcTarget.All, Nowhooker.actorNum, actionJson, var1json, var2json, h);
+
+        yield return new WaitUntil(() => syncCount == 2); //나중에 수정하든가 
+        syncCount = 0;
 
     }
 
@@ -1654,30 +1552,6 @@ public class Overmind : MonoBehaviourPunCallbacks
 
 
 
-
-    [PunRPC]
-
-    void RPC_PlayShowDownAction(int actorNumber1, string actionJson1, int actorNumber2, string actionJson2, int showdownflag, int opofa1Cost, int opofa2Cost, HookType h)
-
-    {  // 1, 2 승자 존재: 승자 번호
-       // 3: 동시발동
-       // 4: 00후 처맞기
-       // 5: 처맞고 00하기하기
-       //6 : 아슬아슬 피하기
-       //7: 비김
-       //3 : 원래 안맞는 놈 , 두 플레이어 모두 이동 , 둘다 헛발질
-       //애니메이션 재생 순서가 중요한 경우
-       //00후 처맞기, 처맞고 00하기, 아슬아슬 피하기
-       //그 외에는 두 액션 모두 동시에 출력되도 됨, 
-
-        //플레이 쇼다운 렌더링으로 따로 나눈 이유를 몰르겟다 ㅎ
-
-
-        var action1 = JsonConvert.DeserializeObject<ActionData>(actionJson1);
-        var action2 = JsonConvert.DeserializeObject<ActionData>(actionJson2);
-        LocalState.Instance.PlayShowDownRendering(actorNumber1, actorNumber2, action1, action2, showdownflag, opofa1Cost, opofa2Cost, h);
-
-    }
 
     public void  SyncDone()
     {
@@ -1695,21 +1569,14 @@ public class Overmind : MonoBehaviourPunCallbacks
 
     //액션결과 렌더링하는 함수.. 큭큭..
 
-  
-    [PunRPC]
-    void RPC_PlayAction(int actorNumber, string actionJson, int opCost, HookType h)
-    {
-        var action = JsonConvert.DeserializeObject<ActionData>(actionJson);
-
-        LocalState.Instance?.PlayActionRendering(actorNumber, action, opCost,h);
-    }
-
 
     private void TimeGoesOn()
     {
         //actionqueue에서 발동되는 액션만큼의 remainingcost를 소모하는 함수
         // 정렬되있응께 맨 앞놈이 Min코스트
         int minCost = actionQueue[0].remainingCost;
+        if (minCost == 0)
+            return;
         for (int i = 0; i < actionQueue.Count; i++)
             actionQueue[i] = (actionQueue[i].actorNumber,
                               actionQueue[i].action,
@@ -1743,21 +1610,6 @@ public class Overmind : MonoBehaviourPunCallbacks
         // 그중 최솟값 반환
         return opponentCosts.Min();
     }
-    private int GetMaxOpponentRemainingCost(int actorNum)
-    {
-        // actorNum과 다르고, 남은 코스트를 뽑아서
-        var opponentCosts = actionQueue
-            .Where(entry => entry.actorNumber != actorNum)
-            .Select(entry => entry.remainingCost);
-
-        // 만약 상대 액션이 없다면 0을 반환 (필요하다면 다른 기본값으로 바꿔도 됨)
-        if (!opponentCosts.Any())
-            return 0;
-
-        // 그중 최댓값 반환
-        return opponentCosts.Max();
-    }
-
     /// <summary>
     /// 두 플레이어가 동시에 남은 Cost == 0이 되어 충돌할 때 호출
     /// </summary>
@@ -1824,13 +1676,37 @@ public class Overmind : MonoBehaviourPunCallbacks
 
         //추가사항//
 
-        // 두 액션 모두 메인액션인 경우만 진짜 격돌
+        // 두 액션 모두 액션인 경우만 진짜 격돌
         if (isAction1 && isAction2)
         {
 
 
-            MasterBeforeRumbleCalc(a1.actor, a1.action, a2.action);
-            MasterBeforeRumbleCalc(a2.actor, a2.action, a1.action);
+            //yield return MasterBeforeRumbleCalc(a1.actor, a1.action, a2.action);
+            //yield return MasterBeforeRumbleCalc(a2.actor, a2.action, a1.action);
+
+
+
+
+            //저 널 자리는 이번 턴에 발동되는 액션 자리인데, 격돌에는 2개이므로, 일단 null로
+            //왜냐면 살펴본 바로는 비포 럼블에서는 딱히 저길 건드리는 코드가 없음 .. .
+            yield return a1ttAction.Norm_ProcessHook(HookType.BeforeRumble, a1.actor, a2.actor, null, a2MainAction, a1MainAction);
+            yield return Norm_After_Hook((a1.actor, a1ttAction), HookType.BeforeRumble); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
+
+            yield return a2ttAction.Norm_ProcessHook(HookType.BeforeRumble, a2.actor, a1.actor, null, a1MainAction, a2MainAction);
+            yield return Norm_After_Hook((a2.actor, a2ttAction), HookType.BeforeRumble); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
+
+
+
+
+
+
+
+
+
+
+
+
+
             //각각의 럼블포인트 계산
             int rumble1 = isAction1 ? a1.action.rumblePoint : int.MinValue;
             int rumble2 = isAction2 ? a2.action.rumblePoint : int.MinValue;
@@ -1847,11 +1723,19 @@ public class Overmind : MonoBehaviourPunCallbacks
 
                     showdownCircFlag = a1.actor;
                     yield return Rumble_Single_Action_Calc(a1.actor, a1.action,a2.action, a2MainAction, a1MainAction,  showdownCircFlag);
+                    yield return a1ttAction.Norm_ProcessHook(HookType.RumbleWin, a1.actor, a2.actor, null, a2MainAction, a1MainAction);
+                    yield return Norm_After_Hook((a1.actor, a1ttAction), HookType.RumbleWin); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
+
                 }
                 else if (rumble2 > rumble1)
                 {
                     showdownCircFlag = a2.actor;
                     yield return Rumble_Single_Action_Calc(a2.actor, a2.action, a1.action, a1MainAction, a2MainAction, showdownCircFlag);
+
+                    yield return a2ttAction.Norm_ProcessHook(HookType.RumbleWin, a2.actor, a1.actor, null, a1MainAction, a2MainAction);
+                    yield return Norm_After_Hook((a2.actor, a2ttAction), HookType.RumbleWin); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
+
+
                 }
                 else
                 {
@@ -1859,6 +1743,7 @@ public class Overmind : MonoBehaviourPunCallbacks
                     showdownCircFlag = 7;
                     //비기면 그냥 튕겨나가자 .. 아무 일도 일어나지 않고
                     //yield return Rumble_Action_Calc(a1.actor, a2.actor, a1.action, a2.action, a2soprightnextmove, a1soprightnextmove, showdownCircFlag);
+                    //여기엔 걍 멀티 액션 박는게 맞을지도?
 
                 }
 
@@ -1887,7 +1772,7 @@ public class Overmind : MonoBehaviourPunCallbacks
                 showdownCircFlag = 3;
                 //뭔가 젖병신같음 ㅋ
                 //yield return MasterRumbleCalc(a1.actor, a2.actor, a1.action, a2.action, a2soprightnextmove, a1soprightnextmove, showdownCircFlag);
-
+                //여기엔 걍 멀티 액션 박는게 맞을지도?
             }
         }
         else
@@ -1962,19 +1847,6 @@ public class Overmind : MonoBehaviourPunCallbacks
         return srcTiles.Contains(pos);
     }
 
-  private string toSendActionQbutOnlyActorNumandCost()
-    {
-        var simpleQueue = actionQueue
-        .Select(e => new Dictionary<string, int>
-        {
-            ["actorNumber"] = e.actorNumber,
-            ["remainingCost"] = e.remainingCost
-        })
-        .ToList();
-
-        string queueJson = JsonConvert.SerializeObject(simpleQueue);
-        return queueJson;
-    }
     IEnumerator UpdateCycleState(int newState) {
         //ttMainAction이 asCombo면 이라는 경우를 생각하셈
         if (cycleState == -1)
@@ -1992,10 +1864,13 @@ public class Overmind : MonoBehaviourPunCallbacks
             }
             else if (newState == 1)
             {
+                players[newState].isStealthed = false;
                 players[newState].canMove = true;
             }
             else if (newState == 2)
             {
+
+                players[newState].isStealthed = false;
                 players[newState].canMove = true;
             }
 

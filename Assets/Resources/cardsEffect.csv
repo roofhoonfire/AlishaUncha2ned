@@ -2,19 +2,23 @@
 c1,Activate,Damage,0,0
 c1,Priority,AddDamage,20,0
 c2,Activate,Damage,0,0
-c2,IQA,StackDamage,,
+c2,IQA,StackDamage,0,0
 c3,Guard,whenAttackedFlagOn,1,0
 c3,Guard,GetDefense,10,1
+c3,Guard,Flag_Off,1,1
 c3,Activate,Damage,0,0
-c4 ,Activate,Damage,0,
-c4 ,Priority,DamageMeBangMoo,10,
-c5,Activate,Damage,0,
+c4 ,Activate,Damage,0,0
+c4 ,Priority,DamageMeBangMoo,10,0
+c5,Activate,Damage,0,0
 c5,Counter,whenDamagedFlagOn,1,0
 c5,Counter,DamageMeBangMoo,10,1
+c5,Counter,Flag_Off,1,1
 c6,Activate,Damage,0,0
 c6,Activate,NotRumbleFlagOn,1,0
 c6,Activate,OpNextActionisMoveFlagOn,2,1
 c6,Activate,ReplaceNextOpsMovetoStun,4,2
+c6,Activate,Flag_Off,1,1
+c6,Activate,Flag_Off,2,2
 c7,Activate,AddDamage,20,0
 c8,Support,SelectActionClockChange,3,0
 c9,Activate,Damage,0,0
@@ -25,8 +29,50 @@ c12,Activate,MoveToSelectedTile,0,0
 c12,Activate,Damage,0,0
 c13 ,Counter,whenAttackedFlagOn,1,0
 c13 ,Counter,GetDefense,-20,1
+c13 ,Counter,Flag_Off,1,1
 c14,Activate,Damage,0,0
 c14,Priority,PrevCycleClockFlagOn,15,0
 c14,Priority,MakeItTrue,0,22
 c15,Guard,ExtraSelect_Kawari,0,0
 c15,Guard,Move,0,0
+c16,Activate,NotRumbleFlagOn,30,0
+c17,BeforeRumble,Invincible_forOneAction,0,0
+c17,Activate,Damage,0,0
+c18,Activate,Damage,0,0
+c18,RumbleWin,Heal,10,0
+c19,Activate,MoveToSelectedTile,0,0
+c19,Activate,Stealth,0,0
+c20,Activate,Damage,0,0
+c20,Activate,Get_Element,1,0
+c21,Activate,Damage,0,0
+c21,Activate,Get_Element,2,0
+c22,Activate,Element_Check_FlagOn,22001,0
+c22,Activate,AddDamage,10,1
+c22,Activate,Damage,0,0
+c22,Activate,intheRange_FlagOn,2,1
+c22,Activate,Add_ActionClock_Op,6,2
+c22 ,Activate,Remove_Element,22,1
+c22,Activate,Flag_Off,1,1
+c22,Activate,Flag_Off,2,2
+c23,Activate,Element_Check_FlagOn,11101,0
+c23,Activate,AddDamage,15,1
+c23,Activate,intheRange_FlagOn,2,1
+c23,Activate,Burn_Op,3,2
+c23,Activate,Remove_Element,111,1
+c23,Activate,Flag_Off,1,1
+c23,Activate,Flag_Off,2,2
+c24,Activate,Damage,0,0
+c24,Activate,Element_Check_FlagOn,10001,0
+c24,Activate,Get_Element,1,1
+c24,Activate,Get_Element,1,1
+c25,Activate,DamageMeBangMoo,20,0
+c25,Activate,Get_Element,1,0
+c25,Activate,Get_Element,1,0
+c25,Activate,Get_Element,1,0
+c26,Activate,Element_Check_FlagOn,12001,0
+c26,Activate,intheRange_FlagOn,2,1
+c26,Activate,Add_Defense_Op_intheQ,-99999,2
+c26,Activate,Damage,0,0
+c26,Activate,Remove_Element,21,1
+c26,Activate,Flag_Off,1,1
+c26,Activate,Flag_Off,2,2

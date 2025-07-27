@@ -24,6 +24,8 @@ public static class ActionPacketConverter
             hands = new List<string>(player.hands),
             CastingMinumum = player.forActionPacket[apProp.CastingMinimum],
 
+            //원소도 추가
+            elements = new List<apProp>(player.forActionPacket_elem_List)
 
         };
 
@@ -58,7 +60,7 @@ public class ActionPacketData
     public bool canMove; //1이면 가능 0이면 ㄴㄴ
     public int CastingMinumum;
     public List<string> hands;
-
+    public List<apProp> elements;
 
     //여기 템프 럼블 같은 것도 넣으면 된다
 }

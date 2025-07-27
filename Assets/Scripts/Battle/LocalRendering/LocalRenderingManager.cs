@@ -135,6 +135,41 @@ public class LocalRenderingManager : MonoBehaviour
         List<RenderDiff> diffs = CopyandDifferences(data1, data2);
         StartCoroutine(AnimateStatChange("defense", diffs));
         StartCoroutine(AnimateStatChange("hp", diffs));
+        StartCoroutine(AnimateStatChange("remainingCost", diffs));
+        
+        //캐릭터 위치도 바꿔죠야 함 
+        //이쁘게하는법이나 좀 찾아라
+        //임시이동
+        //나중에 스킬이동인지 그냥이동인지 구분하고 애니메이션이랑 연동해서 잘 동작하게끔 바꾸 3
+        LocalState.Instance.PlayerObDic[data1.actorNum].transform.position = tileIndextoPosition(data1.curpos).position;
+        LocalState.Instance.PlayerObDic[data2.actorNum].transform.position = tileIndextoPosition(data2.curpos).position;
+
+
+        ApplyDiffsToLocalRenderingData(diffs);
+        //일케하면 또 ㄱㅊ을지도 모르겟군 
+        StealthPlayer(diffs); //아마 스텔스도 지금 data1, data2가 각각 신 구로 이해하고 잇을 가능성이 잇음 
+        ElementRenderer.Instance.RenderElementsFromDiffs(diffs);
+
+
+
+        Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
+
+
+    }
+    public void Rendering_Dot_Action(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h)
+    {
+
+        AlertDialogue.Instance.StartDialogue(action, actorNum, h, 0, DialogueType.Activate);
+
+
+        //훅 타입에 맞는 애니메이션 재생해주고 
+
+
+
+        List<RenderDiff> diffs = CopyandDifferences(data1, data2);
+        StartCoroutine(AnimateStatChange("defense", diffs));
+        StartCoroutine(AnimateStatChange("hp", diffs));
+        StartCoroutine(AnimateStatChange("remainingCost", diffs));
 
 
         //캐릭터 위치도 바꿔죠야 함 
@@ -146,13 +181,35 @@ public class LocalRenderingManager : MonoBehaviour
 
 
         ApplyDiffsToLocalRenderingData(diffs);
-
+        //일케하면 또 ㄱㅊ을지도 모르겟군 
+        StealthPlayer(diffs); //아마 스텔스도 지금 data1, data2가 각각 신 구로 이해하고 잇을 가능성이 잇음 
+        ElementRenderer.Instance.RenderElementsFromDiffs(diffs);
 
 
 
         Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
 
 
+    }
+    private void StealthPlayer(List<RenderDiff> diffs)
+    {
+        foreach (var diff in diffs)
+        {
+            if (diff.changedFields.TryGetValue("isStealthed", out var stealthChange))
+            {
+                bool newValue = (bool)stealthChange.Item2;
+                if (LocalState.Instance.PlayerObDic.TryGetValue(diff.actorNum, out var playerOb))
+                {
+                    var sr = playerOb.GetComponent<SpriteRenderer>();
+                    if (sr != null)
+                    {
+                        var color = sr.color;
+                        color.a = newValue ? 0.4f : 1f;
+                        sr.color = color;
+                    }
+                }
+            }
+        }
     }
     private Transform tileIndextoPosition(int tileindex)
     {
@@ -161,6 +218,38 @@ public class LocalRenderingManager : MonoBehaviour
         return GridManagement.Instance?.tileObjects[tileindex].transform.Find("charpoint");
         //리턴 된 놈은 Transform으로 받고 .transform.position으로 써야 작동
 
+    }
+
+    public ActionData Rendering_Before_Tile_Choose_ShowDown(List<(int actorNum, ActionData action)> actionList, LocalRenderingData data1, LocalRenderingData data2)
+    {
+        int myActorNum = PhotonNetwork.LocalPlayer.ActorNumber;
+
+        var myActionTuple = actionList.FirstOrDefault(pair => pair.actorNum == myActorNum);
+
+        if (myActionTuple.action == null)
+        {
+            Debug.LogError($"로컬 플레이어의 액션을 찾을 수 없습니다. (ActorNumber: {myActorNum})");
+            return null;
+        }
+
+        ActionData myAction = myActionTuple.action;
+
+        if (myAction.actionId == 1)
+        {
+            AlertDialogue.Instance.StartDialogue(myAction, 0, 0, 0, DialogueType.TileChoose);
+
+        }
+        else
+        {
+            AlertDialogue.Instance.StartDialogue(null, 0, 0, 0, DialogueType.Wait);
+        }
+
+
+        List<RenderDiff> diffs = CopyandDifferences(data1, data2);
+        StartCoroutine(AnimateStatChange("remainingCost", diffs));
+        ApplyDiffsToLocalRenderingData(diffs);
+
+        return myAction;
     }
 
     public void Rendering_Before_Tile_Choose(LocalRenderingData data1, LocalRenderingData data2)
@@ -194,38 +283,6 @@ public class LocalRenderingManager : MonoBehaviour
 
 
     }
-    public ActionData Rendering_Before_Tile_Choose_ShowDown( List <(int actorNum, ActionData action)> actionList,  LocalRenderingData data1, LocalRenderingData data2)
-    {
-        int myActorNum = PhotonNetwork.LocalPlayer.ActorNumber;
-
-        var myActionTuple = actionList.FirstOrDefault(pair => pair.actorNum == myActorNum);
-
-        if (myActionTuple.action == null)
-        {
-            Debug.LogError($"로컬 플레이어의 액션을 찾을 수 없습니다. (ActorNumber: {myActorNum})");
-            return null;
-        }
-
-        ActionData myAction = myActionTuple.action;
-
-        if (myAction.actionId ==1)
-        {
-            AlertDialogue.Instance.StartDialogue(myAction, 0, 0, 0, DialogueType.TileChoose);
-
-        }
-        else
-        {
-            AlertDialogue.Instance.StartDialogue(null, 0, 0, 0, DialogueType.Wait);
-        }
-
-
-        List<RenderDiff> diffs = CopyandDifferences(data1, data2);
-        StartCoroutine(AnimateStatChange("remainingCost", diffs));
-        ApplyDiffsToLocalRenderingData(diffs);
-
-        return myAction;
-    }
-
     private IEnumerator AnimateStatChange(string fieldName, List<RenderDiff> diffs)
     {
         foreach (var diff in diffs)
@@ -295,8 +352,9 @@ public class LocalRenderingManager : MonoBehaviour
             Compare("defense", localData.defense, incomingData.defense);
             Compare("remainingCost", localData.remainingCost, incomingData.remainingCost);
             Compare("boundIndex", localData.boundIndex, incomingData.boundIndex);
+            Compare("isStealthed", localData.isStealthed, incomingData.isStealthed); // 추가
 
-            bool ListDiff<T>(List<T> a, List<T> b)
+               bool ListDiff<T>(List<T> a, List<T> b)
                 => !(a?.SequenceEqual(b) ?? b == null);
 
             if (ListDiff(localData.hands, incomingData.hands))
@@ -304,6 +362,9 @@ public class LocalRenderingManager : MonoBehaviour
 
             if (ListDiff(localData.bounds, incomingData.bounds))
                 diff.changedFields["bounds"] = (localData.bounds, incomingData.bounds);
+            if (ListDiff(localData.elements, incomingData.elements))
+                diff.changedFields["elements"] = (localData.elements, incomingData.elements);
+
 
             //스테이터스는 보류
             //  if (ListDiff(localData.statuses, incomingData.statuses))
@@ -355,7 +416,12 @@ public class LocalRenderingManager : MonoBehaviour
                     case "bounds":
                         targetData.bounds = new List<string>((List<string>)newVal);
                         break;
-                        // case "statuses": // 향후 구현
+                    case "isStealthed":
+                        targetData.isStealthed = (bool)newVal;
+                        break;
+                    case "elements":
+                        targetData.elements = new List<apProp>((List<apProp>)newVal);
+                        break;    // case "statuses": // 향후 구현
                         //     break;
                 }
             }

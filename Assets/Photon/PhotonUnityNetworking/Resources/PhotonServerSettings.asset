@@ -81,6 +81,7 @@ MonoBehaviour:
   - RPC_Extra_Selection_M2C
   - RPC_Receive_Extra_Select_C2M
   - RPC_ReceiveTile_C2M
+  - RPC_Dot_Play_Action_M2C
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

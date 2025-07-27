@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,6 +27,38 @@ public class CardAction : MonoBehaviour
         Overmind.Instance.players[actorNum].isStunned = false;
 
 
+    }
+    public void Make_Op_Burn(int hOpActorNum, int amount)
+    {
+        for (int i = 0; i < amount; i++)
+        {
+            int clock = (i + 1) * 5;
+
+            ActionData burn = new ActionData
+            {
+                actionId = 99,
+                actionClock = clock,
+                rumblePoint = 0,
+                defense = 0,
+                hasOtherExecutedSinceInsertion = false,
+                cardname = "화상",
+                nthaction = ++Overmind.Instance.globalaction,
+                tileType = -1,
+                zoneIndex = 4,
+                cardcode = "미싱노",
+                Dot_to = hOpActorNum
+            };
+
+            burn.effects.Add(new CardEffect(HookType.Dot, EffectType.Dot_Burn, 5, 0));
+
+            Overmind.Instance.actionQueue.Add((0, burn, clock));
+        }
+
+        Overmind.Instance.actionQueue.Sort((a, b) =>
+            a.remainingCost != b.remainingCost
+                ? a.remainingCost.CompareTo(b.remainingCost)
+                : a.action.nthaction.CompareTo(b.action.nthaction)
+        );
     }
 
     public void StunOp( int amount, int hOpActorNum)
@@ -66,6 +99,51 @@ public class CardAction : MonoBehaviour
 
 
     }
+
+    public void Add_ActionClock_Op_intheQ(int hActorNum, int amount)
+    {
+        for (int i = 0; i < Overmind.Instance.actionQueue.Count; i++)
+        {
+            if (Overmind.Instance.actionQueue[i].actorNumber == hActorNum)
+            {
+                var tuple = Overmind.Instance.actionQueue[i];
+                Overmind.Instance.actionQueue[i] = (tuple.actorNumber, tuple.action, tuple.remainingCost + amount);
+            }
+        }
+
+        Overmind.Instance.actionQueue.Sort((a, b) =>
+            a.remainingCost != b.remainingCost
+                ? a.remainingCost.CompareTo(b.remainingCost)
+                : a.action.nthaction.CompareTo(b.action.nthaction));
+    }
+    public void Add_Defense_Op_intheQ(int hActorNum, int amount)
+    {
+        for (int i = 0; i < Overmind.Instance.actionQueue.Count; i++)
+        {
+            if (Overmind.Instance.actionQueue[i].actorNumber == hActorNum)
+            {
+                var tuple = Overmind.Instance.actionQueue[i];
+
+                tuple.action.defense = Mathf.Max(0, tuple.action.defense + amount);
+                Overmind.Instance.actionQueue[i] = tuple; // 구조체 재할당 필요
+                return;
+            }
+        }
+
+    }
+    public void Add_ActionClock_Op_ApPacket(int hActorNum, int amount)
+    {
+        var packet = Overmind.Instance.players[hActorNum].forActionPacket;
+
+        if (packet.ContainsKey(apProp.tempCast))
+        {
+            packet[apProp.tempCast] += amount;
+        }
+        else
+        {
+            Debug.LogWarning($"[Add_ActionClock_Op_ApPacket] tempCast 항목이 존재하지 않습니다! actorNum: {hActorNum}");
+        }
+    }
     public void MoveChara(int actorNum, int amount) {
         Overmind.Instance.players[actorNum].curpos = amount; //destindex로 할지 amount로 할지 고민중
         //amount로 쓰고 actionData의 destindex는 쓰지 않도록 해보자 
@@ -75,12 +153,58 @@ public class CardAction : MonoBehaviour
         myaction.flags.Add(amount);
 
     }
+
+    public void FlagOff(int actorNum, ActionData myaction, int amount)
+    {
+        myaction.flags.Remove(amount);
+
+    }
+
+    public void Add_Defense_Op_intheQ()
+    {
+
+
+
+    }
+    public void Get_Element(int actorNum, int amount)
+    {
+        if (!Overmind.Instance.players.ContainsKey(actorNum))
+        {
+            Debug.LogWarning($"플레이어 {actorNum}를 찾을 수 없습니다.");
+            return;
+        }
+
+        List<apProp> list = Overmind.Instance.players[actorNum].forActionPacket_elem_List;
+
+        apProp elemToAdd = amount switch
+        {
+            1 => apProp.elem_fire,
+            2 => apProp.elem_ice,
+            3 => apProp.elem_wind,
+            4 => apProp.elem_earth,
+            _ => throw new ArgumentException($"잘못된 amount 값: {amount}")
+        };
+
+        // 리스트 길이가 4면 가장 앞의 요소 제거
+        if (list.Count >= 4)
+        {
+            list.RemoveAt(0);
+        }
+
+        // 새 요소 추가
+        list.Add(elemToAdd);
+    }
     public void DealDamage(int hActorNum,int hOpActorNum, ActionData hAction,  List<int> effectTiles,
         ActionData hOpMainAction) //이새낀 어차피 데미지 스텝만 처리하니까 단순하게
     {
         int realdamage =  hAction.damage;
         int reduceDamage = hOpMainAction.defense ;
-        
+
+        if (Overmind.Instance.players[hOpActorNum].isInvincible)
+        {
+            Debug.Log("상대 플레이어는 무적이다. 딜 안들어간다");
+            return;
+        }
 
         foreach (var tile in effectTiles)
         {
@@ -104,7 +228,7 @@ public class CardAction : MonoBehaviour
     {
         hAction.damage += hOpMainAction.defense;
     }
-    public void TrueDamage(int hActorNum, int hOpActorNum, ActionData hAction,  List<int> effectTiles) //이새낀 어차피 데미지 스텝만 처리하니까 단순하게
+ /*   public void TrueDamage(int hActorNum, int hOpActorNum, ActionData hAction,  List<int> effectTiles) //이새낀 어차피 데미지 스텝만 처리하니까 단순하게
     {
         int realdamage = hAction.damage;
         
@@ -127,7 +251,7 @@ public class CardAction : MonoBehaviour
         }
     }
 
-
+    */
     public void AddDamage(int hActorNum, ActionData hAction, int amount)
     {
         hAction.damage += amount;
@@ -161,6 +285,11 @@ public class CardAction : MonoBehaviour
         Overmind.Instance.players[actorNum].forActionPacket[apProp.tempCast] += amount;
     }
 
+    public void NextTurn_AddDamage(int actorNum, int amount)
+    {
+
+        Overmind.Instance.players[actorNum].forActionPacket[apProp.tempDam] += amount;
+    }
     public void MoveToSelectedTile(int actorNum, int tileIndex)
     {
 

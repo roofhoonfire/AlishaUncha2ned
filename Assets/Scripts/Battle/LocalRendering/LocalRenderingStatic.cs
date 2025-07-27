@@ -43,6 +43,8 @@ public static class RenderingConverter
             remainingCost = remaining,
             boundIndex = player.boundIndex,
             hands = new List<string>(player.hands),
+            isStealthed = player.isStealthed,
+            elements = new List<apProp>(player.forActionPacket_elem_List)
         };
     }
 }
@@ -57,6 +59,8 @@ public class LocalRenderingData
     public List<status> statuses;
     public int remainingCost;
     public int boundIndex;
+    public bool isStealthed;
+    public List<apProp> elements;
     //여기 애니메이션도 들어가야함
     
 }

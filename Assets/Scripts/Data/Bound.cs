@@ -56,7 +56,7 @@ public class Bound
                 return true;
 
 
-            case BoundType.DefenseShouldBe:
+         /*   case BoundType.DefenseShouldBe:
 
                 ActionData result1 = Overmind.Instance.actionQueue.LastOrDefault(entry => entry.actorNumber == actorNum).action;
 
@@ -64,8 +64,14 @@ public class Bound
                     return true;
                 else
                     return false;
+         */
+            case BoundType.DefenseShouldBe:
+                {
+                    var lastEntry = Overmind.Instance.actionQueue
+                        .LastOrDefault(entry => entry.actorNumber == actorNum);
 
-
+                    return lastEntry.action != null && lastEntry.action.defense == amount;
+                }
             case BoundType.DamageShouldBe:
                 var ddtc = playerData[actorNum].constraintStats.damageDealtThisCycle;
                 if (ddtc== amount)
@@ -79,16 +85,23 @@ public class Bound
                     return true;
                 else return false;
 
-
-            case BoundType.LastActionShouldBe: 
+           /* case BoundType.LastActionShouldBe:
 
                 ActionData result = Overmind.Instance.actionQueue.LastOrDefault(entry => entry.actorNumber == actorNum).action;
                 if (result.actionId == amount)
                     return true;
                 else return false;
+            */
+            
+            case BoundType.LastActionShouldBe:
+                {
+                    var lastEntry = Overmind.Instance.actionQueue
+                        .LastOrDefault(entry => entry.actorNumber == actorNum);
 
+                    return lastEntry.action != null && lastEntry.action.actionId == amount;
+                }
 
-                //amount이상인 경우다
+            //amount이상인 경우다
             case BoundType.ActionClockDifferenceShouldBe: //안됨
                 bool result2 =playerData[actorNum].constraintStats.actionClockDiffer.All(val => val >= amount);
 

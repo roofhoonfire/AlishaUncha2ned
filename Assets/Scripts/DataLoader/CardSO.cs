@@ -32,9 +32,12 @@ public class Card
 
     public string cardText;
 }
-public enum HookType { Activate, Priority, IQA, Counter, Guard ,BeforeRumble, RumbleWin, RumbleLose, Combo, Support }
-public enum EffectType { Damage, whenAttackedFlagOn, Move, Heal, StackDamage,  GetDefense, DamageMeBangMoo, AddDamage, MoveToSelectedTile, OpNextActionisMoveFlagOn,
-    whenDamagedFlagOn, NotRumbleFlagOn, ExtraSelect_Kawari, ReplaceNextOpsMovetoStun, StunRecovery, SelectActionClockChange, UseEnergy, TrueDamage, MakeItTrue, PrevCycleClockFlagOn,  ReduceMyNextTurnActionClock
+public enum HookType { Activate, Priority, IQA, Counter, Guard ,BeforeRumble, RumbleWin, RumbleLose, Combo, Support, Dot }
+public enum EffectType {
+    Add_ActionClock_Op, Add_Defense_Op,Add_Defense_Op_intheQ,
+    Burn_Op,
+    Element_Check_FlagOn,  intheRange_FlagOn, Flag_Off, Remove_Element,Invincible_forOneAction,Stealth, Damage, whenAttackedFlagOn, Move, Get_Element, Heal, StackDamage,  GetDefense, DamageMeBangMoo, AddDamage, MoveToSelectedTile, OpNextActionisMoveFlagOn,
+    whenDamagedFlagOn, NotRumbleFlagOn, ExtraSelect_Kawari,NextTurn_AddDamage, ReplaceNextOpsMovetoStun, StunRecovery, SelectActionClockChange, UseEnergy, TrueDamage, MakeItTrue, PrevCycleClockFlagOn,  ReduceMyNextTurnActionClock, Dot_Burn
 }
 
 
@@ -64,21 +67,212 @@ public class CardEffect
     {
         switch (effectType)
         {
+
+
+
+
+
+            case EffectType.Add_Defense_Op_intheQ:
+                {
+                    if (hOpMainAction != null) {
+                        CardAction.Instance.Add_Defense_Op_intheQ(hActorNum, amount);
+                        Debug.Log($"{hActorNum}의 방어도가 {amount}만큼 더해진다 후후");
+                    }
+
+                    break;
+                }
+
+            case EffectType.Element_Check_FlagOn:
+                {
+                    // amount 분해
+                    int depp = amount % 10;
+                    int raw = amount / 10;
+
+                    // 요구 원소 개수 파싱
+                    Dictionary<apProp, int> required = new Dictionary<apProp, int>();
+                    for (int i = 0; i < 4; i++)
+                    {
+                        int digit = raw % 10;
+                        raw /= 10;
+
+                        if (digit == 0) continue;
+
+                        apProp prop = digit switch
+                        {
+                            1 => apProp.elem_fire,
+                            2 => apProp.elem_ice,
+                            3 => apProp.elem_wind,
+                            4 => apProp.elem_earth,
+                        };
+
+                        if (required.ContainsKey(prop))
+                            required[prop]++;
+                        else
+                            required[prop] = 1;
+                    }
+
+                    // 플레이어의 엘리먼트 리스트에서 보유 현황 집계
+                    var elementList = Overmind.Instance.players[hActorNum].forActionPacket_elem_List;
+                    Dictionary<apProp, int> has = new Dictionary<apProp, int>();
+                    foreach (var elem in elementList)
+                    {
+                        if (has.ContainsKey(elem))
+                            has[elem]++;
+                        else
+                            has[elem] = 1;
+                    }
+
+                    // 요구 조건 충족 여부 확인
+                    bool canActivate = true;
+                    foreach (var kvp in required)
+                    {
+                        if (!has.ContainsKey(kvp.Key) || has[kvp.Key] < kvp.Value)
+                        {
+                            canActivate = false;
+                            Debug.Log($"플레이어 {hActorNum}는 스킬 조건을 못채움 ㅋ ");
+
+                            break;
+                        }
+                    }
+
+                    if (canActivate)
+                    {
+                        Debug.Log($"플레이어 {hActorNum}는 스킬 조건을 채웟다1 ");
+                        CardAction.Instance.FlagOn(hActorNum, hAction, depp);
+                    }
+
+                    break;
+                }
+
+            case EffectType.Flag_Off:
+            {
+                    CardAction.Instance.FlagOff(hActorNum, hAction, amount);
+                    Debug.Log("플래그는 제 역할을 다했다 ㅂㅂ");
+                break;
+            }
+            case EffectType.Add_ActionClock_Op:
+                {
+                    bool existsInQueue = Overmind.Instance.actionQueue
+                        .Any(q => q.actorNumber == hOpActorNum);
+
+                    if (existsInQueue)
+                        CardAction.Instance.Add_ActionClock_Op_intheQ(hOpActorNum, amount);
+                    else
+                        CardAction.Instance.Add_ActionClock_Op_ApPacket(hOpActorNum, amount);
+
+                    break;
+                }
+            case EffectType.Remove_Element:
+                {
+                    List<apProp> list = Overmind.Instance.players[hActorNum].forActionPacket_elem_List;
+
+                    int temp = amount;
+                    List<apProp> toRemove = new List<apProp>();
+
+                    // amount → 제거해야 할 원소 리스트로 변환
+                    while (temp > 0)
+                    {
+                        int digit = temp % 10;
+                        temp /= 10;
+
+                        apProp prop = digit switch
+                        {
+                            1 => apProp.elem_fire,
+                            2 => apProp.elem_ice,
+                            3 => apProp.elem_wind,
+                            4 => apProp.elem_earth,
+                            // 이론상 나올 수 없음
+                        };
+
+                        toRemove.Add(prop);
+                    }
+
+                    // 제거 처리
+                    foreach (var elem in toRemove)
+                    {
+                        // 해당 원소가 리스트에 있으면 하나 제거
+                        if (list.Contains(elem))
+                        {
+                            list.Remove(elem);
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"[Remove_Element] {elem} 원소가 부족하여 제거 실패함 (actor: {hActorNum})");
+                        }
+                    }
+
+                    break;
+                }
+            case EffectType.Heal:
+
+                var data = Overmind.Instance.players[hActorNum];
+                data.prevHP = data.HP;
+                data.HP += amount;
+                Debug.Log($"플레이어 {hActorNum}이 {amount}의 체력을 회복한다 ");
+                
+                break;
+
+
+            case EffectType.Burn_Op:
+                CardAction.Instance.Make_Op_Burn(hOpActorNum, amount);
+                Debug.Log($"플레이어 {hActorNum}가 상대를 불태운다 ");
+
+                break;
+            case EffectType.Stealth:
+
+                var dataa = Overmind.Instance.players[hActorNum];
+                dataa.isStealthed = true;
+                Debug.Log($"플레이어 {hActorNum}이 은신을 얻는다 ");
+
+                break;
+
+
+            case EffectType.Get_Element:
+                CardAction.Instance.Get_Element(hActorNum, amount);
+                Debug.Log($"플레이어 {hActorNum}가 원소을 얻는다 ");
+
+                break;
+
+            case EffectType.Dot_Burn:
+                CardAction.Instance.DamageMeBangMoo(ttAction.Dot_to, amount);
+                Debug.Log($"플레이어 {ttAction.Dot_to}가 화상 피해를 입는다 ");
+
+                break;
             case EffectType.Move:
                 CardAction.Instance.MoveChara(hActorNum, hAction.destindex);
                 Debug.Log($"플레이어 {hActorNum}이 {hAction.destindex}로 이동한다");
                 break;
-
+            case EffectType.Invincible_forOneAction:
+                Overmind.Instance.players[hActorNum].isInvincible = true;
+                Debug.Log($"플레이어 {hActorNum}이 이번 턴 피해를 입지 않는다");
+                break;
             case EffectType.Damage:
                 CardAction.Instance.DealDamage(hActorNum, hOpActorNum, hAction, hAction.effectTiles, hOpMainAction);
                 Debug.Log($"플레이어 {hActorNum}이 플레이어{hOpActorNum}에게 {hAction.damage}의 피해를 입힌다");
                 break;
+            case EffectType.intheRange_FlagOn:
+                {
 
-            case EffectType.TrueDamage:
+                    foreach (var tile in hAction.effectTiles)
+                    {
+                        if (tile == Overmind.Instance.players[hOpActorNum].curpos)
+                        {
+                            Debug.Log($" 플레이어{hOpActorNum}가 피격 범위 내이므로 플래그 온즈섹스");
+
+                            CardAction.Instance.FlagOn(hActorNum, hAction, amount);
+
+                            break;
+                        }
+
+                    }
+
+                    break;
+                }
+           /* case EffectType.TrueDamage:
                 CardAction.Instance.TrueDamage(hActorNum, hOpActorNum, hAction, hAction.effectTiles);
                 Debug.Log($"플레이어 {hActorNum}이 플레이어{hOpActorNum}에게 {hAction.damage}의 고정 피해를 입힌다");
                 break;
-
+           */
             case EffectType.MakeItTrue:
                 CardAction.Instance.MakeItTrue(hAction, hOpMainAction);
                 Debug.Log($"플레이어 {hActorNum}의 피해 {hAction.damage}는 이제 고정뎀이다 ㄷㄷ");
@@ -204,6 +398,9 @@ public class CardEffect
                 }
                 break;
 
+            case EffectType.NextTurn_AddDamage:
+                CardAction.Instance.NextTurn_AddDamage(hActorNum, amount);
+                break;
             case EffectType.ExtraSelect_Kawari:
                 Overmind.Instance.extraSelectionJson = null;
                 Overmind.Instance.ExtraSelection_Caller(ExtraSelection.Kawari, hActorNum);

@@ -5044,6 +5044,7 @@ GameObject:
   - component: {fileID: 1334487634}
   - component: {fileID: 1334487635}
   - component: {fileID: 1334487636}
+  - component: {fileID: 1334487641}
   - component: {fileID: 1334487637}
   - component: {fileID: 1334487639}
   m_Layer: 0
@@ -5242,6 +5243,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d39b12d9e55714c4ebc8da235d034fd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  theHilighted: []
+--- !u!114 &1334487641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334487628}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33056ca924f1cd4f872b1e8cf6c33c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  firePrefab: {fileID: 7838189261029325342, guid: 3cc4e9a441dbc6345a6fe9c95c006dbe,
+    type: 3}
+  icePrefab: {fileID: 3312448930239637363, guid: 645afe0aed7271e469059aac1164fc53,
+    type: 3}
+  windPrefab: {fileID: 529711557686112178, guid: ee1c7c80c6d95484591529fb73fc6bd9,
+    type: 3}
+  earthPrefab: {fileID: 9168746589013319465, guid: d2ad33fd3169a7b46a400a6db1a0ddfd,
+    type: 3}
 --- !u!1 &1334508145
 GameObject:
   m_ObjectHideFlags: 0
