@@ -60,6 +60,7 @@ public class LocalRenderingData
     public int remainingCost;
     public int boundIndex;
     public bool isStealthed;
+    public bool isBlinded;
     public List<apProp> elements;
     //여기 애니메이션도 들어가야함
     

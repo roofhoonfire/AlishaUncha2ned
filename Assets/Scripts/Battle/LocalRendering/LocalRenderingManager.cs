@@ -127,6 +127,7 @@ public class LocalRenderingManager : MonoBehaviour
 
         //훅 타입에 맞는 애니메이션 재생해주고 
 
+        CardAnimationRouter.Instance.Play(action.cardcode, actorNum, h);
 
 
         if (h == HookType.Counter)
@@ -198,13 +199,23 @@ public class LocalRenderingManager : MonoBehaviour
             if (diff.changedFields.TryGetValue("isStealthed", out var stealthChange))
             {
                 bool newValue = (bool)stealthChange.Item2;
+
                 if (LocalState.Instance.PlayerObDic.TryGetValue(diff.actorNum, out var playerOb))
                 {
                     var sr = playerOb.GetComponent<SpriteRenderer>();
                     if (sr != null)
                     {
                         var color = sr.color;
-                        color.a = newValue ? 0.4f : 1f;
+
+                        if (newValue) // 스텔스 On
+                        {
+                            color.a = (diff.actorNum == PhotonNetwork.LocalPlayer.ActorNumber) ? 0.4f : 0f;
+                        }
+                        else // 스텔스 Off
+                        {
+                            color.a = 1f;
+                        }
+
                         sr.color = color;
                     }
                 }

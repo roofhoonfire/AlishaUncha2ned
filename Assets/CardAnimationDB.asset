@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d63687d7caf98d45861ba609c3461b8, type: 3}
+  m_Name: CardAnimationDB
+  m_EditorClassIdentifier: 
+  entries:
+  - cardCode: c1
+    hook: 0
+    animatorTrigger: Trig_Slash
+    stateName: Base Layer.Alisha_Slash
+    clip: {fileID: 7400000, guid: c052ebee4afb8ff4aac20e219294e11a, type: 2}
+    totalFramesOverride: 0
+    victimAnimatorTrigger: Trig_Damaged
+    victimStateName: Base Layer.Alisha_Damaged
+    victimClip: {fileID: 7400000, guid: 7fd8eff2fb1d3c04288c0e7d00ae7d49, type: 2}
+    victimStartFrames: 02000000
+    hitStops:
+    - frame: 3
+      duration: 0.7
+      pauseAttacker: 1
+      pauseVictim: 1
+      pauseEffects: 1
+      pauseScene: 0

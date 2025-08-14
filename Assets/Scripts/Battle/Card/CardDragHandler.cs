@@ -18,6 +18,8 @@ public class CardDragHandler : MonoBehaviour,
     public Sprite arrowSprite;
     public Sprite defaultSprite;
 
+
+
     private RectTransform rectTransform;
     private CanvasGroup canvasGroup;
     private Image uiImage;
@@ -108,6 +110,16 @@ public class CardDragHandler : MonoBehaviour,
             rectTransform.DOAnchorPos(originalAnchoredPos, 0.25f).SetEase(Ease.OutQuad);
             transform.DOScale(originalScale, 0.25f).SetEase(Ease.OutQuad);
             uiImage.sprite = defaultSprite;
+          
+            //피뿌리기 추가 라인
+            if (CardModeState.Instance.apDataRef.isBlinded)
+            {
+                Transform blood = transform.Find("BloodShed");
+                if (blood != null)
+                    blood.gameObject.SetActive(true);
+            }
+
+
         }
 
 
@@ -136,22 +148,14 @@ public class CardDragHandler : MonoBehaviour,
                   //  LocalState.Instance.localPlayers[PhotonNetwork.LocalPlayer.ActorNumber].energy -= thisCardData.energy; 
                     CardModeState.Instance.curAction.effects.AddRange(CardDEffectDatabase.GetEffects(thisCardData.code));
 
-                //  CardDragDropRendering();
+                //해보자
+                //되면 temp rumble도 추가
+                apData.tempDef += thisCardData.defense;
+                apData.tempDam += thisCardData.damage;
+                apData.tempCast += thisCardData.actionClock;
 
-                //발동한 카드 손패에서 제거 코드
-                /*      if (player.hands.Contains(thisCardData.code))
-                      {
-                          player.hands.Remove(thisCardData.code);
-                          //player.trash.Add(thisCardData.code);
+                CardModeState.Instance.ActionPacketUpgrade(apData);
 
-                          Debug.Log($"[CardPlayed] Card '{thisCardData.code}' moved from Hand to Trash.");
-                      }
-                      else
-                      {
-                          Debug.LogWarning($"[CardPlayed] Tried to remove '{thisCardData.code}' but it was not in Hand!");
-                      }
-
-                  */
                 btmPacketAdd(thisCardData.code);
 
                 Destroy(gameObject);
@@ -190,12 +194,25 @@ public class CardDragHandler : MonoBehaviour,
         PlayClickScaleAnimation();
     }
 
-    private void SetDragVisual(bool inside)
+    /*private void SetDragVisual(bool inside)
     {
         uiImage.sprite = inside ? arrowSprite : defaultSprite;
         rectTransform.sizeDelta = originalSizeDelta;
     }
+    */
+    private void SetDragVisual(bool inside)
+    {
+        uiImage.sprite = inside ? arrowSprite : defaultSprite;
+        rectTransform.sizeDelta = originalSizeDelta;
 
+        //  Blinded일 경우 피를 걷거나 다시 덮기
+        if (CardModeState.Instance.apDataRef.isBlinded)
+        {
+            Transform blood = transform.Find("BloodShed");
+            if (blood != null)
+                blood.gameObject.SetActive(!inside); // 드래그 진입 시 false, 나갈 때 true
+        }
+    }
     private bool IsInsideDropZone(Vector2 screenPos) =>
         dropZone != null && RectTransformUtility.RectangleContainsScreenPoint(dropZone, screenPos);
 

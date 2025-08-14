@@ -61,6 +61,19 @@ public class CardChooseTile : MonoBehaviour
         playerCoord = GridManagement.Instance.GetCoordFromIndex(LocalRenderingStatic.localRenderingDatas[actor].curpos);
         myChara = LocalState.Instance?.PlayerObDic[actor];
         AlertDialogue.Instance.StartDialogue(action, actor, HookType.Activate, 0,DialogueType.TileChoose);
+        
+        //타일추스 애니메
+        var tile_chooser_anim = myChara.GetComponentInChildren<Animator>();
+        if (tile_chooser_anim == null)
+        {
+            Debug.LogError("[타일추져] 공격자 Animator 없음");
+            isActive = false;
+
+            _selectTileCoroutine = null; // 안전하게 핸들 초기화
+
+            yield break;
+        }
+        tile_chooser_anim.SetTrigger("Trig_TileChoose");
 
 
         // ★ tileType이 -1이면 바로 종료

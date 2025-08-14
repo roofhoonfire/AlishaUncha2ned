@@ -5,7 +5,7 @@ using Photon.Pun;
 using TMPro; // 반드시 있어야 함
 
 using UnityEngine.Rendering;
-
+using UnityEditor;
 
 public class CardModeState : MonoBehaviour
 {
@@ -66,18 +66,18 @@ public class CardModeState : MonoBehaviour
 
 
     // 코스트, 방어도 데미지 강화된거 렌더링 하는 함수 
-    private void ActionPacketUpgrade(ActionPacketData apData)
+    public void ActionPacketUpgrade(ActionPacketData apData)
     {
         //애니메도 넣으면 좋다 
         int actor = PhotonNetwork.LocalPlayer.ActorNumber;
-        int delta = apData.permCast + apData.tempCast;
-
+        int delta_cast = apData.permCast + apData.tempCast;
+        int delta_def = apData.tempDef + apData.permDef;
 
         //여기에 방어도 코드도 넣으면 된다 
         //지금은 넘어간다 귀찮으ㅡ므로
 
 
-        if (delta == 0)
+        if (delta_cast == 0|| delta_def==0)
             return;
 
         foreach (var card in spawnedCards)
@@ -85,13 +85,20 @@ public class CardModeState : MonoBehaviour
             if (card == null) continue;
 
             Transform timeClockTransform = card.transform.Find("TimeClock");
+            Transform defenseTransform = card.transform.Find("Defense");
             if (timeClockTransform == null)
             {
                 Debug.LogWarning("TimeClock 자식 오브젝트가 없습니다.");
                 continue;
             }
+            if (defenseTransform == null)
+            {
+                Debug.LogWarning("디펜스 자식 오브젝트가 없습니다.");
+                continue;
+            }
 
             TextMeshProUGUI tmp = timeClockTransform.GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI tmpdef = defenseTransform.GetComponent<TextMeshProUGUI>();
             if (tmp == null)
             {
                 Debug.LogWarning("TimeClock 오브젝트에 TextMeshProUGUI가 없습니다.");
@@ -101,12 +108,22 @@ public class CardModeState : MonoBehaviour
             // 현재 텍스트가 숫자일 때만 처리
             if (int.TryParse(tmp.text, out int originalValue))
             {
-                int newValue = Mathf.Max(apData.CastingMinumum, originalValue + delta);
+                int newValue = Mathf.Max(apData.CastingMinumum, originalValue + delta_cast);
                 tmp.text = newValue.ToString();
             }
             else
             {
                 Debug.LogWarning($"TimeClock 텍스트가 숫자가 아닙니다: {tmp.text}");
+            }
+
+            if (int.TryParse(tmpdef.text, out int ogval))
+            {
+                int newValue = Mathf.Max(0, ogval + delta_def);
+                tmpdef.text = newValue.ToString();
+            }
+            else
+            {
+                Debug.LogWarning($"TimeClock 텍스트가 숫자가 아닙니다: {tmpdef.text}");
             }
         }
     }
@@ -170,7 +187,18 @@ public class CardModeState : MonoBehaviour
         {
             var cardGO = Instantiate(cardPrefab, cardContentArea);
             spawnedCards.Add(cardGO); // 참조 저장
-
+            if (apData.isBlinded)
+            {
+                Transform blood = cardGO.transform.Find("BloodShed");
+                if (blood != null)
+                {
+                    blood.gameObject.SetActive(true);
+                }
+                else
+                {
+                    Debug.LogWarning("BloodShed 자식 오브젝트를 찾을 수 없습니다!");
+                }
+            }
             var info = cardGO.GetComponent<EachCardInfo>();
             if (info == null)
             {
@@ -186,36 +214,7 @@ public class CardModeState : MonoBehaviour
 
 
 
-        /* spawnedCards.Clear(); // 이전 것들 제거
-
-        var actor = PhotonNetwork.LocalPlayer.ActorNumber;
-        var deck = LocalState.Instance.localPlayers[actor].DeckCodes;
-        int deckIndex = LocalState.Instance.localPlayers[actor].deckIndexStart;
-
-        if (deckIndex >= deck.Count)
-            deckIndex = 0;
-
-        int endIndex = Mathf.Min(deckIndex + 5, deck.Count);
-
-        for (int i = deckIndex; i < endIndex; i++)
-        {
-            var cardGO = Instantiate(cardPrefab, cardContentArea);
-            spawnedCards.Add(cardGO); // 여기서 참조 저장
-
-            var info = cardGO.GetComponent<EachCardInfo>();
-            if (info == null)
-            {
-                Debug.LogWarning("EachCardInfo 컴포넌트가 없습니다!");
-                continue;
-            }
-
-            string code = deck[i];
-            info.cardData = CardCSVLoader.Instance.GetCardByCode(code);
-            info.ApplyCardData();
-        }
-
-        LocalState.Instance.localPlayers[actor].deckIndexStart = endIndex;
-   */
+      
     }
 
 

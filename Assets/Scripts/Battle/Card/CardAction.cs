@@ -28,6 +28,37 @@ public class CardAction : MonoBehaviour
 
 
     }
+    public void StartDot_Blind_Off(int ActorNum, int amount)
+    {
+
+
+        int actualClock = amount;    // clock 간격으로 증가
+
+        ActionData Blindoff = new ActionData
+        {
+            actionId = 99,
+            actionClock = actualClock,
+            rumblePoint = 0,
+            defense = 0,
+            hasOtherExecutedSinceInsertion = false,
+            cardname = "앞을 볼수 잇어요 이제 ㅠㅠ",
+            nthaction = ++Overmind.Instance.globalaction,
+            tileType = -1,
+            zoneIndex = 4,
+            cardcode = "미싱노",
+            Dot_to = ActorNum
+        };
+
+        Blindoff.effects.Add(new CardEffect(HookType.Dot, EffectType.Dot_Blind_Off, 0, 0));
+        Overmind.Instance.actionQueue.Add((0, Blindoff, actualClock));
+
+        // 정렬
+        Overmind.Instance.actionQueue.Sort((a, b) =>
+            a.remainingCost != b.remainingCost
+                ? a.remainingCost.CompareTo(b.remainingCost)
+                : a.action.nthaction.CompareTo(b.action.nthaction)
+        );
+    }
     public void Make_Op_Burn(int hOpActorNum, int amount)
     {
         for (int i = 0; i < amount; i++)
@@ -153,7 +184,74 @@ public class CardAction : MonoBehaviour
         myaction.flags.Add(amount);
 
     }
+    public void StartDot_Heal(int hActorNum, int amount)
+    {
+        // amount는 항상 6자리: AABBCC
+        int count = amount / 10000;               // AA
+        int clock = (amount / 100) % 100;         // BB
+        int value = amount % 100;                 // CC
 
+        for (int i = 0; i < count; i++)
+        {
+            int actualClock = clock * (i + 1);    // clock 간격으로 증가
+
+            ActionData heal = new ActionData
+            {
+                actionId = 99,
+                actionClock = actualClock,
+                rumblePoint = 0,
+                defense = 0,
+                hasOtherExecutedSinceInsertion = false,
+                cardname = "찔끔힐",
+                nthaction = ++Overmind.Instance.globalaction,
+                tileType = -1,
+                zoneIndex = 4,
+                cardcode = "미싱노",
+                Dot_to = hActorNum
+            };
+
+            heal.effects.Add(new CardEffect(HookType.Dot, EffectType.Heal, value, 0));
+            Overmind.Instance.actionQueue.Add((0, heal, actualClock));
+        }
+
+        // 정렬
+        Overmind.Instance.actionQueue.Sort((a, b) =>
+            a.remainingCost != b.remainingCost
+                ? a.remainingCost.CompareTo(b.remainingCost)
+                : a.action.nthaction.CompareTo(b.action.nthaction)
+        );
+    }
+    public void StartDot_Stealth_Off(int hActorNum, int amount)
+    {
+        
+        
+            int actualClock = amount;    // clock 간격으로 증가
+
+            ActionData stealthoff = new ActionData
+            {
+                actionId = 99,
+                actionClock = actualClock,
+                rumblePoint = 0,
+                defense = 0,
+                hasOtherExecutedSinceInsertion = false,
+                cardname = "은신풀린다잉 ㅠㅠ",
+                nthaction = ++Overmind.Instance.globalaction,
+                tileType = -1,
+                zoneIndex = 4,
+                cardcode = "미싱노",
+                Dot_to = hActorNum
+            };
+
+        stealthoff.effects.Add(new CardEffect(HookType.Dot, EffectType.Stealth_Off, 0, 0));
+            Overmind.Instance.actionQueue.Add((0, stealthoff, actualClock));
+        
+        // 정렬
+        Overmind.Instance.actionQueue.Sort((a, b) =>
+            a.remainingCost != b.remainingCost
+                ? a.remainingCost.CompareTo(b.remainingCost)
+                : a.action.nthaction.CompareTo(b.action.nthaction)
+        );
+    }
     public void FlagOff(int actorNum, ActionData myaction, int amount)
     {
         myaction.flags.Remove(amount);

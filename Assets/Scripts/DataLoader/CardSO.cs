@@ -35,9 +35,13 @@ public class Card
 public enum HookType { Activate, Priority, IQA, Counter, Guard ,BeforeRumble, RumbleWin, RumbleLose, Combo, Support, Dot }
 public enum EffectType {
     Add_ActionClock_Op, Add_Defense_Op,Add_Defense_Op_intheQ,
-    Burn_Op,
-    Element_Check_FlagOn,  intheRange_FlagOn, Flag_Off, Remove_Element,Invincible_forOneAction,Stealth, Damage, whenAttackedFlagOn, Move, Get_Element, Heal, StackDamage,  GetDefense, DamageMeBangMoo, AddDamage, MoveToSelectedTile, OpNextActionisMoveFlagOn,
-    whenDamagedFlagOn, NotRumbleFlagOn, ExtraSelect_Kawari,NextTurn_AddDamage, ReplaceNextOpsMovetoStun, StunRecovery, SelectActionClockChange, UseEnergy, TrueDamage, MakeItTrue, PrevCycleClockFlagOn,  ReduceMyNextTurnActionClock, Dot_Burn
+    Burn_Op,StartDot_Heal,StartDot_Stealth_Off,Stealth_Off,
+    Blind_Op,
+    Dot_Heal, Dot_Burn, Dot_Stealth_Off, Dot_Blind_Off,
+
+    whenDamaged_FlagOn,  Element_Check_FlagOn,  intheRange_FlagOn, 
+    Flag_Off, Remove_Element,Invincible_forOneAction,Stealth, Damage, whenAttackedFlagOn, Move, Get_Element, Heal, StackDamage,  GetDefense, DamageMeBangMoo, AddDamage, MoveToSelectedTile, OpNextActionisMoveFlagOn,
+     NotRumbleFlagOn, ExtraSelect_Kawari,NextTurn_AddDamage, ReplaceNextOpsMovetoStun, StunRecovery, SelectActionClockChange, UseEnergy, TrueDamage, MakeItTrue, PrevCycleClockFlagOn,  ReduceMyNextTurnActionClock, 
 }
 
 
@@ -70,13 +74,25 @@ public class CardEffect
 
 
 
+            case EffectType.StartDot_Heal:
+                {
+                    CardAction.Instance.StartDot_Heal(hActorNum, amount);
+                    Debug.Log($"플레이어 {hActorNum}에게 찔끔힐 DOT을 부여했다");
+                    break;
+                }
 
+            case EffectType.StartDot_Stealth_Off:
+                {
+                    CardAction.Instance.StartDot_Stealth_Off(hActorNum, amount);
+                    Debug.Log($"플레이어 {hActorNum}에게 찔끔힐 DOT을 부여했다");
+                    break;
+                }
 
             case EffectType.Add_Defense_Op_intheQ:
                 {
                     if (hOpMainAction != null) {
-                        CardAction.Instance.Add_Defense_Op_intheQ(hActorNum, amount);
-                        Debug.Log($"{hActorNum}의 방어도가 {amount}만큼 더해진다 후후");
+                        CardAction.Instance.Add_Defense_Op_intheQ(hOpActorNum, amount);
+                        Debug.Log($"{hOpActorNum}의 방어도가 {amount}만큼 더해진다 후후");
                     }
 
                     break;
@@ -211,6 +227,14 @@ public class CardEffect
                 Debug.Log($"플레이어 {hActorNum}이 {amount}의 체력을 회복한다 ");
                 
                 break;
+            case EffectType.Dot_Heal:
+
+                var datar = Overmind.Instance.players[ttAction.Dot_to];
+                datar.prevHP = datar.HP;
+                datar.HP += amount;
+                Debug.Log($"플레이어 {hActorNum}이 {amount}의 체력을 회복한다 ");
+
+                break;
 
 
             case EffectType.Burn_Op:
@@ -225,7 +249,21 @@ public class CardEffect
                 Debug.Log($"플레이어 {hActorNum}이 은신을 얻는다 ");
 
                 break;
-
+            case EffectType.Dot_Stealth_Off:
+                {
+                     Overmind.Instance.players[ttAction.Dot_to].isStealthed = false;
+                                 Debug.Log($"플레이어 {hActorNum}이 은신을 잃는다 ");
+                    break;
+                }
+            case EffectType.Dot_Blind_Off:
+                Overmind.Instance.players[ttAction.Dot_to].isBlinded = false;
+                Debug.Log("눈깔을 회복햇다");
+                break;
+            case EffectType.Blind_Op:
+                Overmind.Instance.players[hOpActorNum].isBlinded = true;
+                CardAction.Instance.StartDot_Blind_Off(hOpActorNum, amount);
+                Debug.Log("눈깔을 파버렸다 ㄷ ㄷ");
+                break;
 
             case EffectType.Get_Element:
                 CardAction.Instance.Get_Element(hActorNum, amount);
@@ -366,27 +404,38 @@ public class CardEffect
                 }
                 break;
 
-            case EffectType.whenDamagedFlagOn:
+            case EffectType.whenDamaged_FlagOn:
                 {
-                    bool damaged = false;
+                    // amount 예시: 3512 → 기준피해량: 35, 플래그: 12
+                    int damageThreshold = amount / 100;
+                    int flagToAdd = amount % 100;
+
+                    bool isInRange = false;
+
                     foreach (var tile in ttAction.effectTiles)
                     {
                         if (tile == Overmind.Instance.players[hActorNum].curpos)
                         {
-                            if (ttAction.damage > hMainAction.defense)
-                                damaged = true;
+                            isInRange = true;
                             break;
                         }
                     }
 
-                    if (damaged)
+                    if (!isInRange)
                     {
-                        CardAction.Instance.FlagOn(hActorNum, hAction, amount);
-                        Debug.Log($"플레이어 {hActorNum}이 피해를 입었기 때문에 플래그 {amount}가 추가된다");
+                        Debug.Log($"플레이어 {hActorNum}의 위치는 공격 범위에 없으므로 플래그 추가 안 함");
+                        break;
+                    }
+
+                    int netDamage = ttAction.damage - hMainAction.defense;
+                    if (netDamage >= damageThreshold)
+                    {
+                        CardAction.Instance.FlagOn(hActorNum, hAction, flagToAdd);
+                        Debug.Log($"플레이어 {hActorNum}이 {netDamage} 피해를 입었고, 기준 {damageThreshold} 이상이므로 플래그 {flagToAdd} 추가");
                     }
                     else
                     {
-                        Debug.Log($"플레이어 {hActorNum}의 위치는 공격 범위에 없으므로 플래그 추가 안 함");
+                        Debug.Log($"플레이어 {hActorNum}이 받은 피해 {netDamage}가 기준 {damageThreshold} 미만이므로 플래그 추가 안 함");
                     }
                 }
                 break;
@@ -538,7 +587,7 @@ public class CardEffect
                 }
                 break;
 
-            case EffectType.whenDamagedFlagOn:
+            case EffectType.whenDamaged_FlagOn:
                 bool damaged = false;
                 foreach (var tile in rightnowOP.effectTiles)
                 {

@@ -16,11 +16,12 @@ using System.Net.Sockets;
 using UnityEngine.UIElements;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Analytics;
+using System.Numerics;
 
 public enum apProp
 {
 
-    defaultMove,defaultMoveCast,tempCast,permCast,tempDef,permDef,tempDam,permDam, CastingMinimum, elem_fire, elem_ice, elem_wind, elem_earth
+   blinded, defaultMove,defaultMoveCast,tempCast,permCast,tempDef,permDef,tempDam,permDam, CastingMinimum, elem_fire, elem_ice, elem_wind, elem_earth
 }
 
 public enum ExtraSelection
@@ -48,6 +49,7 @@ public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 
     //즉 방어도 렌더링은 카드 내릴때, 한번 처음 해주고 그 뒤엔 localUIRendering에서 맘껏 건들면될듯 ;;
     public int energy;
     public bool canMove = true;
+    public bool isBlinded = false;
     public bool isInvincible = false;
     public bool isStunned = false;
     public bool isStealthed = false;
@@ -667,22 +669,24 @@ public class Overmind : MonoBehaviourPunCallbacks
                     Turn_End_Call();
 
 
-                    if (actionQueue.Count <= 0) //연계카드가 없다면 무조건 이 경우일 것
+                    if (actionQueue.Count <= 0 ||
+    actionQueue.All(a => a.actorNumber == 0)) // 0만 있는 경우 포함
                     {
-                        break; //다시 페이스 오프
-
+                        break; // 다시 페이스 오프
                     }
-                    else //이건 연계의 케이스를 고려해서 짜두었다
+                    else
                     {
-                        int loneActor = actionQueue[0].actorNumber;
-                        bool allSame = actionQueue.All(a => a.actorNumber == loneActor);
-                        if (allSame)
+                        var nonZeroActors = actionQueue
+                            .Where(a => a.actorNumber != 0)
+                            .Select(a => a.actorNumber)
+                            .ToList();
+
+                        if (nonZeroActors.Count > 0 && nonZeroActors.All(a => a == nonZeroActors[0]))
                         {
-                            // 2) 상대 플레이어 번호 구하기
+                            int loneActor = nonZeroActors[0];
                             int actorNum = GetOtherPlayerNumber(loneActor);
 
                             pendingSelections.Clear();
-
 
                             Hand_Gen(actorNum);
                             ActionPacketData var = ActionPacketConverter.FromPlayer(players[actorNum]);
@@ -692,7 +696,6 @@ public class Overmind : MonoBehaviourPunCallbacks
                             var newSel = pendingSelections[actorNum];
                             pendingSelections.Remove(actorNum);
 
-                            // 7) 액션 초기화 및 큐에 추가
                             InitActionBeforeInsert(newSel.action, actorNum);
                             actionQueue.Add((actorNum, newSel.action, newSel.cost));
                             actionQueue.Sort((a, b) =>
@@ -700,12 +703,12 @@ public class Overmind : MonoBehaviourPunCallbacks
                                     ? a.remainingCost.CompareTo(b.remainingCost)
                                     : a.action.nthaction.CompareTo(b.action.nthaction)
                             );
-                        }
-                        ///다시 선택후
-                        ///
-                        continue;
 
-                    } //연계카드가 있다면 요 경우가 될 것이다
+                            continue;
+                        }
+
+                        // 이 아래는 (0,1,2 혼재 등) 아무 작업도 하지 않음
+                    }
                 }
 
 
@@ -1370,6 +1373,17 @@ public class Overmind : MonoBehaviourPunCallbacks
         {
             //상대 생각중!
 
+           var  chooserOb = LocalState.Instance?.PlayerObDic[actornum];
+            var tile_chooser_anim = chooserOb.GetComponentInChildren<Animator>();
+            if (tile_chooser_anim == null)
+            {
+                Debug.LogError("난 처맞을 건데, 공격자 Animator 없음");
+           
+                 return;
+            }
+            tile_chooser_anim.SetTrigger("Trig_TileChoose");
+
+
         }
 
         else
@@ -1864,13 +1878,13 @@ public class Overmind : MonoBehaviourPunCallbacks
             }
             else if (newState == 1)
             {
-                players[newState].isStealthed = false;
+              //  players[newState].isStealthed = false;
                 players[newState].canMove = true;
             }
             else if (newState == 2)
             {
 
-                players[newState].isStealthed = false;
+              //  players[newState].isStealthed = false;
                 players[newState].canMove = true;
             }
 
