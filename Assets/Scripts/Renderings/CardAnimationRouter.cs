@@ -234,13 +234,35 @@ public class CardAnimationRouter : MonoBehaviour
             // Prep 종료까지 대기
             yield return WaitForStateEnd(attackerAnim, entry.prepStateName);
 
-            // 마지막 프레임 정지
+            // 마지막 프레임 정지 + 백드롭 시작
+
             if (entry.prepPoseHoldSec > 0f)
             {
                 FreezeOnLastFrame(attackerAnim, entry.prepStateName, true);
+
+                // === 백드롭 시작 ===
+                if (enableCameraCinematic && entry.usePrepBackdrop && entry.prepBackdropSprite != null && CameraLovesAlisha.Instance != null)
+                {
+                    CameraLovesAlisha.Instance.BeginPoint1Backdrop(
+                        attackerGO,
+                        entry.prepBackdropSprite,
+                        entry.prepBackdropFadeIn,
+                        entry.prepPoseHoldSec // ← 여기! CutLine이 이 시간에 맞춰 자동 스케일
+                    );
+                }
+
+                // 정지 유지(클로즈업+백드롭 유지)
                 yield return new WaitForSecondsRealtime(entry.prepPoseHoldSec);
+
+                // 정지 해제 + 백드롭 종료
                 FreezeOnLastFrame(attackerAnim, entry.prepStateName, false);
+
+                if (enableCameraCinematic && entry.usePrepBackdrop && entry.prepBackdropSprite != null && CameraLovesAlisha.Instance != null)
+                {
+                    CameraLovesAlisha.Instance.EndPoint1Backdrop(entry.prepBackdropFadeOut);
+                }
             }
+          
         }
 
         // 2) Attack 진입

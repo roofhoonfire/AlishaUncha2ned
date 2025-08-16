@@ -132,9 +132,9 @@ public class LocalRenderingManager : MonoBehaviour
         else if (data2 != null && data2.actorNum == actorNum) actorData = data2;
 
         ApplyFacingFromRightOrLeft(actorNum, actorData);
-        AlertDialogue.Instance.StartDialogue(action, actorNum, h, 0, DialogueType.Activate);
+        //  AlertDialogue.Instance.StartDialogue(action, actorNum, h, 0, DialogueType.Activate);
 
-
+        CameraLovesAlisha.Instance.HideEmAll(LocalState.Instance.PlayerObDic[actorNum]);
         //훅 타입에 맞는 애니메이션 재생해주고 
 
         CardAnimationRouter.Instance.Play(action.cardcode, actorNum, h);

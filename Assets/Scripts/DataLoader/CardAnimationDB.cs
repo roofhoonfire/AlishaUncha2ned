@@ -5,6 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CardAnimationDB", menuName = "DB/Card Animation DB")]
 public class CardAnimationDB : ScriptableObject
 {
+    
     [Serializable]
     public class HitStopSpec
     {
@@ -55,6 +56,20 @@ public class CardAnimationDB : ScriptableObject
 
         [Tooltip("피격자 애니를 시작할 프레임들(※ Attack 클립 기준 프레임!)")]
         public List<int> victimStartFrames = new List<int>();
+
+
+        // CardAnimationDB.CardAnimEntry 안에 아래 블록을 추가
+        [Header("Cinematic Backdrop (Point1: Prep 정지 구간)")]
+        [Tooltip("Prep 정지 구간에 백드롭을 사용할지")]
+        public bool usePrepBackdrop = true;
+
+        [Tooltip("Prep 정지 구간에 표시할 풀스크린 이미지")]
+        public Sprite prepBackdropSprite;
+
+        [Tooltip("백드롭 페이드 인/아웃 시간(초)")]
+        public float prepBackdropFadeIn = 0.15f;
+        public float prepBackdropFadeOut = 0.12f;
+
 
         [Header("히트스탑 설정(※ Attack 클립 기준 프레임!)")]
         public List<HitStopSpec> hitStops = new List<HitStopSpec>();
