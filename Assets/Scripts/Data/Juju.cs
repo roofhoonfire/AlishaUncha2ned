@@ -55,7 +55,7 @@ public class Juju
 
 
             case JujuType.Reinforce:
-                playerData.defaultMoveCast = 0;
+                playerData.forActionPacket[apProp.defaultMoveCast] = 0;
                 break;
         }
 

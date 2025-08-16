@@ -56,6 +56,7 @@ public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 
     public int actionClockManuplate = 0;
     public int defenseManuplate = 0;
     public int timeBombSetinTomMotion = 0;
+    public string rightOrLeft;
 
     public List<string> Bounds ; //바운드 아이디의 리스투이돵돠라돵돵
     public int boundIndex = 0;
@@ -397,6 +398,11 @@ public class Overmind : MonoBehaviourPunCallbacks
             // 1) 위치 초기화
             player.curpos = (kvp.Key == PhotonNetwork.MasterClient.ActorNumber) ? 17 : 19;
             // 에너지, 체력 초기화가 필요하다면 여기서 추가
+            if (player.curpos == 17)
+                player.rightOrLeft = "right";
+            else
+                player.rightOrLeft = "left";
+
 
             // 2) 덱 셔플 
             ShuffleList(player.DeckCodes);
@@ -443,7 +449,8 @@ public class Overmind : MonoBehaviourPunCallbacks
                 defense = 0,
                 bounds = new List<string>(playerData.Value.Bounds), // 안전하게 복사
                 remainingCost = 0,
-                boundIndex = 0
+                boundIndex = 0,
+                rightOrLeft = playerData.Value.rightOrLeft
 
             };
 
@@ -1453,11 +1460,11 @@ public class Overmind : MonoBehaviourPunCallbacks
     
 
 
-    public void SendTile(int actorNum, List<int> tiles)
+    public void SendTileandDirec(int actorNum, List<int> tiles, string direc)
     {
 
         string tilejson = JsonConvert.SerializeObject(tiles);
-        photonView.RPC(nameof(RPC_ReceiveTile_C2M),RpcTarget.MasterClient, actorNum,tilejson  );
+        photonView.RPC(nameof(RPC_ReceiveTile_C2M),RpcTarget.MasterClient, actorNum,tilejson, direc  );
 
 
 
@@ -1474,13 +1481,19 @@ public class Overmind : MonoBehaviourPunCallbacks
 
     }
     [PunRPC]
-    void RPC_ReceiveTile_C2M(int actorNum, string tileListJson)
+    void RPC_ReceiveTile_C2M(int actorNum, string tileListJson, string mouseSide)
     {
 
         Debug.Log($"[Master] RPC_ReceiveTile 호출됨! actorNum={actorNum}, tileList={tileListJson}");
         List<int> deser = JsonConvert.DeserializeObject<List<int>>(tileListJson);
         pendingTiles.Add((actorNum, deser));
         Debug.Log($"[Master] pendingTiles.Count={pendingTiles.Count}");
+
+        if (mouseSide!= null)
+        {
+
+            players[actorNum].rightOrLeft = mouseSide;
+        }
 
     }
 

@@ -44,7 +44,8 @@ public static class RenderingConverter
             boundIndex = player.boundIndex,
             hands = new List<string>(player.hands),
             isStealthed = player.isStealthed,
-            elements = new List<apProp>(player.forActionPacket_elem_List)
+            elements = new List<apProp>(player.forActionPacket_elem_List),
+            rightOrLeft = player.rightOrLeft,
         };
     }
 }
@@ -62,6 +63,7 @@ public class LocalRenderingData
     public bool isStealthed;
     public bool isBlinded;
     public List<apProp> elements;
+    public string rightOrLeft;
     //여기 애니메이션도 들어가야함
     
 }

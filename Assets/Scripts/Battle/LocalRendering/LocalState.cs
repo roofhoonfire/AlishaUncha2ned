@@ -79,6 +79,7 @@ public class LocalState : MonoBehaviour
                 bounds = new List<string>(kvp.Value.bounds), // 참조형 필드는 복제
                 remainingCost = kvp.Value.remainingCost,
                 boundIndex = kvp.Value.boundIndex,
+                rightOrLeft = kvp.Value.rightOrLeft,
             };
 
             LocalRenderingStatic.localRenderingDatas[kvp.Key] = copied;

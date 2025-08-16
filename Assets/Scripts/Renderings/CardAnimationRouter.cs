@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,14 +7,66 @@ public class CardAnimationRouter : MonoBehaviour
 {
     public static CardAnimationRouter Instance { get; private set; }
 
-    [Header("DB ÂüÁ¶")]
+    // -------- Camera cinematic (ì´ë™/ì¤Œ ì—°ì¶œ) --------
+    [Header("Camera Cinematic (Movement)")]
+    public bool enableCameraCinematic = true;      // ì „ì²´ ì¹´ë©”ë¼ ì‹œë„¤ë§ˆí‹± on/off
+    public bool camMove_Point1 = true;             // Prep ë(í¬ì¸íŠ¸1) ì´ë™/ì¤Œ
+    public bool camMove_Point2 = true;             // Ní”„ë ˆì„(í¬ì¸íŠ¸2) ì´ë™/ì¤Œ
+    public bool camMove_Return = true;             // Attack ì¢…ë£Œ ì‹œ ë³µê·€
+
+    public float cameraDefaultFOV = 60f;           // ë””í´íŠ¸ ë³µê·€ FOV
+    public float cameraReturnDuration = 0.35f;
+    public float cameraPoint1FOV = 15f;            // í¬ì¸íŠ¸1 ëª©í‘œ FOV
+    public float cameraPoint2FOV = 40f;            // í¬ì¸íŠ¸2 ëª©í‘œ FOV
+
+    // -------- Impact toggles (íš¨ê³¼ ë¯¹ìŠ¤) --------
+    [Header("Impact at K (í”¼ê²© ì‹œì‘ í”„ë ˆì„)")]
+    public bool impactK_Shake = true;
+    public bool impactK_PunchFOV = true;
+    public bool impactK_Flash = true;
+
+    [Header("Impact at N (íˆíŠ¸ìŠ¤í†± ì‹œì‘ í”„ë ˆì„)")]
+    public bool impactN_Shake = true;
+    public bool impactN_Flash = true;
+
+    [Header("Impact After HitStop (í•´ì œ ì§í›„)")]
+    public bool impactAfter_Shake = true;
+    public bool impactAfter_PunchFOV = true;
+
+    // -------- Flash settings --------
+    [Header("Screen Flash - K")]
+    public Color flashK_Color = Color.white;
+    public float flashK_FadeIn = 0.015f;
+    public float flashK_Hold = 0.02f;
+    public float flashK_FadeOut = 0.08f;
+    [Range(0f, 1f)] public float flashK_MaxAlpha = 0.55f;
+
+    [Header("Screen Flash - N")]
+    public Color flashN_Color = Color.white;
+    public float flashN_FadeIn = 0.010f;
+    [Tooltip("íˆíŠ¸ìŠ¤í†± ê¸¸ì´ì— ë¹„ë¡€(hold = min(scale * duration, holdClamp))")]
+    public float flashN_HoldScale = 0.4f;
+    public float flashN_HoldClamp = 0.05f;
+    public float flashN_FadeOut = 0.10f;
+    [Range(0f, 1f)] public float flashN_MaxAlpha = 0.75f;
+
+    // -------- DB/Animator ê¸°ë³¸ ì„¸íŒ… --------
+    [Header("DB ì°¸ì¡°")]
     public CardAnimationDB db;
 
-    // (cardCode, hook) ¡æ Entry
+    // (cardCode, hook) â†’ Entry
     private Dictionary<(string, HookType), CardAnimationDB.CardAnimEntry> _map;
 
     [Header("Animator Layer Index")]
     public int animatorLayer = 0;
+
+    [Header("ì „í™˜/ëŒ€ê¸° ì˜µì…˜")]
+    [Tooltip("ìƒíƒœ ì „í™˜ í¬ë¡œìŠ¤í˜ì´ë“œ(ì´ˆ)")]
+    public float crossFade = 0.05f;
+    [Tooltip("Prep ìƒíƒœ ì§„ì… ëŒ€ê¸° ìµœëŒ€(ì´ˆ)")]
+    public float prepEnterMaxWait = 0.5f;
+    [Tooltip("Attack ìƒíƒœ ì§„ì… ëŒ€ê¸° ìµœëŒ€(ì´ˆ)")]
+    public float attackEnterMaxWait = 0.5f;
 
     void Awake()
     {
@@ -32,13 +84,13 @@ public class CardAnimationRouter : MonoBehaviour
         {
             if (string.IsNullOrEmpty(e.cardCode))
             {
-                Debug.LogWarning("[CardAnimationRouter] ºó cardCode Ç×¸ñÀÌ ÀÖÀ½");
+                Debug.LogWarning("[CardAnimationRouter] ë¹ˆ cardCode í•­ëª©ì´ ìˆìŒ");
                 continue;
             }
             var key = (Normalize(e.cardCode), e.hook);
             if (_map.ContainsKey(key))
             {
-                Debug.LogWarning($"[CardAnimationRouter] Áßº¹ ¸ÅÇÎ: {e.cardCode} / {e.hook}");
+                Debug.LogWarning($"[CardAnimationRouter] ì¤‘ë³µ ë§¤í•‘: {e.cardCode} / {e.hook}");
                 continue;
             }
             _map[key] = e;
@@ -47,35 +99,20 @@ public class CardAnimationRouter : MonoBehaviour
 
     private string Normalize(string s) => (s ?? "").Trim();
 
-    /// <summary>
-    /// current ¶Ç´Â ÀüÀÌÁß next »óÅÂ°¡ targetÀÌ¸é ±× »óÅÂÀÇ normalizedTimeÀ» ¹İÈ¯.
-    /// </summary>
     private bool TryGetNormTowardsState(Animator anim, string targetStateName, int layer, out float norm)
     {
         norm = 0f;
-
         var cur = anim.GetCurrentAnimatorStateInfo(layer);
-        if (cur.IsName(targetStateName))
-        {
-            norm = cur.normalizedTime; // 0¡æ1
-            return true;
-        }
+        if (cur.IsName(targetStateName)) { norm = cur.normalizedTime; return true; }
 
         if (anim.IsInTransition(layer))
         {
             var next = anim.GetNextAnimatorStateInfo(layer);
-            if (next.IsName(targetStateName))
-            {
-                norm = next.normalizedTime; // 0¡æ1
-                return true;
-            }
+            if (next.IsName(targetStateName)) { norm = next.normalizedTime; return true; }
         }
         return false;
     }
 
-    /// <summary>
-    /// target »óÅÂÀÇ length(ÃÊ)¸¦ current/next¿¡¼­ ±¸ÇÑ´Ù(¾øÀ¸¸é 0).
-    /// </summary>
     private bool TryGetTargetStateLength(Animator anim, string targetStateName, int layer, out float length)
     {
         var cur = anim.GetCurrentAnimatorStateInfo(layer);
@@ -92,30 +129,29 @@ public class CardAnimationRouter : MonoBehaviour
     }
 
     /// <summary>
-    /// Ä«µå ÄÚµå + ÈÅ¿¡ ¸Â´Â °ø°İ ¾Ö´Ï¸ŞÀÌ¼ÇÀ» Àç»ıÇÏ°í, ÇÇ°İÀÚ ¾Ö´Ï/È÷Æ®½ºÅ¾À» µ¿±âÈ­.
-    /// victimActorNumÀ» ³Ñ±âÁö ¾ÊÀ¸¸é 1v1 ÀüÁ¦¿¡¼­ ÀÚµ¿ Ãß·Ğ.
+    /// ì¹´ë“œ ì½”ë“œ + í›…ì— ë§ëŠ” ì• ë‹ˆë©”ì´ì…˜ ì˜¤ì¼€ìŠ¤íŠ¸ë ˆì´ì…˜ (Prepâ†’PoseHoldâ†’Attackâ†’K/N ì„íŒ©íŠ¸/íˆíŠ¸ìŠ¤í†±).
     /// </summary>
     public void Play(string cardCode, int attackerActorNum, HookType hook, int? victimActorNum = null)
     {
         if (LocalState.Instance == null || LocalState.Instance.PlayerObDic == null)
         {
-            Debug.LogError("[CardAnimationRouter] LocalState.Instance.PlayerObDic ¾øÀ½");
+            Debug.LogError("[CardAnimationRouter] LocalState.Instance.PlayerObDic ì—†ìŒ");
             return;
         }
 
         if (!LocalState.Instance.PlayerObDic.TryGetValue(attackerActorNum, out var attackerGO) || attackerGO == null)
         {
-            Debug.LogError($"[CardAnimationRouter] attacker actor {attackerActorNum} ¿ÀºêÁ§Æ® ¾øÀ½");
+            Debug.LogError($"[CardAnimationRouter] attacker actor {attackerActorNum} ì˜¤ë¸Œì íŠ¸ ì—†ìŒ");
             return;
         }
 
         if (!_TryGetEntry(cardCode, hook, out var entry))
         {
-            Debug.LogWarning($"[CardAnimationRouter] ¸ÅÇÎ ¾øÀ½ ¡æ card:{cardCode}, hook:{hook}");
+            Debug.LogWarning($"[CardAnimationRouter] ë§¤í•‘ ì—†ìŒ â†’ card:{cardCode}, hook:{hook}");
             return;
         }
 
-        // victim Ãß·Ğ(1v1): Å° Áß °ø°İÀÚ°¡ ¾Æ´Ñ Ã¹ ¹øÂ°
+        // victim ì¶”ë¡ (1v1)
         int? victimNumResolved = victimActorNum;
         if (victimNumResolved == null)
         {
@@ -132,18 +168,22 @@ public class CardAnimationRouter : MonoBehaviour
         var attackerAnim = attackerGO.GetComponentInChildren<Animator>();
         if (attackerAnim == null)
         {
-            Debug.LogError("[CardAnimationRouter] °ø°İÀÚ Animator ¾øÀ½");
+            Debug.LogError("[CardAnimationRouter] ê³µê²©ì Animator ì—†ìŒ");
             return;
         }
         Animator victimAnim = null;
         if (victimGO != null) victimAnim = victimGO.GetComponentInChildren<Animator>();
 
-        // °ø°İÀÚ Æ®¸®°Å ¹ßÈ­
-        if (!string.IsNullOrEmpty(entry.animatorTrigger))
-            attackerAnim.SetTrigger(entry.animatorTrigger);
+        // ì¹´ë©”ë¼ ë””í´íŠ¸ ì…‹ì—…
+        if (enableCameraCinematic && CameraLovesAlisha.Instance != null)
+        {
+            var cam = CameraLovesAlisha.Instance;
+            cam.defaultFOV = cameraDefaultFOV;
+            cam.returnDuration = cameraReturnDuration;
+            cam.SetDefault(attackerGO.transform);
+        }
 
-        // ¸ŞÀÎ ÄÚ·çÆ¾: ÇÇ°İÀÚ Å¸ÀÌ¹Ö + È÷Æ®½ºÅ¾ µ¿±âÈ­
-        StartCoroutine(PlayWithVictimAndHitStops(attackerAnim, victimAnim, attackerGO, victimGO, entry));
+        StartCoroutine(PlayOrchestrated(attackerAnim, victimAnim, attackerGO, victimGO, entry));
     }
 
     private bool _TryGetEntry(string cardCode, HookType hook, out CardAnimationDB.CardAnimEntry entry)
@@ -160,6 +200,136 @@ public class CardAnimationRouter : MonoBehaviour
         return false;
     }
 
+    // ================== ì˜¤ì¼€ìŠ¤íŠ¸ë ˆì´ì…˜ ==================
+
+    private IEnumerator PlayOrchestrated(
+       Animator attackerAnim, Animator victimAnim,
+       GameObject attackerGO, GameObject victimGO,
+       CardAnimationDB.CardAnimEntry entry)
+    {
+        // 1) Prep ì§„ì…
+        if (!string.IsNullOrEmpty(entry.prepTrigger) || !string.IsNullOrEmpty(entry.prepStateName))
+        {
+            int prepHash = 0;
+            if (!string.IsNullOrEmpty(entry.prepStateName))
+                prepHash = Animator.StringToHash(entry.prepStateName);
+
+            if (!string.IsNullOrEmpty(entry.prepTrigger))
+                attackerAnim.SetTrigger(entry.prepTrigger);
+            else if (!string.IsNullOrEmpty(entry.prepStateName))
+                attackerAnim.CrossFadeInFixedTime(prepHash, crossFade, animatorLayer);
+
+            // Prep ìƒíƒœ ì§„ì… ëŒ€ê¸°
+            yield return WaitForStateEnter(attackerAnim, entry.prepStateName, prepEnterMaxWait);
+
+            // === ì¹´ë©”ë¼ í¬ì¸íŠ¸1 ì´ë™/ì¤Œ ===
+            if (enableCameraCinematic && camMove_Point1 && CameraLovesAlisha.Instance != null && !string.IsNullOrEmpty(entry.prepStateName))
+            {
+                float prepLen = 0f; TryGetTargetStateLength(attackerAnim, entry.prepStateName, animatorLayer, out prepLen);
+                float prepNorm = 0f; TryGetNormTowardsState(attackerAnim, entry.prepStateName, animatorLayer, out prepNorm);
+                float remain = Mathf.Max(0f, (prepLen > 0f ? (1f - (prepNorm % 1f)) * prepLen : 0.2f));
+                CameraLovesAlisha.Instance.MoveToPoint1_Attacker(attackerGO.transform, remain, cameraPoint1FOV);
+            }
+
+            // Prep ì¢…ë£Œê¹Œì§€ ëŒ€ê¸°
+            yield return WaitForStateEnd(attackerAnim, entry.prepStateName);
+
+            // ë§ˆì§€ë§‰ í”„ë ˆì„ ì •ì§€
+            if (entry.prepPoseHoldSec > 0f)
+            {
+                FreezeOnLastFrame(attackerAnim, entry.prepStateName, true);
+                yield return new WaitForSecondsRealtime(entry.prepPoseHoldSec);
+                FreezeOnLastFrame(attackerAnim, entry.prepStateName, false);
+            }
+        }
+
+        // 2) Attack ì§„ì…
+        if (!string.IsNullOrEmpty(entry.animatorTrigger))
+            attackerAnim.SetTrigger(entry.animatorTrigger);
+        else if (!string.IsNullOrEmpty(entry.stateName))
+            attackerAnim.CrossFadeInFixedTime(Animator.StringToHash(entry.stateName), crossFade, animatorLayer);
+
+        // Attack ìƒíƒœ ì§„ì… ë³´ì¥
+        yield return WaitForStateEnter(attackerAnim, entry.stateName, attackEnterMaxWait);
+
+        // === ì¹´ë©”ë¼ í¬ì¸íŠ¸2 ì´ë™/ì¤Œ (N í”„ë ˆì„ê¹Œì§€) ===
+        if (enableCameraCinematic && camMove_Point2 && CameraLovesAlisha.Instance != null && victimGO != null)
+        {
+            int nFrame = (entry.hitStops != null && entry.hitStops.Count > 0) ? entry.hitStops.Min(h => h.frame) : -1;
+            if (nFrame >= 0)
+            {
+                float clipLen = 0f;
+                if (entry.clip != null) clipLen = entry.clip.length;
+                else if (!TryGetTargetStateLength(attackerAnim, entry.stateName, animatorLayer, out clipLen) || clipLen <= 0f)
+                    clipLen = 1f;
+
+                float fps = 0f;
+                if (entry.clip != null && entry.clip.frameRate > 0f) fps = entry.clip.frameRate;
+                else if (entry.totalFramesOverride > 0 && clipLen > 0f) fps = entry.totalFramesOverride / clipLen;
+                else fps = 30f;
+
+                float timeToN = Mathf.Max(0f, nFrame / Mathf.Max(1f, fps));
+                CameraLovesAlisha.Instance.MoveToPoint2_Victim(victimGO.transform, timeToN, cameraPoint2FOV);
+            }
+        }
+
+        // 3) Attack êµ¬ê°„ì—ì„œ Victim ì‹œì‘/HitStop ë™ê¸°í™”
+        yield return StartCoroutine(PlayWithVictimAndHitStops(attackerAnim, victimAnim, attackerGO, victimGO, entry));
+
+        // 4) Attack ì¢…ë£Œì™€ ë™ì‹œì— ë””í´íŠ¸ë¡œ ë³µê·€
+        if (enableCameraCinematic && camMove_Return && CameraLovesAlisha.Instance != null)
+            CameraLovesAlisha.Instance.ReturnToDefault(cameraReturnDuration, attackerGO.transform);
+    }
+
+    private IEnumerator WaitForStateEnter(Animator anim, string stateName, float maxWaitSec)
+    {
+        if (string.IsNullOrEmpty(stateName)) yield break;
+
+        float end = Time.realtimeSinceStartup + Mathf.Max(0.01f, maxWaitSec);
+        while (Time.realtimeSinceStartup < end)
+        {
+            if (TryGetNormTowardsState(anim, stateName, animatorLayer, out _))
+                yield break;
+            yield return null;
+        }
+        Debug.LogWarning($"[CardAnimationRouter] ìƒíƒœ ì§„ì… íƒ€ì„ì•„ì›ƒ: {stateName}");
+    }
+
+    private IEnumerator WaitForStateEnd(Animator anim, string stateName)
+    {
+        if (string.IsNullOrEmpty(stateName)) yield break;
+
+        while (!TryGetNormTowardsState(anim, stateName, animatorLayer, out _))
+            yield return null;
+
+        while (true)
+        {
+            var s = anim.GetCurrentAnimatorStateInfo(animatorLayer);
+            if (!anim.IsInTransition(animatorLayer) && s.IsName(stateName) && s.normalizedTime >= 1f)
+                break;
+            yield return null;
+        }
+    }
+
+    private void FreezeOnLastFrame(Animator anim, string stateName, bool freeze)
+    {
+        if (string.IsNullOrEmpty(stateName) || anim == null) return;
+
+        int hash = Animator.StringToHash(stateName);
+        if (freeze)
+        {
+            anim.Play(hash, animatorLayer, 0.999f);
+            anim.Update(0f);
+            anim.speed = 0f;
+        }
+        else
+        {
+            anim.speed = 1f;
+        }
+    }
+
+    // ================== Attack êµ¬ê°„ ë™ê¸°í™” (K/N/AfterShock) ==================
+
     private IEnumerator PlayWithVictimAndHitStops(
         Animator attackerAnim, Animator victimAnim,
         GameObject attackerGO, GameObject victimGO,
@@ -167,22 +337,20 @@ public class CardAnimationRouter : MonoBehaviour
     {
         if (string.IsNullOrEmpty(entry.stateName))
         {
-            Debug.LogWarning($"[CardAnimationRouter] stateName ¹ÌÁöÁ¤: {entry.cardCode}/{entry.hook}");
+            Debug.LogWarning($"[CardAnimationRouter] stateName ë¯¸ì§€ì •: {entry.cardCode}/{entry.hook}");
             yield break;
         }
 
-        // ±æÀÌ/ÇÁ·¹ÀÓ·¹ÀÌÆ® °è»ê(°ø°İÀÚ ±âÁØ)
         float clipLen = 0f;
         if (entry.clip != null) clipLen = entry.clip.length;
         else if (!TryGetTargetStateLength(attackerAnim, entry.stateName, animatorLayer, out clipLen) || clipLen <= 0f)
-            clipLen = 1f; // ¸ğ¸£¸é 1ÃÊ °¡Á¤
+            clipLen = 1f;
 
         float fps = 0f;
         if (entry.clip != null && entry.clip.frameRate > 0f) fps = entry.clip.frameRate;
         else if (entry.totalFramesOverride > 0 && clipLen > 0f) fps = entry.totalFramesOverride / clipLen;
-        else fps = 30f; // º¸¼öÀû ±âº»
+        else fps = 30f;
 
-        // ÇÇ°İÀÚ ½ÃÀÛ Å¸ÀÌ¹Ö(Á¤±ÔÈ­ Å¸ÀÓ Å¥·Î º¯È¯)
         var victimStarts = (entry.victimStartFrames != null)
             ? entry.victimStartFrames.OrderBy(x => x).ToList()
             : new List<int>();
@@ -194,24 +362,17 @@ public class CardAnimationRouter : MonoBehaviour
             victimTargets.Enqueue(norm);
         }
 
-        // È÷Æ®½ºÅ¾ Å¸ÀÌ¹Ö
         var hitStops = (entry.hitStops != null)
             ? entry.hitStops.OrderBy(h => h.frame).ToList()
             : new List<CardAnimationDB.HitStopSpec>();
         int hitIndex = 0;
 
-        // (¼±ÅÃ) ÀÌÆåÆ® ¾Ö´Ï¸ğÀ½(ÇöÀç ÇÁ·ÎÁ§Æ®¿¡ IEffectAnimatorSource ¾øÀ¸¸é null ¹İÈ¯ÇØµµ OK)
-        var effectAnims = CollectEffectAnimators(attackerGO, victimGO);
-
-        // ÇÇ°İÀÚ°¡ "¹İ ÇÁ·¹ÀÓ" ÀÌ»ó ÁøÇàÇß´ÂÁö ÆÇ´Ü ÀÓ°è°ª(Á¤±ÔÈ­)
         float victimMinNorm = ComputeVictimMinNorm(entry);
 
         while (true)
         {
-            // °ø°İÀÚ ÁøÇà·ü: current/next ¸ğµÎ Çã¿ë
             if (!TryGetNormTowardsState(attackerAnim, entry.stateName, animatorLayer, out float curNorm))
             {
-                // ´õ ÀÌ»ó ÇØ´ç »óÅÂ°¡ ¾Æ´Ï¸é Á¾·á
                 yield return null;
                 if (!TryGetNormTowardsState(attackerAnim, entry.stateName, animatorLayer, out _)) break;
                 continue;
@@ -219,25 +380,28 @@ public class CardAnimationRouter : MonoBehaviour
 
             bool victimTriggeredThisFrame = false;
 
-            // 1) ÇÇ°İÀÚ ¾Ö´Ï ½ÃÀÛ
+            // ---- K í”„ë ˆì„: í”¼ê²©ì ì• ë‹ˆ ì‹œì‘ ----
             while (victimTargets.Count > 0 && curNorm >= victimTargets.Peek())
             {
                 victimTargets.Dequeue();
-                if (victimAnim != null && !string.IsNullOrEmpty(entry.victimAnimatorTrigger))
+                if (victimGO != null && victimAnim != null && !string.IsNullOrEmpty(entry.victimAnimatorTrigger))
                 {
                     victimAnim.SetTrigger(entry.victimAnimatorTrigger);
-
-                    // Áï½Ã ÀüÀÌ Æò°¡(»óÅÂ Áï½Ã ÁøÀÔ È®Á¤)
                     victimAnim.Update(0f);
-
-                    // ¡Ú ¹İ ÇÁ·¹ÀÓ¸¸ ¾ÕÀ¸·Î ¹Ğ¾î °íÁ¤¼º È®º¸(0ÇÁ·¹ÀÓ Á¤Áö ¹æÁö)
                     NudgeVictimHalfFrame(victimAnim, entry);
+                    victimTriggeredThisFrame = true;
 
-                    victimTriggeredThisFrame = true;   // °°Àº ÇÁ·¹ÀÓ È÷Æ®½ºÅ¾Àº ´ÙÀ½ Æ½À¸·Î ¹Ì·ë
+                    // K ì„íŒ©íŠ¸ í† ê¸€
+                    if (enableCameraCinematic && CameraLovesAlisha.Instance != null)
+                    {
+                        if (impactK_Shake) CameraLovesAlisha.Instance.ShakeSoft();
+                        if (impactK_PunchFOV) CameraLovesAlisha.Instance.PunchSoft();
+                        if (impactK_Flash) ScreenFlashFX.Instance?.Flash(flashK_Color, flashK_FadeIn, flashK_Hold, flashK_FadeOut, flashK_MaxAlpha);
+                    }
                 }
             }
 
-            // 2) È÷Æ®½ºÅ¾
+            // ---- N í”„ë ˆì„: íˆíŠ¸ìŠ¤í†± + ì„íŒ©íŠ¸ ----
             if (hitIndex < hitStops.Count)
             {
                 var spec = hitStops[hitIndex];
@@ -248,10 +412,8 @@ public class CardAnimationRouter : MonoBehaviour
                 {
                     bool needDelay = false;
 
-                    // A) ¹æ±İ ÇÇ°İ Æ®¸®°Å°¡ ³ª°£ ÇÁ·¹ÀÓÀÌ¸é Áö¿¬
                     if (victimTriggeredThisFrame) needDelay = true;
 
-                    // B) ÇÇ°İÀÚ Á¤Áö ´ë»óÀÎµ¥ ¾ÆÁ÷ ÃæºĞÈ÷ ÁøÇàÇÏÁö ¸øÇßÀ¸¸é Áö¿¬
                     if (!needDelay && spec.pauseVictim && victimAnim != null)
                     {
                         if (TryGetNormTowardsState(victimAnim, entry.victimStateName, animatorLayer, out float vNorm))
@@ -260,34 +422,48 @@ public class CardAnimationRouter : MonoBehaviour
                         }
                         else
                         {
-                            // ¾ÆÁ÷ ÇÇ°İ »óÅÂ ¾Æ´Ô ¡æ Áö¿¬
                             needDelay = true;
                         }
                     }
 
                     if (needDelay)
                     {
-                        // ÀÌ¹ø ÇÁ·¹ÀÓÀÇ Animator °»½ÅÀÌ ³¡³¯ ¶§±îÁö ¹Ì·ë
                         yield return new WaitForEndOfFrame();
-                        continue; // ´ÙÀ½ ·çÇÁ¿¡¼­ ´Ù½Ã °Ë»ç
+                        continue;
                     }
 
+                    // N ì„íŒ©íŠ¸(íˆíŠ¸ìŠ¤í†± ì§ì „)
+                    if (enableCameraCinematic && CameraLovesAlisha.Instance != null)
+                    {
+                        if (impactN_Shake) CameraLovesAlisha.Instance.ShakeHard(spec.duration);
+                        if (impactN_Flash)
+                        {
+                            float hold = Mathf.Min(flashN_HoldScale * spec.duration, flashN_HoldClamp);
+                            ScreenFlashFX.Instance?.Flash(flashN_Color, flashN_FadeIn, hold, flashN_FadeOut, flashN_MaxAlpha);
+                        }
+                    }
+
+                    // ì‹¤ì œ íˆíŠ¸ìŠ¤í†±
                     var pauseList = new List<Animator>();
                     if (spec.pauseAttacker && attackerAnim != null) pauseList.Add(attackerAnim);
                     if (spec.pauseVictim && victimAnim != null) pauseList.Add(victimAnim);
-                    if (spec.pauseEffects && effectAnims != null && effectAnims.Count > 0)
-                        pauseList.AddRange(effectAnims.Where(a => a != null));
-
                     yield return HitStopManager.Instance.HitStop(spec.duration, pauseList, spec.pauseScene);
+
+                    // ì• í”„í„°ì‡¼í¬(íˆíŠ¸ìŠ¤í†± í•´ì œ ì§í›„)
+                    if (enableCameraCinematic && CameraLovesAlisha.Instance != null)
+                    {
+                        if (impactAfter_Shake) CameraLovesAlisha.Instance.ShakeSoft();
+                        if (impactAfter_PunchFOV) CameraLovesAlisha.Instance.PunchHard();
+                    }
+
                     hitIndex++;
                     continue;
                 }
             }
 
-            // Å¸±ê »óÅÂ ÀÌÅ» ½Ã Á¾·á(Idle º¹±Í µî)
             bool stillTargeting =
                 attackerAnim.GetCurrentAnimatorStateInfo(animatorLayer).IsName(entry.stateName) ||
-                (attackerAnim.IsInTransition(animimatorLayer) &&
+                (attackerAnim.IsInTransition(animatorLayer) &&
                  attackerAnim.GetNextAnimatorStateInfo(animatorLayer).IsName(entry.stateName));
             if (!stillTargeting) break;
 
@@ -295,21 +471,14 @@ public class CardAnimationRouter : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// ÇÇ°İÀÚ°¡ ÃÖ¼Ò "¹İ ÇÁ·¹ÀÓ"Àº ÁøÇàÇß´ÂÁö ÆÇ´ÜÇÏ±â À§ÇÑ Á¤±ÔÈ­ ÀÓ°è°ª.
-    /// victimClipÀÌ ¾øÀ¸¸é 30fps, ±æÀÌ 1ÃÊ °¡Á¤.
-    /// </summary>
     private float ComputeVictimMinNorm(CardAnimationDB.CardAnimEntry e)
     {
         float vf = (e.victimClip != null && e.victimClip.frameRate > 0f) ? e.victimClip.frameRate : 30f;
         float vlen = (e.victimClip != null && e.victimClip.length > 0f) ? e.victimClip.length : 1f;
-        float halfFrameSec = 0.5f / vf; // ¹İ ÇÁ·¹ÀÓ
+        float halfFrameSec = 0.5f / vf; // ë°˜ í”„ë ˆì„
         return Mathf.Clamp01(halfFrameSec / vlen);
     }
 
-    /// <summary>
-    /// ÇÇ°İ Æ®¸®°Å Á÷ÈÄ ¹İ ÇÁ·¹ÀÓ¸¸ ÁøÇà À§Ä¡·Î ¿öÇÁ(0ÇÁ·¹ÀÓ Á¤Áö ¹æÁö).
-    /// </summary>
     private void NudgeVictimHalfFrame(Animator victimAnim, CardAnimationDB.CardAnimEntry e)
     {
         float vf = (e.victimClip != null && e.victimClip.frameRate > 0f) ? e.victimClip.frameRate : 30f;
@@ -318,11 +487,5 @@ public class CardAnimationRouter : MonoBehaviour
 
         victimAnim.Play(e.victimStateName, animatorLayer, halfFrameNorm);
         victimAnim.Update(0f);
-    }
-
-    private List<Animator> CollectEffectAnimators(GameObject attackerGO, GameObject victimGO)
-    {
-        // ÇÁ·ÎÁ§Æ®¿¡ IEffectAnimatorSource ¾øÀ¸¸é null/ºó ¸®½ºÆ®·Î µÎÀÚ.
-        return null;
     }
 }

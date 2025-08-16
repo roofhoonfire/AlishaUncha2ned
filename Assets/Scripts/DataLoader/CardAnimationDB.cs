@@ -15,13 +15,8 @@ public class CardAnimationDB : ScriptableObject
         public float duration = 0.06f;
 
         [Header("정지 대상")]
-        [Tooltip("공격자 애니메이터 정지")]
         public bool pauseAttacker = true;
-
-        [Tooltip("피격자 애니메이터 정지")]
         public bool pauseVictim = true;
-
-        [Tooltip("이펙트 애니메이터 정지(있으면)")]
         public bool pauseEffects = true;
 
         [Tooltip("씬 전체 정지(Time.timeScale=0)")]
@@ -35,26 +30,33 @@ public class CardAnimationDB : ScriptableObject
         public string cardCode;
         public HookType hook;
 
+        [Header("예비동작(Prep) 애니")]
+        [Tooltip("Prep으로 진입시키는 트리거(없으면 state로 직접 전환)")]
+        public string prepTrigger;
+        [Tooltip("Prep 상태 이름")]
+        public string prepStateName;
+        [Tooltip("Prep 클립(알면 정확도↑)")]
+        public AnimationClip prepClip;
+        [Tooltip("Prep 총 프레임 수를 직접 지정하고 싶을 때")]
+        public int prepTotalFramesOverride = 0;
+        [Tooltip("Prep 마지막 스프라이트에서 멈춰 있을 시간(초)")]
+        public float prepPoseHoldSec = 0.25f;
+
         [Header("공격자(Attacker) 애니")]
-        public string animatorTrigger;
-        public string stateName;
-        public AnimationClip clip;
+        public string animatorTrigger;   // Attack 트리거
+        public string stateName;         // Attack 상태 이름
+        public AnimationClip clip;       // Attack 클립
         public int totalFramesOverride = 0;
 
         [Header("피격자(Victim) 애니")]
-        [Tooltip("피격자 애니 트리거(예: Trig_Hit)")]
         public string victimAnimatorTrigger = "Trig_Hit";
-
-        [Tooltip("피격자 애니 상태 이름(예: Base Layer.Hit)")]
         public string victimStateName = "Base Layer.Hit";
-
-        [Tooltip("피격자 애니 클립(있으면 정확도↑)")]
         public AnimationClip victimClip;
 
-        [Tooltip("피격자 애니를 시작할 프레임들(공격자 클립의 프레임 기준)")]
+        [Tooltip("피격자 애니를 시작할 프레임들(※ Attack 클립 기준 프레임!)")]
         public List<int> victimStartFrames = new List<int>();
 
-        [Header("히트스탑 설정(공격자 프레임 기준)")]
+        [Header("히트스탑 설정(※ Attack 클립 기준 프레임!)")]
         public List<HitStopSpec> hitStops = new List<HitStopSpec>();
     }
 

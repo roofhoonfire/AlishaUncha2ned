@@ -100,9 +100,15 @@ public class LocalRenderingManager : MonoBehaviour
     {
 
         //게임시작 렌더링 연출 넣고 싶은거 집어 옇어라 스발아
-
-
         
+        
+        
+        ApplyFacingFromRightOrLeft(data1.actorNum, data1);
+        ApplyFacingFromRightOrLeft(data2.actorNum, data2);
+
+
+
+
 
         ApplyImmediateUI(data1);
         ApplyImmediateUI(data2);
@@ -121,7 +127,11 @@ public class LocalRenderingManager : MonoBehaviour
     }
     public void Rendering_Norm_Action(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h)
     {
+        LocalRenderingData actorData = null;
+        if (data1 != null && data1.actorNum == actorNum) actorData = data1;
+        else if (data2 != null && data2.actorNum == actorNum) actorData = data2;
 
+        ApplyFacingFromRightOrLeft(actorNum, actorData);
         AlertDialogue.Instance.StartDialogue(action, actorNum, h, 0, DialogueType.Activate);
 
 
@@ -437,6 +447,28 @@ public class LocalRenderingManager : MonoBehaviour
                 }
             }
         }
+    }
+    private void ApplyFacingFromRightOrLeft(int actorNum, LocalRenderingData d)
+    {
+        if (d == null) return;
+        if (!LocalState.Instance.PlayerObDic.TryGetValue(actorNum, out var go) || go == null) return;
+
+        // "right"면 오른쪽을 보게(기본은 왼쪽을 봄)
+        bool faceRight = string.Equals(d.rightOrLeft, "right", System.StringComparison.OrdinalIgnoreCase);
+
+        // 우선 SpriteRenderer.flipX로 처리 (여러 파츠가 있으면 전부 뒤집기)
+        var srs = go.GetComponentsInChildren<SpriteRenderer>(true);
+        if (srs != null && srs.Length > 0)
+        {
+            foreach (var sr in srs) sr.flipX = faceRight;
+            return;
+        }
+
+        // 스프라이트가 아니라면(혹은 렌더러가 없다면) 스케일로 폴백
+        var t = go.transform;
+        var ls = t.localScale;
+        ls.x = Mathf.Abs(ls.x) * (faceRight ? -1f : 1f); // 기본 왼쪽(+), 오른쪽은 -로 뒤집기
+        t.localScale = ls;
     }
 
 }

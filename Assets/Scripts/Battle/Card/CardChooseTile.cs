@@ -18,7 +18,7 @@ public class CardChooseTile : MonoBehaviour
     private List<int> prevHighlighted = new List<int>();
 
     public List<Vector3Int> debugYong;
-
+    public string mouseSide;
 
     void Awake()
     {
@@ -79,7 +79,7 @@ public class CardChooseTile : MonoBehaviour
         // ★ tileType이 -1이면 바로 종료
         if (action.tileType == -1)
         {
-            Overmind.Instance.SendTile(PhotonNetwork.LocalPlayer.ActorNumber, new List<int>());
+            Overmind.Instance.SendTileandDirec(PhotonNetwork.LocalPlayer.ActorNumber, new List<int>(), null);
             isActive = false;
 
             _selectTileCoroutine = null; // 안전하게 핸들 초기화
@@ -112,6 +112,38 @@ public class CardChooseTile : MonoBehaviour
             yield return null;
             if (Input.GetMouseButtonDown(0))
             {
+
+                //캐릭터 좌우 판정
+
+                var cam = Camera.main;
+                if (cam != null && myChara != null)
+                {
+                    Vector3 charScreen = cam.WorldToScreenPoint(myChara.transform.position);
+
+                    if (charScreen.z > 0f)
+                    {
+                        // 캐릭터가 카메라 앞에 있을 때: 스크린 x 기준
+                        mouseSide = (Input.mousePosition.x >= charScreen.x) ? "right" : "left";
+                    }
+                    else
+                    {
+                        // 캐릭터가 카메라 뒤에 있거나 투영이 이상할 때: 그라운드 평면에 레이캐스트로 대체
+                        var plane = new Plane(Vector3.up, myChara.transform.position); // y-수평인 평면(그리드 평면)
+                        var ray = cam.ScreenPointToRay(Input.mousePosition);
+                        if (plane.Raycast(ray, out float dist))
+                        {
+                            Vector3 hit = ray.GetPoint(dist);
+                            Vector3 toHit = hit - myChara.transform.position;
+                            float side = Vector3.Dot(toHit, cam.transform.right); // 카메라의 '오른쪽' 기준
+                            mouseSide = (side >= 0f) ? "right" : "left";
+                        }
+                        else
+                        {
+                            mouseSide = "right"; // 레이 미스면 디폴트
+                        }
+                    }
+                }
+                //
                 GridManagement.Instance.ResetAllTiles();
                 StopSelectTileLoop();
             }
@@ -125,7 +157,7 @@ public class CardChooseTile : MonoBehaviour
             _selectTileCoroutine = null;
             //여기서 마스터 클라이언트한테 넘겨주면 된다
 
-            Overmind.Instance.SendTile(PhotonNetwork.LocalPlayer.ActorNumber, CoordsToIndices(debugYong));
+            Overmind.Instance.SendTileandDirec(PhotonNetwork.LocalPlayer.ActorNumber, CoordsToIndices(debugYong), mouseSide);
             isActive = false;
 
         }
