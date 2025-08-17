@@ -38,6 +38,13 @@ public class LocalState : MonoBehaviour
     public TextMeshProUGUI opponencostRemainTxt;
     public TextMeshProUGUI mycostRemainTxt;
 
+
+
+    //추가됨 낄렵
+    private ActionPacketData _lastApData;
+    private bool _isReturningToChoose;
+    //
+
     public GameObject alim; // 나중엔 걍 애니메이션으로 퉁쳐잇~
 
     void Awake()
@@ -163,30 +170,61 @@ public class LocalState : MonoBehaviour
 
     //해줄일 액터 넘버도 같이 변수로 넘겨줘서 어느 액터인지
 
-
     public void Start_NormChoose_Phase(int actorNumber, string apjson)
     {
-        ActionPacketData apData = JsonConvert.DeserializeObject<ActionPacketData>(apjson);
-        var playerData = LocalRenderingStatic.localRenderingDatas[actorNumber];
-        Debug.Log($"이번턴의 제약은 {playerData.bounds[playerData.boundIndex]}");
-        // 이미 대기 중이면 중단
-        if (_chooseMoveRoutine != null)
-            StopCoroutine(_chooseMoveRoutine);
-
-        // 키 입력 대기 코루틴 시작
+        var apData = JsonConvert.DeserializeObject<ActionPacketData>(apjson);
+        _lastApData = apData;                             // ★ 보관
+        if (_chooseMoveRoutine != null) StopCoroutine(_chooseMoveRoutine);
         _chooseMoveRoutine = StartCoroutine(ChooseMoveInputLoop(apData));
-
     }
 
     public void Start_FaceDown_Phase(int actorNumber, string apjson)
     {
-        ActionPacketData apData = JsonConvert.DeserializeObject<ActionPacketData>(apjson);
-        if (_chooseMoveRoutine != null)
-            StopCoroutine(_chooseMoveRoutine);
-
-        // 키 입력 대기 코루틴 시작
+        var apData = JsonConvert.DeserializeObject<ActionPacketData>(apjson);
+        _lastApData = apData;                             // ★ 보관
+        if (_chooseMoveRoutine != null) StopCoroutine(_chooseMoveRoutine);
         _chooseMoveRoutine = StartCoroutine(ChooseMoveInputLoop(apData));
+    }
+    //추가됨 낄렵
 
+    /*  public void Start_NormChoose_Phase(int actorNumber, string apjson)
+      {
+          ActionPacketData apData = JsonConvert.DeserializeObject<ActionPacketData>(apjson);
+          var playerData = LocalRenderingStatic.localRenderingDatas[actorNumber];
+          Debug.Log($"이번턴의 제약은 {playerData.bounds[playerData.boundIndex]}");
+          // 이미 대기 중이면 중단
+          if (_chooseMoveRoutine != null)
+              StopCoroutine(_chooseMoveRoutine);
+
+          // 키 입력 대기 코루틴 시작
+          _chooseMoveRoutine = StartCoroutine(ChooseMoveInputLoop(apData));
+
+      }
+
+      public void Start_FaceDown_Phase(int actorNumber, string apjson)
+      {
+          ActionPacketData apData = JsonConvert.DeserializeObject<ActionPacketData>(apjson);
+          if (_chooseMoveRoutine != null)
+              StopCoroutine(_chooseMoveRoutine);
+
+          // 키 입력 대기 코루틴 시작
+          _chooseMoveRoutine = StartCoroutine(ChooseMoveInputLoop(apData));
+
+      }*/
+    //추가됨 낄렵
+    public void ReturnToChooseLoop()
+    {
+        if (_isReturningToChoose) return;                 // 재진입 방지
+        _isReturningToChoose = true;
+
+        // 선택바는 ‘숨김 대기’ 상태로 초기화(애니 없이 깔끔)
+        SelectionBarManager.Instance?.PrepareHiddenStandby();
+
+        // 혹시 남아있을지 모를 코루틴 정리 후 재시작
+        if (_chooseMoveRoutine != null) StopCoroutine(_chooseMoveRoutine);
+        _chooseMoveRoutine = StartCoroutine(ChooseMoveInputLoop(_lastApData));
+
+        _isReturningToChoose = false;
     }
     private IEnumerator ChooseMoveInputLoop(ActionPacketData apData)
     {

@@ -38,8 +38,16 @@ public class CardModeState : MonoBehaviour
         }
 
     }
+    public void SetActive(bool active, ActionPacketData apData)
+    {
+        if (active == isActive) return;
+        isActive = active;
+        if (isActive) StartSelectCardLoop(apData);
+        else StopSelectCardLoop(null);   // null이면 제출 안 함
+    }
 
-
+    //추가 됨낄렵
+    /*
     public void SetActive(bool active, ActionPacketData apData)
     {
         if (active == isActive) return; //이미중복 코루틴 시작 방지
@@ -47,8 +55,25 @@ public class CardModeState : MonoBehaviour
         if (isActive) StartSelectCardLoop(apData);
         else StopSelectCardLoop(null);
     }
+    */
 
+  
+    private void CancelAndReturn()
+    {
+        // 코루틴만 멈추면 카드가 남으니, 확실히 비워주자
+        if (_selectCardCoroutine != null)
+        {
+            StopCoroutine(_selectCardCoroutine);
+            _selectCardCoroutine = null;
+        }
+        isActive = false;
 
+        ClearAllCards();                    // ★ 손패 UI 제거
+        if (LocalState.Instance?.alim) LocalState.Instance.alim.SetActive(false);
+
+        // 제출 없이 복귀
+        LocalState.Instance.ReturnToChooseLoop();
+    }
     private void StartSelectCardLoop(ActionPacketData apdata)
     {
         apDataRef = apdata;
@@ -134,6 +159,25 @@ public class CardModeState : MonoBehaviour
         curAction = new ActionData();
         curAction.effects = new List<CardEffect>();
     }
+
+    //추가됨 낄렵
+    private IEnumerator SelectCardLoop()
+    {
+        while (isActive)
+        {
+            // ESC 취소
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                CancelAndReturn();
+                yield break;
+            }
+
+            SelectCard();
+            yield return null;
+        }
+    }
+
+    /*
     private IEnumerator SelectCardLoop()
     {
         while (isActive)
@@ -143,7 +187,7 @@ public class CardModeState : MonoBehaviour
             yield return null; //SelectCard()가 무한이 아닌 매 프레임마다 한번씩만 호출 되게끔!
         }
 
-    }
+    }*/
     private void SelectCard()
     {
 

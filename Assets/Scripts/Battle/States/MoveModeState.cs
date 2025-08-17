@@ -38,14 +38,24 @@ public class MoveModeState : MonoBehaviour
 
     }
 
-
+    //추가됨 낄렵
+    //
+    public void SetActive(bool active, ActionPacketData apData)
+    {
+        if (active == isActive) return;
+        isActive = active;
+        if (isActive) StartSelectDestLoop(apData);
+        else StopSelectDestLoop();
+    }
+    /*
     public void SetActive(bool active, ActionPacketData apData)
     {
         if (active == isActive) return; //이미중복 코루틴 시작 방지
         isActive = active;
         if (isActive) StartSelectDestLoop(apData);
         else StopSelectDestLoop();
-    }
+    }*/
+
     private void StartSelectDestLoop(ActionPacketData apData)
     {
         TilePreprocessing(apData);
@@ -70,6 +80,34 @@ public class MoveModeState : MonoBehaviour
 
 
     }
+
+    //추가됨 낄렵
+    private IEnumerator SelectDestLoop(ActionPacketData apData)
+    {
+        while (isActive)
+        {
+            // ★ ESC 취소
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                CancelAndReturn();
+                yield break;
+            }
+
+            SelectDest(apData);
+            yield return null;
+        }
+    }
+
+    private void CancelAndReturn()
+    {
+        StopSelectDestLoop();                // 하이라이트/코루틴 정리
+        isActive = false;
+        hoveredTile = null; selectedTile = null;
+        if (alim) alim.SetActive(false);
+
+        LocalState.Instance.ReturnToChooseLoop();   // ★ 중앙 게이트 호출
+    }
+    /*
     private IEnumerator SelectDestLoop(ActionPacketData apData)
     {
         while (isActive)
@@ -77,7 +115,9 @@ public class MoveModeState : MonoBehaviour
             SelectDest(apData);     // 매 프레임 목적지 선택 로직
             yield return null;
         }
-    }
+    }*/
+
+
     private void StopSelectDestLoop()
     {
 
