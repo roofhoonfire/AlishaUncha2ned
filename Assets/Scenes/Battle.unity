@@ -1872,6 +1872,55 @@ Transform:
   m_Children: []
   m_Father: {fileID: 252134912}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &602796184
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 602796186}
+  - component: {fileID: 602796185}
+  m_Layer: 0
+  m_Name: Global Volume
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &602796185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 602796184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: a6560a915ef98420e9faacc1c7438823, type: 2}
+--- !u!4 &602796186
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 602796184}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -44.560947, y: 12.895794, z: 23.53034}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &648365943
 GameObject:
   m_ObjectHideFlags: 0
@@ -1882,7 +1931,6 @@ GameObject:
   m_Component:
   - component: {fileID: 648365947}
   - component: {fileID: 648365946}
-  - component: {fileID: 648365945}
   - component: {fileID: 648365944}
   m_Layer: 0
   m_Name: overlayCam
@@ -1914,7 +1962,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -1935,14 +1983,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!81 &648365945
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 648365943}
-  m_Enabled: 1
 --- !u!20 &648365946
 Camera:
   m_ObjectHideFlags: 0
@@ -3928,14 +3968,14 @@ RectTransform:
   m_GameObject: {fileID: 1084574150}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 0.55, z: 1}
+  m_LocalScale: {x: 1, y: 0.55, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2089998020}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 80}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &1084574152
@@ -8564,7 +8604,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -8597,6 +8637,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 047383492a546d74b9cb6d6ddf46f19f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  autoHideMarkedChildren: 1
   overlayCamera: {fileID: 648365946}
   backdropCanvas: {fileID: 2089998019}
   backdropImage: {fileID: 974501740}
@@ -8609,6 +8650,11 @@ MonoBehaviour:
   cutLineGO: {fileID: 1084574150}
   cutLineAnimator: {fileID: 1084574152}
   cutLineImage: {fileID: 1084574153}
+  cutLineZRotWhenFacingLeft: 5
+  cutLineZRotWhenFacingRight: -5
+  cutLineYRotWhenFacingLeft: 10
+  cutLineYRotWhenFacingRight: 10
+  cutLineAngleAsOffset: 0
   cutLineTrigger: Trig_Play
   cutLineStateName: Play
   cutLineClip: {fileID: 7400000, guid: 6988dfce77185554ebe9cc2fbd7ab7fd, type: 2}
@@ -8800,7 +8846,7 @@ GameObject:
   - component: {fileID: 2089998018}
   - component: {fileID: 2089998017}
   m_Layer: 5
-  m_Name: cutscenecam
+  m_Name: cutscenecan
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9312,3 +9358,4 @@ SceneRoots:
   - {fileID: 1860031147}
   - {fileID: 2082289070}
   - {fileID: 2089998020}
+  - {fileID: 602796186}

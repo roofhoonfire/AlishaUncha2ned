@@ -16,11 +16,11 @@ public class LocalState : MonoBehaviour
     public static LocalState Instance;
     [SerializeField] private GameObject charaprefab;
 
-    public Dictionary<int , GameObject > PlayerObDic;
+    public Dictionary<int, GameObject> PlayerObDic;
     // 각 ActorNumber에 대응하는 플레이어 상태
     public Dictionary<int, PlayerData> localPlayers = new Dictionary<int, PlayerData>();
 
-    public List<(int actorNumber,  int remainingCost)> localActionQueue =new List<(int actorNumber, int remainingCost)>();
+    public List<(int actorNumber, int remainingCost)> localActionQueue = new List<(int actorNumber, int remainingCost)>();
 
     private Coroutine _chooseMoveRoutine;
     public BacktoMaster btmPacket;
@@ -39,7 +39,7 @@ public class LocalState : MonoBehaviour
     public TextMeshProUGUI mycostRemainTxt;
 
     public GameObject alim; // 나중엔 걍 애니메이션으로 퉁쳐잇~
-  
+
     void Awake()
     {
         if (Instance == null)
@@ -57,7 +57,7 @@ public class LocalState : MonoBehaviour
     /// 마스터 클라이언트에서 받은 data로 로컬 플레이어 상태만 부분 동기화합니다.
     /// 이미 localPlayers에 키가 존재한다고 가정하고, 값만 갱신합니다.
     /// </summary>
-   
+
 
     /// <summary>
     /// 전체 로컬 상태를 초기화합니다.
@@ -83,21 +83,21 @@ public class LocalState : MonoBehaviour
             };
 
             LocalRenderingStatic.localRenderingDatas[kvp.Key] = copied;
-            copies.Add( LocalRenderingStatic.localRenderingDatas[kvp.Key]);
+            copies.Add(LocalRenderingStatic.localRenderingDatas[kvp.Key]);
 
             i++;
         }
 
         Debug.Log("LocalState: 전체 플레이어 상태 초기화됨");
         //d아래는 디버깅 용이다 나중에 지우기
-        
+
         //게임 시작 연출 하나 집어넣기 ;
 
 
         CharaObInit();
         LocalRenderingManager.Instance.Rendering_GameStart(copies[0], copies[1]);
 
-       //PlayerStateUIRendering();
+        //PlayerStateUIRendering();
     }
 
 
@@ -114,11 +114,11 @@ public class LocalState : MonoBehaviour
             GameObject temp = Instantiate(charaprefab);
             GameObject mcChecker = temp.transform.Find("MyChara")?.gameObject;
 
-            
+
             //렌더링 용 커넥션 변수
-            CharaInfo charinfo  = temp.GetComponent<CharaInfo>();
-          
-            
+            CharaInfo charinfo = temp.GetComponent<CharaInfo>();
+
+
             temp.transform.position = summonpoint.transform.position;
             charinfo.actorNum = pinfo.Value.actorNum;
 
@@ -127,9 +127,9 @@ public class LocalState : MonoBehaviour
                 LocalRenderingManager.Instance.myHP = charinfo.Hp;
                 LocalRenderingManager.Instance.mydefense = charinfo.Def;
                 mcChecker.SetActive(true);
-               SelectionBarManager.Instance.CM =  temp.GetComponent<Transform>().Find("CM");
-               SelectionBarManager.Instance.MM = temp.GetComponent<Transform>().Find("MM");
-               SelectionBarManager.Instance.JM = temp.GetComponent<Transform>().Find("JM");
+                SelectionBarManager.Instance.CM = temp.GetComponent<Transform>().Find("CM");
+                SelectionBarManager.Instance.MM = temp.GetComponent<Transform>().Find("MM");
+                SelectionBarManager.Instance.JM = temp.GetComponent<Transform>().Find("JM");
                 SelectionBarManager.Instance.CM.gameObject.SetActive(false);
                 SelectionBarManager.Instance.MM.gameObject.SetActive(false);
                 SelectionBarManager.Instance.JM.gameObject.SetActive(false);
@@ -143,7 +143,7 @@ public class LocalState : MonoBehaviour
                 mcChecker.SetActive(false);
             }
             PlayerObDic.Add(pinfo.Value.actorNum, temp);
-            
+
         }
 
 
@@ -159,7 +159,7 @@ public class LocalState : MonoBehaviour
     }
 
 
-   
+
 
     //해줄일 액터 넘버도 같이 변수로 넘겨줘서 어느 액터인지
 
@@ -174,13 +174,13 @@ public class LocalState : MonoBehaviour
             StopCoroutine(_chooseMoveRoutine);
 
         // 키 입력 대기 코루틴 시작
-          _chooseMoveRoutine = StartCoroutine(ChooseMoveInputLoop(apData));
+        _chooseMoveRoutine = StartCoroutine(ChooseMoveInputLoop(apData));
 
     }
 
     public void Start_FaceDown_Phase(int actorNumber, string apjson)
     {
-        ActionPacketData apData = JsonConvert.DeserializeObject<ActionPacketData>(apjson);  
+        ActionPacketData apData = JsonConvert.DeserializeObject<ActionPacketData>(apjson);
         if (_chooseMoveRoutine != null)
             StopCoroutine(_chooseMoveRoutine);
 
@@ -192,36 +192,39 @@ public class LocalState : MonoBehaviour
     {
         InitBacktoMaster();
 
+        // 1) 선택바 토글(나타나기 시작)
         SelectionBarManager.Instance.SetActive();
-        // 대기 상태
-       
-        //여기서 n초 기다려야 셀렉션 바 삐꾸 안날듯 
-       //페이스 다운 페이즈에서 호출시 m 은 불가하게 
+
+        // 2) 등장 애니 끝날 때까지 대기 → 입력 경합 차단
+        //    (유틸 쓰거나, 한 줄 계산식으로도 가능)
+        // yield return SelectionBarManager.Instance.WaitUntilIdle();
+        yield return new WaitForSeconds(
+            SelectionBarManager.Instance.rotationDuration
+            + SelectionBarManager.Instance.overlapDelay * 2f
+        );
+
+        // 3) 이제부터 C/M 입력을 받음
         while (true)
         {
-            if (Input.GetKeyDown(KeyCode.M) && 
-                apData.canMove
-                )
+            if (Input.GetKeyDown(KeyCode.M) && apData.canMove)
             {
-                // M 키 눌리면 MoveModeState의 반복 로직 시작
                 MoveModeState.Instance.SetActive(true, apData);
                 break;
             }
             else if (Input.GetKeyDown(KeyCode.C))
             {
-           
-              CardModeState.Instance.SetActive(true, apData);
-              break;
-           }
-
+                CardModeState.Instance.SetActive(true, apData);
+                break;
+            }
             yield return null;
         }
 
-        // 코루틴 참조 해제
         _chooseMoveRoutine = null;
-        SelectionBarManager.Instance.SetActive();
 
+        // 4) 모드 진입이 결정됐으니 선택바는 토글로 닫기
+        SelectionBarManager.Instance.SetActive();
     }
+
 
 
     //마스터한테 돌려줄 것들을 담는 패키지를 초기화한다
@@ -256,7 +259,7 @@ public class LocalState : MonoBehaviour
         JujuSelectModeState.Instance.SetActive(true, actorNum, boundCode, jujucodes);
 
     }
-   
 
- 
+
+
 }

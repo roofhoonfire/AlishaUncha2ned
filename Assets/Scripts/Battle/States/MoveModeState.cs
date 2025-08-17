@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class MoveModeState : MonoBehaviour
 {
-   
+
     public static MoveModeState Instance;
     public bool isActive = false;
     private EachTile hoveredTile = null;
@@ -35,7 +35,7 @@ public class MoveModeState : MonoBehaviour
         {
             Destroy(gameObject);
         }
-      
+
     }
 
 
@@ -50,7 +50,7 @@ public class MoveModeState : MonoBehaviour
     {
         TilePreprocessing(apData);
         if (_selectDestCoroutine == null)
-            _selectDestCoroutine = StartCoroutine(SelectDestLoop( apData));
+            _selectDestCoroutine = StartCoroutine(SelectDestLoop(apData));
     }
     private void TilePreprocessing(ActionPacketData apData)
     {
@@ -60,14 +60,14 @@ public class MoveModeState : MonoBehaviour
 
         var data = LocalRenderingStatic.localRenderingDatas[actorNum];
         int startIndex = data.curpos;
-       
+
         GridManagement.Instance.HighlightReachableTilesFrom(
             startIndex,
             apData.defaultMove,
             Color.cyan,
             "Move"// 이동 가능 타일
         );
-   
+
 
     }
     private IEnumerator SelectDestLoop(ActionPacketData apData)
@@ -126,7 +126,7 @@ public class MoveModeState : MonoBehaviour
                     destinationIndex = currentTile.tileIndex;
 
 
-                  
+
 
                     StopSelectDestLoop();
 
@@ -139,7 +139,7 @@ public class MoveModeState : MonoBehaviour
                     action.effects.Add(moveEffect);
                     int actualCost = Mathf.Min(distance, apData.defaultMoveCast);
 
-                    
+
                     Overmind.Instance?.SubmitSelection(action, actualCost, actorNum, LocalState.Instance.btmPacket);
 
                     isActive = false;

@@ -4,12 +4,16 @@ using UnityEngine.UI;
 
 using DG.Tweening;
 using System.Collections.Generic;
+//using UnityEditor.Experimental.GraphView;
 
 public class CameraLovesAlisha : MonoBehaviour
 {
     public static CameraLovesAlisha Instance;
     [Header("Point1: Auto-hide marked children")]
     public bool autoHideMarkedChildren = true;
+
+
+
 
     private readonly List<CineHideDuringPoint1> _autoHidden = new();
     [Header("Point1 Backdrop & Isolation")]
@@ -41,6 +45,20 @@ public class CameraLovesAlisha : MonoBehaviour
     public GameObject cutLineGO;
     public Animator cutLineAnimator;
     public Image cutLineImage;
+
+    [Header("CutLine Facing Angle")]
+    [Tooltip("flipX=true(왼쪽), false(오른쪽)일 때 CutLine의 Z 회전각(도)")]
+    public float cutLineZRotWhenFacingLeft = 5f;
+    public float cutLineZRotWhenFacingRight = -5f;
+
+
+    [Tooltip("flipX=true(왼쪽), false(오른쪽)일 때 CutLine의 Y 회전각(도)")]
+    public float cutLineYRotWhenFacingLeft = 60f;
+    public float cutLineYRotWhenFacingRight = -60f;
+
+    [Tooltip("현재 로컬 회전에 위 값을 덧셈(오프셋)할지 여부. 끄면 절대값으로 세팅")]
+    public bool cutLineAngleAsOffset = false;
+
 
     [Tooltip("Animator Trigger 이름 (Idle→Play)")]
     public string cutLineTrigger = "Trig_Play";
@@ -304,16 +322,16 @@ public class CameraLovesAlisha : MonoBehaviour
         overlayCamera.gameObject.SetActive(true);
 
         // 4) CutLine 트리거
-        TriggerCutLine(holdWindowSec);
+        TriggerCutLine(holdWindowSec, attackerRoot != null ? attackerRoot.transform : null);
 
         // 5) 마커 붙은 자식 자동 숨김
-      /*  if (autoHideMarkedChildren && attackerRoot != null)
-        {
-            _autoHidden.Clear();
-            attackerRoot.GetComponentsInChildren(true, _autoHidden);
-            foreach (var h in _autoHidden) h.Hide();
-        }
-      */
+        /*  if (autoHideMarkedChildren && attackerRoot != null)
+          {
+              _autoHidden.Clear();
+              attackerRoot.GetComponentsInChildren(true, _autoHidden);
+              foreach (var h in _autoHidden) h.Hide();
+          }
+        */
         _isIsolationActive = true;
 
 
@@ -330,11 +348,39 @@ public class CameraLovesAlisha : MonoBehaviour
 
 
     }
-    private void TriggerCutLine(float windowSec)
+    private void TriggerCutLine(float windowSec, Transform attacker)
     {
         if (cutLineGO == null) return;
+        // --- 0) flipX 확인 ---
+        bool flipX = false;
+        if (attacker != null)
+        {
+            var sr = attacker.GetComponentInChildren<SpriteRenderer>();
+            if (sr != null) flipX = sr.flipX;
+        }
 
-        // 보이게 준비
+
+        // --- 1) CutLine 회전 세팅 ---
+        var rt = cutLineGO.transform as RectTransform; // UI라면 RectTransform일 것
+        if (rt != null)
+        {
+            float targetZ = flipX ? cutLineZRotWhenFacingLeft : cutLineZRotWhenFacingRight;
+            float targetY = flipX ? cutLineYRotWhenFacingLeft : cutLineYRotWhenFacingRight;
+
+            if (cutLineAngleAsOffset)
+            {
+                // 기존 로컬 각도에 더해주기
+                var e = rt.localEulerAngles;
+                rt.localRotation = Quaternion.Euler(e.x, e.y + targetY, e.z + targetZ);
+            }
+            else
+            {
+                // 절대값으로 세팅 (X는 건드리지 않음)
+                var e = rt.localEulerAngles;
+                rt.localRotation = Quaternion.Euler(e.x, targetY, targetZ);
+            }
+        }
+        // 2) 보이게 준비
         cutLineGO.SetActive(true);
         if (cutLineImage != null)
         {
@@ -342,6 +388,7 @@ public class CameraLovesAlisha : MonoBehaviour
             cutLineImage.DOFade(1f, cutLineFadeIn).SetUpdate(backdropUseRealtime);
         }
 
+        //3 애니 길이 업뎃 ㅎ
         if (cutLineAnimator != null)
         {
             if (cutLineUseUnscaled) cutLineAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;
@@ -384,6 +431,9 @@ public class CameraLovesAlisha : MonoBehaviour
         for (int i = 0; i < _autoHidden.Count; i++)
             if (_autoHidden[i] != null) _autoHidden[i].Show();
         _autoHidden.Clear();
+        //  셀렉션바는 화면에서 보이지 않게 ‘대기 상태’로
+        SelectionBarManager.Instance?.PrepareHiddenStandby();
+
 
         // === 1) 백드롭/오버레이/레이어 복구: 실제로 켠 경우에만 수행 ===
         if (_isIsolationActive && overlayCamera != null && backdropCanvas != null && backdropImage != null)

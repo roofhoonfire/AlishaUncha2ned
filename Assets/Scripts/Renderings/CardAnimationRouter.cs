@@ -131,7 +131,7 @@ public class CardAnimationRouter : MonoBehaviour
     /// <summary>
     /// 카드 코드 + 훅에 맞는 애니메이션 오케스트레이션 (Prep→PoseHold→Attack→K/N 임팩트/히트스톱).
     /// </summary>
-    public void Play(string cardCode, int attackerActorNum, HookType hook, int? victimActorNum = null)
+  /*  public void Play(string cardCode, int attackerActorNum, HookType hook, int? victimActorNum = null)
     {
         if (LocalState.Instance == null || LocalState.Instance.PlayerObDic == null)
         {
@@ -185,7 +185,7 @@ public class CardAnimationRouter : MonoBehaviour
 
         StartCoroutine(PlayOrchestrated(attackerAnim, victimAnim, attackerGO, victimGO, entry));
     }
-
+  */
     private bool _TryGetEntry(string cardCode, HookType hook, out CardAnimationDB.CardAnimEntry entry)
     {
         entry = null;
@@ -510,4 +510,61 @@ public class CardAnimationRouter : MonoBehaviour
         victimAnim.Play(e.victimStateName, animatorLayer, halfFrameNorm);
         victimAnim.Update(0f);
     }
+
+    // CardAnimationRouter.cs
+    public IEnumerator PlayCo(string cardCode, int attackerActorNum, HookType hook, int? victimActorNum = null)
+    {
+        // 기존 Play(...) 첫부분과 동일한 방어구문들
+        if (LocalState.Instance == null || LocalState.Instance.PlayerObDic == null) yield break;
+        if (!LocalState.Instance.PlayerObDic.TryGetValue(attackerActorNum, out var attackerGO) || attackerGO == null) yield break;
+
+        if (!_TryGetEntry(cardCode, hook, out var entry))
+            yield break;
+
+        GameObject victimGO = null;
+        if (victimActorNum == null)
+        {
+            foreach (var kv in LocalState.Instance.PlayerObDic)
+                if (kv.Key != attackerActorNum) { victimGO = kv.Value; break; }
+        }
+        else
+        {
+            LocalState.Instance.PlayerObDic.TryGetValue(victimActorNum.Value, out victimGO);
+        }
+
+        var attackerAnim = attackerGO.GetComponentInChildren<Animator>();
+        var victimAnim = victimGO ? victimGO.GetComponentInChildren<Animator>() : null;
+
+        if (enableCameraCinematic && CameraLovesAlisha.Instance != null)
+        {
+            var cam = CameraLovesAlisha.Instance;
+            cam.defaultFOV = cameraDefaultFOV;
+            cam.returnDuration = cameraReturnDuration;
+            cam.SetDefault(attackerGO.transform);
+        }
+
+        //  핵심: 내부 오케스트레이션이 끝날 때까지 기다림
+        yield return StartCoroutine(PlayOrchestrated(attackerAnim, victimAnim, attackerGO, victimGO, entry));
+
+        //  백드롭 페이드아웃을 기다려 '완전히' 끝낸다 (EndPoint1Backdrop 호출 직후)
+        if (enableCameraCinematic && entry.usePrepBackdrop && entry.prepBackdropSprite != null)
+        {
+            float fadeOut = Mathf.Max(0f, entry.prepBackdropFadeOut);
+            if (fadeOut > 0f) yield return new WaitForSecondsRealtime(fadeOut);
+        }
+
+        // ★ 카메라 복귀 트윈도 기다려서 완전 종료 보장
+        if (enableCameraCinematic && camMove_Return && CameraLovesAlisha.Instance != null)
+        {
+            float ret = Mathf.Max(0f, cameraReturnDuration);
+            if (ret > 0f) yield return new WaitForSecondsRealtime(ret);
+        }
+    }
+
+    // (기존) 레거시 호환용: 바깥에서 그냥 쏘고 싶다면 그대로 사용 가능
+    public void Play(string cardCode, int attackerActorNum, HookType hook, int? victimActorNum = null)
+    {
+        StartCoroutine(PlayCo(cardCode, attackerActorNum, hook, victimActorNum));
+    }
+
 }

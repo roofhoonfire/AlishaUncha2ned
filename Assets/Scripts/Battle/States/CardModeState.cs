@@ -13,9 +13,9 @@ public class CardModeState : MonoBehaviour
     public GameObject cardPrefab;
     public RectTransform cardContentArea; // ScrollView 안의 Content
 
-   
+
     public static CardModeState Instance;
-    
+
     // Buffer
     public ActionData curAction;
     public int actionClockBuffer = 0;
@@ -53,9 +53,9 @@ public class CardModeState : MonoBehaviour
     {
         apDataRef = apdata;
         PopulateCards(apdata);//손패 쫘자작
-        
-       InitBuffer();
-       ActionPacketUpgrade(apdata);
+
+        InitBuffer();
+        ActionPacketUpgrade(apdata);
 
         if (_selectCardCoroutine == null)
             _selectCardCoroutine = StartCoroutine(SelectCardLoop());
@@ -77,7 +77,7 @@ public class CardModeState : MonoBehaviour
         //지금은 넘어간다 귀찮으ㅡ므로
 
 
-        if (delta_cast == 0|| delta_def==0)
+        if (delta_cast == 0 || delta_def == 0)
             return;
 
         foreach (var card in spawnedCards)
@@ -127,7 +127,7 @@ public class CardModeState : MonoBehaviour
             }
         }
     }
-    
+
     public void InitBuffer()
     {
         // Reset buffers
@@ -180,7 +180,7 @@ public class CardModeState : MonoBehaviour
     {
         spawnedCards.Clear(); // 이전 것들 제거
 
-     
+
 
         // hands의 카드 코드들로 카드 오브젝트 Instantiate
         foreach (string code in apData.hands)
@@ -214,7 +214,7 @@ public class CardModeState : MonoBehaviour
 
 
 
-      
+
     }
 
 

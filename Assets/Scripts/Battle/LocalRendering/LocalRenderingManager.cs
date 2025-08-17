@@ -125,47 +125,87 @@ public class LocalRenderingManager : MonoBehaviour
         AlertDialogue.Instance.StartDialogue(null, 0, 0, nthFaceOff, DialogueType.FaceOff);
 
     }
+    /*  public void Rendering_Norm_Action(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h)
+      {
+          LocalRenderingData actorData = null;
+          if (data1 != null && data1.actorNum == actorNum) actorData = data1;
+          else if (data2 != null && data2.actorNum == actorNum) actorData = data2;
+
+          ApplyFacingFromRightOrLeft(actorNum, actorData);
+          //  AlertDialogue.Instance.StartDialogue(action, actorNum, h, 0, DialogueType.Activate);
+
+          CameraLovesAlisha.Instance.HideEmAll(LocalState.Instance.PlayerObDic[actorNum]);
+          //훅 타입에 맞는 애니메이션 재생해주고 
+
+          CardAnimationRouter.Instance.Play(action.cardcode, actorNum, h);
+
+
+          if (h == HookType.Counter)
+              Debug.Log("칩실드 넌 뒤졋어");
+
+          List<RenderDiff> diffs = CopyandDifferences(data1, data2);
+          StartCoroutine(AnimateStatChange("defense", diffs));
+          StartCoroutine(AnimateStatChange("hp", diffs));
+          StartCoroutine(AnimateStatChange("remainingCost", diffs));
+
+          //캐릭터 위치도 바꿔죠야 함 
+          //이쁘게하는법이나 좀 찾아라
+          //임시이동
+          //나중에 스킬이동인지 그냥이동인지 구분하고 애니메이션이랑 연동해서 잘 동작하게끔 바꾸 3
+          LocalState.Instance.PlayerObDic[data1.actorNum].transform.position = tileIndextoPosition(data1.curpos).position;
+          LocalState.Instance.PlayerObDic[data2.actorNum].transform.position = tileIndextoPosition(data2.curpos).position;
+
+
+          ApplyDiffsToLocalRenderingData(diffs);
+          //일케하면 또 ㄱㅊ을지도 모르겟군 
+          StealthPlayer(diffs); //아마 스텔스도 지금 data1, data2가 각각 신 구로 이해하고 잇을 가능성이 잇음 
+          ElementRenderer.Instance.RenderElementsFromDiffs(diffs);
+
+
+
+          Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
+
+
+      }*/
+
+
     public void Rendering_Norm_Action(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h)
+    {
+        StartCoroutine(Rendering_Norm_Action_Co(actorNum, data1, data2, action, h));
+    }
+    private IEnumerator Rendering_Norm_Action_Co(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h)
     {
         LocalRenderingData actorData = null;
         if (data1 != null && data1.actorNum == actorNum) actorData = data1;
         else if (data2 != null && data2.actorNum == actorNum) actorData = data2;
 
         ApplyFacingFromRightOrLeft(actorNum, actorData);
-        //  AlertDialogue.Instance.StartDialogue(action, actorNum, h, 0, DialogueType.Activate);
 
         CameraLovesAlisha.Instance.HideEmAll(LocalState.Instance.PlayerObDic[actorNum]);
-        //훅 타입에 맞는 애니메이션 재생해주고 
 
-        CardAnimationRouter.Instance.Play(action.cardcode, actorNum, h);
-
+        // ★ 여기서 '끝날 때까지' 기다린다
+        yield return StartCoroutine(CardAnimationRouter.Instance.PlayCo(action.cardcode, actorNum, h));
 
         if (h == HookType.Counter)
             Debug.Log("칩실드 넌 뒤졋어");
 
-        List<RenderDiff> diffs = CopyandDifferences(data1, data2);
-        StartCoroutine(AnimateStatChange("defense", diffs));
-        StartCoroutine(AnimateStatChange("hp", diffs));
-        StartCoroutine(AnimateStatChange("remainingCost", diffs));
-        
-        //캐릭터 위치도 바꿔죠야 함 
-        //이쁘게하는법이나 좀 찾아라
-        //임시이동
-        //나중에 스킬이동인지 그냥이동인지 구분하고 애니메이션이랑 연동해서 잘 동작하게끔 바꾸 3
+        // 이하 로직은 '연출이 완전히 끝난 후' 실행
+        var diffs = CopyandDifferences(data1, data2);
+
+        // 병렬이 필요 없다면 순차로 기다려서 확실히 끝내자
+        yield return StartCoroutine(AnimateStatChange("defense", diffs));
+        yield return StartCoroutine(AnimateStatChange("hp", diffs));
+        yield return StartCoroutine(AnimateStatChange("remainingCost", diffs));
+
         LocalState.Instance.PlayerObDic[data1.actorNum].transform.position = tileIndextoPosition(data1.curpos).position;
         LocalState.Instance.PlayerObDic[data2.actorNum].transform.position = tileIndextoPosition(data2.curpos).position;
 
-
         ApplyDiffsToLocalRenderingData(diffs);
-        //일케하면 또 ㄱㅊ을지도 모르겟군 
-        StealthPlayer(diffs); //아마 스텔스도 지금 data1, data2가 각각 신 구로 이해하고 잇을 가능성이 잇음 
+        StealthPlayer(diffs);
         ElementRenderer.Instance.RenderElementsFromDiffs(diffs);
 
-
-
+        // ★ 모든 것이 끝난 '후에' 렌더링 완료 보고 → 다음 턴 RPC가 여기서부터 출발
         Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
-
-
     }
     public void Rendering_Dot_Action(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h)
     {
