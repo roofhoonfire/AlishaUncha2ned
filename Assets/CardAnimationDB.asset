@@ -15,6 +15,8 @@ MonoBehaviour:
   entries:
   - cardCode: c1
     hook: 0
+    victimDefendTrigger: Trig_Defend
+    victimDefendStateName: Base Layer.Alisha_Defend
     prepTrigger: Trig_Prep_Slash
     prepStateName: Base Layer.Alisha_Prep_Slash
     prepClip: {fileID: 7400000, guid: 7fb552cbf3b38a749882866e3dc5d288, type: 2}
@@ -42,6 +44,8 @@ MonoBehaviour:
       pauseScene: 0
   - cardCode: c2
     hook: 0
+    victimDefendTrigger: Trig_Defend
+    victimDefendStateName: Base Layer.Alisha_Defend
     prepTrigger: Trig_Prep_Slash
     prepStateName: Base Layer.Alisha_Prep_Slash
     prepClip: {fileID: 7400000, guid: 7fb552cbf3b38a749882866e3dc5d288, type: 2}
@@ -69,6 +73,8 @@ MonoBehaviour:
       pauseScene: 0
   - cardCode: c3
     hook: 0
+    victimDefendTrigger: Trig_Defend
+    victimDefendStateName: Base Layer.Alisha_Defend
     prepTrigger: Trig_Prep_Slash
     prepStateName: Base Layer.Alisha_Prep_Slash
     prepClip: {fileID: 7400000, guid: 7fb552cbf3b38a749882866e3dc5d288, type: 2}
@@ -96,6 +102,8 @@ MonoBehaviour:
       pauseScene: 0
   - cardCode: c4
     hook: 0
+    victimDefendTrigger: Trig_Defend
+    victimDefendStateName: Base Layer.Alisha_Defend
     prepTrigger: Trig_Prep_Pierce
     prepStateName: Base Layer.Alisha_Prep_Pierce
     prepClip: {fileID: 7400000, guid: 607c46d6cb592fc46b8a3f502feb6f77, type: 2}
@@ -123,6 +131,8 @@ MonoBehaviour:
       pauseScene: 0
   - cardCode: c5
     hook: 0
+    victimDefendTrigger: Trig_Defend
+    victimDefendStateName: Base Layer.Alisha_Defend
     prepTrigger: Trig_Prep_Pierce
     prepStateName: Base Layer.Alisha_Prep_Pierce
     prepClip: {fileID: 7400000, guid: 607c46d6cb592fc46b8a3f502feb6f77, type: 2}
@@ -150,6 +160,8 @@ MonoBehaviour:
       pauseScene: 0
   - cardCode: c6
     hook: 0
+    victimDefendTrigger: Trig_Defend
+    victimDefendStateName: Base Layer.Alisha_Defend
     prepTrigger: Trig_Prep_Pierce
     prepStateName: Base Layer.Alisha_Prep_Pierce
     prepClip: {fileID: 7400000, guid: 607c46d6cb592fc46b8a3f502feb6f77, type: 2}
@@ -177,6 +189,8 @@ MonoBehaviour:
       pauseScene: 0
   - cardCode: c9
     hook: 0
+    victimDefendTrigger: Trig_Defend
+    victimDefendStateName: Base Layer.Alisha_Defend
     prepTrigger: Trig_Prep_Slash
     prepStateName: Base Layer.Alisha_Prep_Slash
     prepClip: {fileID: 7400000, guid: 7fb552cbf3b38a749882866e3dc5d288, type: 2}
@@ -204,6 +218,8 @@ MonoBehaviour:
       pauseScene: 0
   - cardCode: c20
     hook: 0
+    victimDefendTrigger: Trig_Defend
+    victimDefendStateName: Base Layer.Alisha_Defend
     prepTrigger: Trig_Prep_SpellDam
     prepStateName: Base Layer.Alisha_Prep_SpellDam
     prepClip: {fileID: 7400000, guid: 815045b1187f5954f821d1712fb2dbe7, type: 2}

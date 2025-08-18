@@ -29,6 +29,13 @@ public enum ExtraSelection
 
     Kawari
 }
+
+public enum HitResolution
+{
+    Missed,    // 타일 미스(타겟이 범위 밖) 또는 타일형(-1)
+    Defended,  // 범위 안이나 (action.damage < targetDefense)
+    Damage     // 범위 안이고 (action.damage >= targetDefense)
+}
 public class ConstraintStats
 {
     public int damageDealtThisCycle = 0;
@@ -1529,8 +1536,10 @@ public class Overmind : MonoBehaviourPunCallbacks
         //여기서 출력되어야하는 애니메이션을 한번에 보여주면 됨 그냥(순차적으로)
         //한번의 해프터 후커당 하나의 애니메이션이 출력된다고 생각해라 게이야 
         string actionJson = JsonConvert.SerializeObject(Nowhooker.action);
+
+        Debug.Log($"{Nowhooker.action.nthaction}의 렌더링하라고 마스터 클라이언트 요청 :: 렐렐");
         photonView.RPC(nameof(RPC_Norm_Play_Action_M2C), RpcTarget.All, Nowhooker.actorNum, actionJson, var1json, var2json, h);
-       
+        
          yield return new WaitUntil(() => syncCount == 2); //나중에 수정하든가 
         syncCount = 0;
 
@@ -2126,7 +2135,6 @@ public class Overmind : MonoBehaviourPunCallbacks
     {
         photonView.RPC(nameof(RPC_JustSync_C2M), RpcTarget.MasterClient,actorNum);
 
-
     }
    
 
@@ -2134,6 +2142,7 @@ public class Overmind : MonoBehaviourPunCallbacks
     [PunRPC]
     void RPC_JustSync_C2M(int actorNum)
     {
+        Debug.Log($"{actorNum}의 렌더링 완료");
 
         syncCount++;
     }

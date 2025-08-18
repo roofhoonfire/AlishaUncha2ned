@@ -178,7 +178,7 @@ MonoBehaviour:
   m_ChildAlignment: 4
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 200, y: 200}
+  m_CellSize: {x: 150, y: 200}
   m_Spacing: {x: 50, y: 50}
   m_Constraint: 0
   m_ConstraintCount: 2
@@ -8754,6 +8754,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2082289070}
+  - component: {fileID: 2082289071}
   - component: {fileID: 2082289069}
   - component: {fileID: 2082289068}
   m_Layer: 0
@@ -8833,6 +8834,32 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2082289071
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2082289067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df71827e545ffff468458228a63c213b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animatorLayer: 0
+  dashTrigger: Trig_Dash
+  dashStateName: Alisha_Dash
+  dashClip: {fileID: 7400000, guid: ff440d738b6d1ea41a062b883372de8c, type: 2}
+  dashWarpFrame: 4
+  dashTotalFramesOverride: 0
+  jumpTrigger: Trig_Jump
+  jumpStateName: Alisha_Jump
+  jumpClip: {fileID: 7400000, guid: 3570e29cc7069e945a1221dc848d4f89, type: 2}
+  jumpWarpFrame: 5
+  jumpTotalFramesOverride: 0
+  defaultClipLen: 1
+  defaultFPS: 30
+  stateEnterMaxWait: 0.5
 --- !u!1 &2089998016
 GameObject:
   m_ObjectHideFlags: 0

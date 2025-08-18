@@ -125,49 +125,6 @@ public class LocalRenderingManager : MonoBehaviour
         AlertDialogue.Instance.StartDialogue(null, 0, 0, nthFaceOff, DialogueType.FaceOff);
 
     }
-    /*  public void Rendering_Norm_Action(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h)
-      {
-          LocalRenderingData actorData = null;
-          if (data1 != null && data1.actorNum == actorNum) actorData = data1;
-          else if (data2 != null && data2.actorNum == actorNum) actorData = data2;
-
-          ApplyFacingFromRightOrLeft(actorNum, actorData);
-          //  AlertDialogue.Instance.StartDialogue(action, actorNum, h, 0, DialogueType.Activate);
-
-          CameraLovesAlisha.Instance.HideEmAll(LocalState.Instance.PlayerObDic[actorNum]);
-          //훅 타입에 맞는 애니메이션 재생해주고 
-
-          CardAnimationRouter.Instance.Play(action.cardcode, actorNum, h);
-
-
-          if (h == HookType.Counter)
-              Debug.Log("칩실드 넌 뒤졋어");
-
-          List<RenderDiff> diffs = CopyandDifferences(data1, data2);
-          StartCoroutine(AnimateStatChange("defense", diffs));
-          StartCoroutine(AnimateStatChange("hp", diffs));
-          StartCoroutine(AnimateStatChange("remainingCost", diffs));
-
-          //캐릭터 위치도 바꿔죠야 함 
-          //이쁘게하는법이나 좀 찾아라
-          //임시이동
-          //나중에 스킬이동인지 그냥이동인지 구분하고 애니메이션이랑 연동해서 잘 동작하게끔 바꾸 3
-          LocalState.Instance.PlayerObDic[data1.actorNum].transform.position = tileIndextoPosition(data1.curpos).position;
-          LocalState.Instance.PlayerObDic[data2.actorNum].transform.position = tileIndextoPosition(data2.curpos).position;
-
-
-          ApplyDiffsToLocalRenderingData(diffs);
-          //일케하면 또 ㄱㅊ을지도 모르겟군 
-          StealthPlayer(diffs); //아마 스텔스도 지금 data1, data2가 각각 신 구로 이해하고 잇을 가능성이 잇음 
-          ElementRenderer.Instance.RenderElementsFromDiffs(diffs);
-
-
-
-          Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
-
-
-      }*/
-
 
     public void Rendering_Norm_Action(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h)
     {
@@ -180,31 +137,58 @@ public class LocalRenderingManager : MonoBehaviour
         else if (data2 != null && data2.actorNum == actorNum) actorData = data2;
 
         ApplyFacingFromRightOrLeft(actorNum, actorData);
+        Debug.Log($"{actorData.rightOrLeft}를 바라 볼 겁니다 이제");
 
-        CameraLovesAlisha.Instance.HideEmAll(LocalState.Instance.PlayerObDic[actorNum]);
 
-        // ★ 여기서 '끝날 때까지' 기다린다
-        yield return StartCoroutine(CardAnimationRouter.Instance.PlayCo(action.cardcode, actorNum, h));
+        bool isMoveAction = (action != null && action.actionId == 0);
 
-        if (h == HookType.Counter)
-            Debug.Log("칩실드 넌 뒤졋어");
+        // 메인 액션 전용: 숨김 처리
+        if (!isMoveAction)
+            CameraLovesAlisha.Instance.HideEmAll(LocalState.Instance.PlayerObDic[actorNum]);
 
-        // 이하 로직은 '연출이 완전히 끝난 후' 실행
+        if (isMoveAction)
+        {
+            // ★ 이동 액션 전용 애니메이션(대시/점프 + 지정 프레임 워프)
+            yield return StartCoroutine(
+                MoveAnimationRouter.Instance.PlayMoveCo(actorNum, data1, data2, action)
+            );
+        }
+        else
+        {
+            // 메인 액션(어제 작업한 라우터 그대로)
+            HitResolution? forcedOutcome = null;
+            if (h == HookType.Activate)
+                forcedOutcome = EvaluateHitOutcome(actorNum, data1, data2, action);
+
+            yield return StartCoroutine(
+                CardAnimationRouter.Instance.PlayCo(
+                    action.cardcode, actorNum, h,
+                    victimActorNum: null,
+                    forcedOutcome: forcedOutcome
+                )
+            );
+        }
+
+        Debug.Log("자자 노멀 액션 시퀀스 잘봣니?");
+
+
+        // ===== 여기부터는 공통 사후 처리(기존 유지) =====
         var diffs = CopyandDifferences(data1, data2);
-
-        // 병렬이 필요 없다면 순차로 기다려서 확실히 끝내자
         yield return StartCoroutine(AnimateStatChange("defense", diffs));
         yield return StartCoroutine(AnimateStatChange("hp", diffs));
         yield return StartCoroutine(AnimateStatChange("remainingCost", diffs));
 
-        LocalState.Instance.PlayerObDic[data1.actorNum].transform.position = tileIndextoPosition(data1.curpos).position;
-        LocalState.Instance.PlayerObDic[data2.actorNum].transform.position = tileIndextoPosition(data2.curpos).position;
+        Debug.Log("자자 UI 바뀐거 잘밧지?");
+
+        // 위치 최종 스냅(이동 라우터에서 이미 워프했더라도 동일 좌표로 한번 더 정렬 → 문제 없음)
+        //여기서 넉백류 애니메이션 넣으면 좋을 듯 ㅎㅎ
+        //LocalState.Instance.PlayerObDic[data1.actorNum].transform.position = tileIndextoPosition(data1.curpos).position;
+        //LocalState.Instance.PlayerObDic[data2.actorNum].transform.position = tileIndextoPosition(data2.curpos).position;
 
         ApplyDiffsToLocalRenderingData(diffs);
         StealthPlayer(diffs);
         ElementRenderer.Instance.RenderElementsFromDiffs(diffs);
-
-        // ★ 모든 것이 끝난 '후에' 렌더링 완료 보고 → 다음 턴 RPC가 여기서부터 출발
+        Debug.Log("자자 노멀 액션 렌더링 다 끝, 이제 렌더링 섭밑만 하면됨");
         Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
     }
     public void Rendering_Dot_Action(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h)
@@ -509,6 +493,64 @@ public class LocalRenderingManager : MonoBehaviour
         var ls = t.localScale;
         ls.x = Mathf.Abs(ls.x) * (faceRight ? -1f : 1f); // 기본 왼쪽(+), 오른쪽은 -로 뒤집기
         t.localScale = ls;
+    }
+
+
+
+
+
+
+
+
+    //뚜드려패기 ㅎ판정용
+
+    private HitResolution EvaluateHitOutcome(int attackerActorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action)
+    {
+        // 1) 타일형 -1 → 자동 Miss
+        if (action.tileType == -1)
+            return HitResolution.Missed;
+
+        // 2) 상대 actorNumber (2인 전제)
+        int victimActorNum = Overmind.Instance.GetOtherPlayerNumber(attackerActorNum);
+
+        // 3) 상대 렌더링데이터 찾기
+        var victimData =
+            (data1 != null && data1.actorNum == victimActorNum) ? data1 :
+            (data2 != null && data2.actorNum == victimActorNum) ? data2 : null;
+
+        if (victimData == null)
+            return HitResolution.Missed; // 안전빵
+
+        int victimIndex = victimData.curpos;
+
+        // 4) 효과 범위 타일
+        var effectTiles = GetEffectTilesSafe(action);
+
+        // 5) 범위 밖이면 Miss
+        if (effectTiles == null || effectTiles.Count == 0 || !effectTiles.Contains(victimIndex))
+            return HitResolution.Missed;
+
+        // 6) 방어/데미지 비교
+        int dmg = Mathf.Max(0, action.damage);
+        int def = GetDefenseFromRenderingData(victimData);
+
+        return (dmg <= def) ? HitResolution.Defended : HitResolution.Damage;
+    }
+
+    private HashSet<int> GetEffectTilesSafe(ActionData action)
+    {
+        // ActionData에 effectTiles가 채워져 있다고 했으니 그걸 그대로 사용
+        if (action.effectTiles != null && action.effectTiles.Count > 0)
+            return new HashSet<int>(action.effectTiles);
+
+        // 없으면 빈 집합 → Miss로 처리됨
+        return new HashSet<int>();
+    }
+
+    private int GetDefenseFromRenderingData(LocalRenderingData rd)
+    {
+        // 네가 준 필드명 그대로
+        return rd.defense;
     }
 
 }

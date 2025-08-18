@@ -31,6 +31,10 @@ public class CardAnimationDB : ScriptableObject
         public string cardCode;
         public HookType hook;
 
+        [Header("피격자(방어) 전용 애니(옵션)")]
+        public string victimDefendTrigger;     // 예: "Trig_Defend"
+        public string victimDefendStateName;   // 예: "Base Layer.Defend"
+
         [Header("예비동작(Prep) 애니")]
         [Tooltip("Prep으로 진입시키는 트리거(없으면 state로 직접 전환)")]
         public string prepTrigger;
