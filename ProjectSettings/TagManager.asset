@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Tile
   - dropzone
+  - cardPreview
   layers:
   - Default
   - TransparentFX

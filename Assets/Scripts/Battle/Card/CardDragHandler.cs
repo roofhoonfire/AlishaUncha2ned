@@ -206,11 +206,13 @@ public class CardDragHandler : MonoBehaviour,
             {
                 if (inside)
                 {
+                    AnimTriggerManager.Instance.FireByLabel("myCasting", "Trig_Open");
                     animator.ResetTrigger(trigOffZone);
                     animator.SetTrigger(trigInZone);
                 }
                 else
                 {
+                    AnimTriggerManager.Instance.FireByLabel("myCasting", "Trig_Close"); 
                     animator.ResetTrigger(trigInZone);
                     animator.SetTrigger(trigOffZone);
                 }

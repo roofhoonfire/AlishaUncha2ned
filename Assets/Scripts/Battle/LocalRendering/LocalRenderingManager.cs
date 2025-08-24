@@ -350,11 +350,9 @@ public class LocalRenderingManager : MonoBehaviour
                 case "remainingCost":
                     target = isMyActor ? mycostRemainTxt : opponencostRemainTxt;
                     break;
-
                 case "hp":
                     target = isMyActor ? myHP : opHP;
                     break;
-
             }
 
             if (target == null) continue;
@@ -362,6 +360,7 @@ public class LocalRenderingManager : MonoBehaviour
             float duration = 0.4f;
             float elapsed = 0f;
 
+            // 숫자 애니메이션(띠리리링)
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
@@ -371,10 +370,24 @@ public class LocalRenderingManager : MonoBehaviour
                 yield return null;
             }
 
-            target.text = newVal.ToString(); // 보정
+            // 애니메이션 종료 후 보정/후처리
+            if (fieldName == "remainingCost" && isMyActor && newVal == 0)
+            {
+                // 최종 0을 잠깐 찍은 뒤 즉시 지움
+                target.text = "0";
+                target.text = string.Empty;
+
+                // 트리거 발사 (라벨 기반)
+                AnimTriggerManager.Instance?.FireByLabel("myCasting", "Trig_End");
+            }
+            else
+            {
+                target.text = newVal.ToString(); // 일반 보정
+            }
         }
     }
-    private  List<RenderDiff> CopyandDifferences(LocalRenderingData data1, LocalRenderingData data2)
+
+    private List<RenderDiff> CopyandDifferences(LocalRenderingData data1, LocalRenderingData data2)
     {
         List<RenderDiff> results = new();
 
