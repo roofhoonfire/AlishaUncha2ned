@@ -139,12 +139,33 @@ public class LocalRenderingManager : MonoBehaviour
         ApplyFacingFromRightOrLeft(actorNum, actorData);
         Debug.Log($"{actorData.rightOrLeft}를 바라 볼 겁니다 이제");
 
-
         bool isMoveAction = (action != null && action.actionId == 0);
 
+        // [MOD] 라우터/DB 조회 준비
+        var router = CardAnimationRouter.Instance; // null 가능
+        bool hasExactAnim = false;                 // 기본값: 없음
+
+        // [MOD] 메인 액션(이동 아님)인 경우에만 애니메이션 존재 여부를 엄격히 검사
+        if (!isMoveAction && router != null && action != null)
+        {
+            hasExactAnim = router.HasExactEntry(action.cardcode, h); // 정확 일치만 허용
+            if (!hasExactAnim)
+            {
+                Debug.Log($"[Rendering] Skip PlayCo: No exact anim for card='{action.cardcode}', hook='{h}'"); // [MOD] 로그
+            }
+        }
+
         // 메인 액션 전용: 숨김 처리
-        if (!isMoveAction)
-            CameraLovesAlisha.Instance.HideEmAll(LocalState.Instance.PlayerObDic[actorNum]);
+        // [MOD] 기존과 달리, "정확히 등록되어 재생할 때만" 숨긴다.
+        if (!isMoveAction && hasExactAnim)
+        {
+            if (CameraLovesAlisha.Instance != null &&
+                LocalState.Instance.PlayerObDic.TryGetValue(actorNum, out var actorGO) &&
+                actorGO != null)
+            {
+                CameraLovesAlisha.Instance.HideEmAll(actorGO); // 기존 주석/동작 유지
+            }
+        }
 
         if (isMoveAction)
         {
@@ -155,22 +176,30 @@ public class LocalRenderingManager : MonoBehaviour
         }
         else
         {
-            // 메인 액션(어제 작업한 라우터 그대로)
-            HitResolution? forcedOutcome = null;
-            if (h == HookType.Activate)
-                forcedOutcome = EvaluateHitOutcome(actorNum, data1, data2, action);
+            // [MOD] 메인 액션이더라도, 등록이 없으면 PlayCo를 "아예 호출하지 않는다".
+            if (hasExactAnim)
+            {
+                // 메인 액션(어제 작업한 라우터 그대로)
+                HitResolution? forcedOutcome = null;
+                if (h == HookType.Activate)
+                    forcedOutcome = EvaluateHitOutcome(actorNum, data1, data2, action);
 
-            yield return StartCoroutine(
-                CardAnimationRouter.Instance.PlayCo(
-                    action.cardcode, actorNum, h,
-                    victimActorNum: null,
-                    forcedOutcome: forcedOutcome
-                )
-            );
+                yield return StartCoroutine(
+                    CardAnimationRouter.Instance.PlayCo(
+                        action.cardcode, actorNum, h,
+                        victimActorNum: null,
+                        forcedOutcome: forcedOutcome
+                    )
+                );
+            }
+            else
+            {
+                // [MOD] 등록이 없을 때는 아무 애니도 재생하지 않고 통과
+                // 숨김도 하지 않았으므로 Unhide 불필요
+            }
         }
 
         Debug.Log("자자 노멀 액션 시퀀스 잘봣니?");
-
 
         // ===== 여기부터는 공통 사후 처리(기존 유지) =====
         var diffs = CopyandDifferences(data1, data2);
@@ -191,6 +220,7 @@ public class LocalRenderingManager : MonoBehaviour
         Debug.Log("자자 노멀 액션 렌더링 다 끝, 이제 렌더링 섭밑만 하면됨");
         Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
     }
+
     public void Rendering_Dot_Action(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h)
     {
 

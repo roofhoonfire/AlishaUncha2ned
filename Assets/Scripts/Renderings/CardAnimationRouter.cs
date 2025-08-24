@@ -142,6 +142,16 @@ public class CardAnimationRouter : MonoBehaviour
         return false;
     }
 
+    // ================== [MOD] 정확 일치 조회 API ==================
+    /// <summary>
+    /// [MOD] 해당 (cardCode, hook) 쌍이 DB에 '정확히' 등록돼 있는지 여부만 반환(폴백 없음).
+    /// </summary>
+    public bool HasExactEntry(string cardCode, HookType hook)
+    {
+        if (_map == null) BuildMap();
+        return _map != null && _map.ContainsKey((Normalize(cardCode), hook));
+    }
+
     // ================== 오케스트레이션 ==================
     private IEnumerator PlayOrchestrated(
         Animator attackerAnim, Animator victimAnim,
@@ -249,11 +259,12 @@ public class CardAnimationRouter : MonoBehaviour
         if (!missFlow && enableCameraCinematic && camMove_Return && CameraLovesAlisha.Instance != null)
             CameraLovesAlisha.Instance.ReturnToDefault(cameraReturnDuration, attackerGO.transform);
     }
+
     private IEnumerator PlayWithVictimAndHitStops(
-    Animator attackerAnim, Animator victimAnim,
-    GameObject attackerGO, GameObject victimGO,
-    CardAnimationDB.CardAnimEntry entry,
-    HookType hook, HitResolution? forcedOutcome)
+        Animator attackerAnim, Animator victimAnim,
+        GameObject attackerGO, GameObject victimGO,
+        CardAnimationDB.CardAnimEntry entry,
+        HookType hook, HitResolution? forcedOutcome)
     {
         if (string.IsNullOrEmpty(entry.stateName))
         {
@@ -423,7 +434,6 @@ public class CardAnimationRouter : MonoBehaviour
         }
     }
 
-
     private IEnumerator WaitForStateEnter(Animator anim, string stateName, float maxWaitSec)
     {
         if (string.IsNullOrEmpty(stateName)) yield break;
@@ -437,6 +447,7 @@ public class CardAnimationRouter : MonoBehaviour
         }
         Debug.LogWarning($"[CardAnimationRouter] 상태 진입 타임아웃: {stateName}");
     }
+
     private IEnumerator WaitForStateEnd(Animator anim, string stateName)
     {
         if (string.IsNullOrEmpty(stateName)) yield break;
@@ -526,8 +537,13 @@ public class CardAnimationRouter : MonoBehaviour
         if (LocalState.Instance == null || LocalState.Instance.PlayerObDic == null) yield break;
         if (!LocalState.Instance.PlayerObDic.TryGetValue(attackerActorNum, out var attackerGO) || attackerGO == null) yield break;
 
-        if (!_TryGetEntry(cardCode, hook, out var entry))
+        // [MOD] 폴백 금지: 정확 일치 엔트리 없으면 '아예' 시작하지 않음
+        if (_map == null) BuildMap(); // 안전
+        if (_map == null || !_map.TryGetValue((Normalize(cardCode), hook), out var entry))
+        {
+            Debug.Log($"[CardAnimationRouter] Skip PlayCo: no exact entry for {cardCode}/{hook}"); // [MOD] 로그
             yield break;
+        }
 
         GameObject victimGO = null;
         if (victimActorNum == null)
