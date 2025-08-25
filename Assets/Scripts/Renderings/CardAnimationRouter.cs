@@ -198,7 +198,11 @@ public class CardAnimationRouter : MonoBehaviour
                 prepHash = Animator.StringToHash(entry.prepStateName);
 
             if (!string.IsNullOrEmpty(entry.prepTrigger))
+            {
+                attackerAnim.ResetTrigger(entry.prepTrigger);
+
                 attackerAnim.SetTrigger(entry.prepTrigger);
+            }
             else if (!string.IsNullOrEmpty(entry.prepStateName))
                 attackerAnim.CrossFadeInFixedTime(prepHash, crossFade, animatorLayer);
 
@@ -250,10 +254,14 @@ public class CardAnimationRouter : MonoBehaviour
 
         // === Attack 진입 ===
         if (!string.IsNullOrEmpty(entry.animatorTrigger))
+        {
+            attackerAnim.ResetTrigger(entry.animatorTrigger); // ← 추가
             attackerAnim.SetTrigger(entry.animatorTrigger);
+        }
         else if (!string.IsNullOrEmpty(entry.stateName))
+        {
             attackerAnim.CrossFadeInFixedTime(Animator.StringToHash(entry.stateName), crossFade, animatorLayer);
-
+        }
         // Attack 상태 진입 보장
         yield return WaitForStateEnter(attackerAnim, entry.stateName, attackEnterMaxWait);
 
@@ -280,6 +288,25 @@ public class CardAnimationRouter : MonoBehaviour
         yield return StartCoroutine(
             PlayWithVictimAndHitStops(attackerAnim, victimAnim, attackerGO, victimGO, entry, hook, forcedOutcome)
         );
+
+
+        // === [추가] Guard-스킵 시나리오였으면, 공격 끝난 즉시 트리거 싹 정리 ===
+        if (skipPoint1Cine)
+        {
+            // 명시 트리거 우선 정리
+            if (!string.IsNullOrEmpty(entry.prepTrigger)) attackerAnim.ResetTrigger(entry.prepTrigger);
+            if (!string.IsNullOrEmpty(entry.animatorTrigger)) attackerAnim.ResetTrigger(entry.animatorTrigger);
+
+            // 안전빵: 모든 트리거 리셋
+            ResetAllTriggers(attackerAnim);
+
+            // 한 프레임 플러시(컨트롤러 즉시 반영)
+            attackerAnim.Update(0f);
+
+            // (선택) 그래도 튄다면 아래 2줄로 중립상태로 잠깐 고정
+            // attackerAnim.Play(Animator.StringToHash(neutralIdleStateName), animatorLayer, 0f);
+            // attackerAnim.Update(0f);
+        }
 
         // 종료 복귀
         if (!missFlow && enableCameraCinematic && camMove_Return && CameraLovesAlisha.Instance != null)
@@ -562,6 +589,18 @@ public class CardAnimationRouter : MonoBehaviour
         }
     }
 
+    private void ResetAllTriggers(Animator anim)
+    {
+        if (anim == null) return;
+        for (int i = 0; i < anim.parameterCount; i++)
+        {
+            var p = anim.parameters[i];
+            if (p.type == AnimatorControllerParameterType.Trigger)
+                anim.ResetTrigger(p.name);
+        }
+    }
+
+
     private float ComputeVictimMinNorm(CardAnimationDB.CardAnimEntry e)
     {
         float vf = (e.victimClip != null && e.victimClip.frameRate > 0f) ? e.victimClip.frameRate : 30f;
@@ -697,6 +736,11 @@ public class CardAnimationRouter : MonoBehaviour
                     CameraLovesAlisha.Instance.EndPoint1Backdrop(preFadeOut);
 
                 FreezeOnLastFrame(origAttackerAnim, actEntry.prepStateName, false);
+                
+                if (!string.IsNullOrEmpty(actEntry.prepTrigger))
+                    origAttackerAnim.ResetTrigger(actEntry.prepTrigger);  // 같은 이름 우선
+                ResetAllTriggers(origAttackerAnim);                       // 안전빵: 모든 트리거 정리
+                origAttackerAnim.Update(0f);
             }
 
             // 2) 카메라를 피격자(Guard 주체=attackerGO)에게 이동(포인트1 스타일)
