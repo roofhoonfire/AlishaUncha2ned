@@ -5,6 +5,7 @@ c2,Activate,Damage,0,0
 c2,IQA,StackDamage,0,0
 c3,Guard,whenAttackedFlagOn,1,0
 c3,Guard,GetDefense,10,1
+c3,Guard,GA_On,0,1
 c3,Guard,Flag_Off,1,1
 c3,Activate,Damage,0,0
 c4 ,Activate,Damage,0,0
@@ -32,8 +33,11 @@ c13 ,Counter,Flag_Off,1,1
 c14,Activate,Damage,0,0
 c14,Priority,PrevCycleClockFlagOn,15,0
 c14,Priority,MakeItTrue,0,22
-c15,Guard,ExtraSelect_Kawari,0,0
-c15,Guard,Move,0,0
+c15,Guard,whenAttackedFlagOn,1,0
+c15,Guard,ExtraSelect_Kawari,0,1
+c15,Guard,Move,0,1
+c15,Guard,GA_On,0,1
+c15,Guard,Flag_Off,1,1
 c16,Activate,NotRumbleFlagOn,30,0
 c17,BeforeRumble,Invincible_forOneAction,0,0
 c17,Activate,Damage,0,0

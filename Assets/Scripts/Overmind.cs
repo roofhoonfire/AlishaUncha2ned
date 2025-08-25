@@ -171,7 +171,7 @@ public class ActionData //여기 뭐 추가할 거면 carddragHandler로 수정�
     public List<CardEffect> effects = new();
     public int Dot_to; //도트 딜이 노리는 액터넘버
     public List<int> effectTiles = new();
-
+    //public HitResolution? resolvedOutcome;
 
     [NonSerialized]
     public bool hasOtherExecutedSinceInsertion = false; //선공, 대처 결정용 변수
@@ -303,6 +303,14 @@ public class Overmind : MonoBehaviourPunCallbacks
     public Dictionary<int, Dictionary<string, Juju>> playerJujuData = new Dictionary<int, Dictionary<string, Juju>>();
 
     private int syncCount = 0;
+
+
+
+    public bool GA_On = false;
+
+
+
+
 
     public string extraSelectionJson;
     private int faceOffCount = 0;// 더 좋은 방법있음 나와보라그래
@@ -844,12 +852,12 @@ public class Overmind : MonoBehaviourPunCallbacks
         if (ttAction2 != ttMainAction2) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
         {
             yield return ttMainAction2.Norm_ProcessHook(HookType.Guard, ttActorNum2, ttActorNum1, ttAction1, ttMainAction1, ttMainAction2);
-            yield return Norm_After_Hook((ttActorNum2, ttMainAction2), HookType.Guard); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
+            yield return Norm_After_Hook((ttActorNum2, ttMainAction2), HookType.Guard, false, null); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
         }
 
 
         yield return ttAction1.Norm_ProcessHook(HookType.Activate, ttActorNum1, ttActorNum2, ttAction1, ttMainAction2, ttMainAction1);
-        yield return Norm_After_Hook((ttActorNum1, ttAction1), HookType.Activate);
+        yield return Norm_After_Hook((ttActorNum1, ttAction1), HookType.Activate, false, null);
 
 
         //요부분만 노말 훅이아니라 럼블 훅으로 바꿔주면 될지도?
@@ -859,7 +867,7 @@ public class Overmind : MonoBehaviourPunCallbacks
         {
 
             yield return ttMainAction2.Norm_ProcessHook(HookType.Counter, ttActorNum2, ttActorNum1, ttAction1, ttMainAction1, ttMainAction2);
-            yield return Norm_After_Hook((ttActorNum2, ttMainAction2), HookType.Counter);
+            yield return Norm_After_Hook((ttActorNum2, ttMainAction2), HookType.Counter, false, null);
         }
 
 
@@ -867,12 +875,12 @@ public class Overmind : MonoBehaviourPunCallbacks
         if (ttAction1 != ttMainAction1) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
         {
             yield return ttMainAction1.Norm_ProcessHook(HookType.Guard, ttActorNum1, ttActorNum2, ttAction2, ttMainAction2, ttMainAction1);
-            yield return Norm_After_Hook((ttActorNum1, ttMainAction1), HookType.Guard); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
+            yield return Norm_After_Hook((ttActorNum1, ttMainAction1), HookType.Guard, false, null); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
         }
 
 
         yield return ttAction1.Norm_ProcessHook(HookType.Activate, ttActorNum2, ttActorNum1, ttAction2, ttMainAction1, ttMainAction2);
-        yield return Norm_After_Hook((ttActorNum2, ttAction2), HookType.Activate);
+        yield return Norm_After_Hook((ttActorNum2, ttAction2), HookType.Activate, false, null);
 
 
         //요부분만 노말 훅이아니라 럼블 훅으로 바꿔주면 될지도?
@@ -882,7 +890,7 @@ public class Overmind : MonoBehaviourPunCallbacks
         {
 
             yield return ttMainAction1.Norm_ProcessHook(HookType.Counter, ttActorNum1, ttActorNum2, ttAction2, ttMainAction2, ttMainAction1);
-            yield return Norm_After_Hook((ttActorNum1, ttMainAction1), HookType.Counter);
+            yield return Norm_After_Hook((ttActorNum1, ttMainAction1), HookType.Counter, false, null);
         }
 
 
@@ -910,12 +918,12 @@ public class Overmind : MonoBehaviourPunCallbacks
         if (ttOpAction != ttOpMainAction) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
         {      
             yield return ttOpMainAction.Norm_ProcessHook(HookType.Guard, ttOpActorNum, ttActorNum, ttAction, ttMainAction, ttOpMainAction);
-            yield return Norm_After_Hook((ttOpActorNum, ttOpMainAction), HookType.Guard); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
+            yield return Norm_After_Hook((ttOpActorNum, ttOpMainAction), HookType.Guard, false, null); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
         }
 
 
         yield return ttAction.Norm_ProcessHook(HookType.Activate, ttActorNum, ttOpActorNum, ttAction, ttOpMainAction, ttMainAction);
-        yield return Norm_After_Hook((ttActorNum, ttAction), HookType.Activate);
+        yield return Norm_After_Hook((ttActorNum, ttAction), HookType.Activate, false, null);
 
 
         //요부분만 노말 훅이아니라 럼블 훅으로 바꿔주면 될지도?
@@ -926,7 +934,7 @@ public class Overmind : MonoBehaviourPunCallbacks
         {
 
         yield return ttOpMainAction.Norm_ProcessHook(HookType.Counter, ttOpActorNum, ttActorNum, ttAction, ttMainAction, ttOpMainAction);
-        yield return Norm_After_Hook((ttOpActorNum, ttOpMainAction), HookType.Counter);
+        yield return Norm_After_Hook((ttOpActorNum, ttOpMainAction), HookType.Counter, false, null);
         }
         //nth 액션이랑 비교해서 순서대로 실행하기 
         //여기선 action의 반대 플레이어가 카운터의 주체이므로 헷갈리지 말자 ㅎㅎ
@@ -939,24 +947,58 @@ public class Overmind : MonoBehaviourPunCallbacks
     }
     IEnumerator Norm_Action_Calc(int ttActorNum, ActionData ttAction,  ActionData ttOpMainAction,ActionData ttMainAction)
     {
-
+        //내일 여기 부터 작업 하면됨 .
         int ttOpActorNum = GetOtherPlayerNumber(ttActorNum);
 
         // GuardOrCounter는 현재 행동하는 액터의 상대 액터의 큐에 삽입되있는 바로 다음 액션임
         //action이 지금 발동되는 액션
 
+
+
         yield return ttOpMainAction.Norm_ProcessHook(HookType.Guard, ttOpActorNum, ttActorNum, ttAction, ttMainAction, ttOpMainAction);
-        yield return Norm_After_Hook((ttOpActorNum, ttOpMainAction), HookType.Guard); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
+        yield return Norm_After_Hook((ttOpActorNum, ttOpMainAction), HookType.Guard, GA_On, ttAction); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
 
 
 
         //action.ProcessHook(HookType.Activate, actorNum, )
         yield return ttAction.Norm_ProcessHook(HookType.Priority, ttActorNum, ttOpActorNum, ttAction, ttOpMainAction, ttMainAction);
-        yield return ttAction.Norm_ProcessHook(HookType.Activate, ttActorNum, ttOpActorNum, ttAction, ttOpMainAction, ttMainAction); 
-        yield return Norm_After_Hook((ttActorNum, ttAction), HookType.Activate);
+        yield return ttAction.Norm_ProcessHook(HookType.Activate, ttActorNum, ttOpActorNum, ttAction, ttOpMainAction, ttMainAction);
+
+        //어쩔수 없다 하드 코딩
+        //히트 미스 디펜드
+     /*   bool m_issed = true;
+        foreach (var tile in ttAction.effectTiles)
+        {
+            if (tile == Overmind.Instance.players[ttOpActorNum].curpos)
+            {
+                m_issed = false;
+                break;
+            }
+        }
+        if (m_issed)
+        {
+            ttAction.resolvedOutcome = HitResolution.Missed;
+        }
+        else
+        {
+            if (ttAction.damage > ttOpMainAction.defense)
+            {
+                ttAction.resolvedOutcome = HitResolution.Damage;
+
+            }
+            else if (ttAction.damage <= ttOpMainAction.defense)
+            {
+                ttAction.resolvedOutcome = HitResolution.Defended;
+            }
+
+
+        }
+
+        */
+        yield return Norm_After_Hook((ttActorNum, ttAction), HookType.Activate, GA_On, null);
 
         yield return  ttOpMainAction.Norm_ProcessHook(HookType.Counter, ttOpActorNum, ttActorNum, ttAction, ttMainAction, ttOpMainAction);
-        yield return Norm_After_Hook((ttOpActorNum, ttOpMainAction), HookType.Counter);
+        yield return Norm_After_Hook((ttOpActorNum, ttOpMainAction), HookType.Counter, GA_On, null);
 
         //nth 액션이랑 비교해서 순서대로 실행하기 
         //여기선 action의 반대 플레이어가 카운터의 주체이므로 헷갈리지 말자 ㅎㅎ
@@ -966,6 +1008,11 @@ public class Overmind : MonoBehaviourPunCallbacks
         //애프터 액션 플래그 같은거 주면 될 듯 
 
         // Turn_End_Call();
+        
+        //급한대로 하드 코딩 어쩔 수 없다 
+        //어차피 가드는 노멀 액션에서만 발동되니 걱정 ㄴ
+
+        GA_On = false;
     }
 
 
@@ -1297,15 +1344,17 @@ public class Overmind : MonoBehaviourPunCallbacks
 
 
     [PunRPC]
-    void RPC_Norm_Play_Action_M2C(int actorNumber, string actionJson, string lrjson1, string lrjson2, HookType h)
+    void RPC_Norm_Play_Action_M2C(int actorNumber, string actionJson, string lrjson1, string lrjson2, HookType h, string actionJson2, bool isGA)
     {
-        
+        //actionJson2 는 가드시 상대 액션 애니메용
+        // GA_On은 가드 애니메이션 재생 여부 결정용
         var action = JsonConvert.DeserializeObject<ActionData>(actionJson);
+        var action2 = JsonConvert.DeserializeObject<ActionData>(actionJson2);
         var data1 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson1);
 
         var data2 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson2);
 
-        LocalRenderingManager.Instance.Rendering_Norm_Action(actorNumber, data1, data2, action, h);
+        LocalRenderingManager.Instance.Rendering_Norm_Action(actorNumber, data1, data2, action, h, action2, isGA );
 
     }
 
@@ -1506,7 +1555,7 @@ public class Overmind : MonoBehaviourPunCallbacks
 
 
     //해당 액션 추가 선택 까지 이 안에서 구현하면 됩니다 
-    IEnumerator Norm_After_Hook((int actorNum, ActionData action) Nowhooker, HookType h)
+    IEnumerator Norm_After_Hook((int actorNum, ActionData action) Nowhooker, HookType h, bool isGA, ActionData opAction)
     {
         if (!Nowhooker.action.effects.Any(effect => effect.hookType == h)) //이번 액션에 해당 훅없으면 스킵.
             yield break;
@@ -1536,9 +1585,9 @@ public class Overmind : MonoBehaviourPunCallbacks
         //여기서 출력되어야하는 애니메이션을 한번에 보여주면 됨 그냥(순차적으로)
         //한번의 해프터 후커당 하나의 애니메이션이 출력된다고 생각해라 게이야 
         string actionJson = JsonConvert.SerializeObject(Nowhooker.action);
-
+        string actionJson2 = JsonConvert.SerializeObject(opAction);
         Debug.Log($"{Nowhooker.action.nthaction}의 렌더링하라고 마스터 클라이언트 요청 :: 렐렐");
-        photonView.RPC(nameof(RPC_Norm_Play_Action_M2C), RpcTarget.All, Nowhooker.actorNum, actionJson, var1json, var2json, h);
+        photonView.RPC(nameof(RPC_Norm_Play_Action_M2C), RpcTarget.All, Nowhooker.actorNum, actionJson, var1json, var2json, h, actionJson2, isGA);
         
          yield return new WaitUntil(() => syncCount == 2); //나중에 수정하든가 
         syncCount = 0;
@@ -1726,10 +1775,10 @@ public class Overmind : MonoBehaviourPunCallbacks
             //저 널 자리는 이번 턴에 발동되는 액션 자리인데, 격돌에는 2개이므로, 일단 null로
             //왜냐면 살펴본 바로는 비포 럼블에서는 딱히 저길 건드리는 코드가 없음 .. .
             yield return a1ttAction.Norm_ProcessHook(HookType.BeforeRumble, a1.actor, a2.actor, null, a2MainAction, a1MainAction);
-            yield return Norm_After_Hook((a1.actor, a1ttAction), HookType.BeforeRumble); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
+            yield return Norm_After_Hook((a1.actor, a1ttAction), HookType.BeforeRumble, false, null); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
 
             yield return a2ttAction.Norm_ProcessHook(HookType.BeforeRumble, a2.actor, a1.actor, null, a1MainAction, a2MainAction);
-            yield return Norm_After_Hook((a2.actor, a2ttAction), HookType.BeforeRumble); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
+            yield return Norm_After_Hook((a2.actor, a2ttAction), HookType.BeforeRumble, false, null); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
 
 
 
@@ -1760,7 +1809,7 @@ public class Overmind : MonoBehaviourPunCallbacks
                     showdownCircFlag = a1.actor;
                     yield return Rumble_Single_Action_Calc(a1.actor, a1.action,a2.action, a2MainAction, a1MainAction,  showdownCircFlag);
                     yield return a1ttAction.Norm_ProcessHook(HookType.RumbleWin, a1.actor, a2.actor, null, a2MainAction, a1MainAction);
-                    yield return Norm_After_Hook((a1.actor, a1ttAction), HookType.RumbleWin); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
+                    yield return Norm_After_Hook((a1.actor, a1ttAction), HookType.RumbleWin, false, null); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
 
                 }
                 else if (rumble2 > rumble1)
@@ -1769,7 +1818,7 @@ public class Overmind : MonoBehaviourPunCallbacks
                     yield return Rumble_Single_Action_Calc(a2.actor, a2.action, a1.action, a1MainAction, a2MainAction, showdownCircFlag);
 
                     yield return a2ttAction.Norm_ProcessHook(HookType.RumbleWin, a2.actor, a1.actor, null, a1MainAction, a2MainAction);
-                    yield return Norm_After_Hook((a2.actor, a2ttAction), HookType.RumbleWin); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
+                    yield return Norm_After_Hook((a2.actor, a2ttAction), HookType.RumbleWin, false, null); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
 
 
                 }

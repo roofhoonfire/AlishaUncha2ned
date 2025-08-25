@@ -126,11 +126,19 @@ public class LocalRenderingManager : MonoBehaviour
 
     }
 
-    public void Rendering_Norm_Action(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h)
+    public void Rendering_Norm_Action(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h, ActionData OpAction, bool GA)
     {
-        StartCoroutine(Rendering_Norm_Action_Co(actorNum, data1, data2, action, h));
+        StartCoroutine(Rendering_Norm_Action_Co(actorNum, data1, data2, action, h, OpAction, GA));
     }
-    private IEnumerator Rendering_Norm_Action_Co(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h)
+    private IEnumerator Rendering_Norm_Action_Co(
+     int actorNum,
+     LocalRenderingData data1,
+     LocalRenderingData data2,
+     ActionData action,
+     HookType h,
+     ActionData otherActionData,                 // [MOD] 로컬 기준 상대편 ActionData (마스터에서 전달)
+     bool shouldGuardAnimationPlay               // [MOD] Guard 시네마틱 재생 여부(추가 안전장치)
+ )
     {
         LocalRenderingData actorData = null;
         if (data1 != null && data1.actorNum == actorNum) actorData = data1;
@@ -141,31 +149,28 @@ public class LocalRenderingManager : MonoBehaviour
 
         bool isMoveAction = (action != null && action.actionId == 0);
 
-        // [MOD] 라우터/DB 조회 준비
-        var router = CardAnimationRouter.Instance; // null 가능
-        bool hasExactAnim = false;                 // 기본값: 없음
+        var router = CardAnimationRouter.Instance; // [MOD] 라우터 캐시(null 가능)
 
-        // [MOD] 메인 액션(이동 아님)인 경우에만 애니메이션 존재 여부를 엄격히 검사
-        if (!isMoveAction && router != null && action != null)
-        {
-            hasExactAnim = router.HasExactEntry(action.cardcode, h); // 정확 일치만 허용
-            if (!hasExactAnim)
-            {
-                Debug.Log($"[Rendering] Skip PlayCo: No exact anim for card='{action.cardcode}', hook='{h}'"); // [MOD] 로그
-            }
-        }
+        // [MOD] 액터 GO 캐시 (HideEmAll 등에 사용)
+        GameObject actorGO = null;
+        if (LocalState.Instance != null && LocalState.Instance.PlayerObDic != null)
+            LocalState.Instance.PlayerObDic.TryGetValue(actorNum, out actorGO);
 
-        // 메인 액션 전용: 숨김 처리
-        // [MOD] 기존과 달리, "정확히 등록되어 재생할 때만" 숨긴다.
-        if (!isMoveAction && hasExactAnim)
+        // [MOD] 상대 액터 넘버/카드코드 해석 (Guard 프롤로그용)
+        int ResolveOpponentActorNum(int self)
         {
-            if (CameraLovesAlisha.Instance != null &&
-                LocalState.Instance.PlayerObDic.TryGetValue(actorNum, out var actorGO) &&
-                actorGO != null)
+            // ActionData에는 actorNum이 없다고 했으니, Overmind의 헬퍼로 상대 액터 넘버를 얻는다.
+            if (Overmind.Instance != null) return Overmind.Instance.GetOtherPlayerNumber(self);
+
+            // 안전빵: Overmind가 없으면 씬에 있는 "다른" 플레이어를 픽업
+            if (LocalState.Instance != null && LocalState.Instance.PlayerObDic != null)
             {
-                CameraLovesAlisha.Instance.HideEmAll(actorGO); // 기존 주석/동작 유지
+                foreach (var kv in LocalState.Instance.PlayerObDic)
+                    if (kv.Key != self) return kv.Key;
             }
+            return self; // fallback
         }
+        string ResolveOpponentCardCode() => otherActionData != null ? otherActionData.cardcode : null;
 
         if (isMoveAction)
         {
@@ -176,26 +181,98 @@ public class LocalRenderingManager : MonoBehaviour
         }
         else
         {
-            // [MOD] 메인 액션이더라도, 등록이 없으면 PlayCo를 "아예 호출하지 않는다".
-            if (hasExactAnim)
-            {
-                // 메인 액션(어제 작업한 라우터 그대로)
-                HitResolution? forcedOutcome = null;
-                if (h == HookType.Activate)
-                    forcedOutcome = EvaluateHitOutcome(actorNum, data1, data2, action);
+            // ============================ 메인 액션(이동 아님) ============================
 
-                yield return StartCoroutine(
-                    CardAnimationRouter.Instance.PlayCo(
-                        action.cardcode, actorNum, h,
-                        victimActorNum: null,
-                        forcedOutcome: forcedOutcome
-                    )
-                );
+            if (router == null || action == null)
+            {
+                Debug.LogWarning("[Rendering] Router or Action is null. Skip animation.");
+            }
+            else if (h == HookType.Guard)
+            {
+                // ---------- Guard 렌더링(피격자 = actorNum) ----------
+                bool hasExactGuard = CardAnimationRouter.Instance != null &&
+                                     CardAnimationRouter.Instance.HasExactEntry(action.cardcode, HookType.Guard);
+
+                if (shouldGuardAnimationPlay && hasExactGuard)
+                {
+                    int activateActorNum = ResolveOpponentActorNum(actorNum);
+                    string activateCardCode = ResolveOpponentCardCode();
+
+                    // [중요] Guard에서는 피격자 HideEmAll 하지 않음!
+                    yield return StartCoroutine(
+                        CardAnimationRouter.Instance.PlayCo(
+                            action.cardcode,                 // 지금(피격자) 카드
+                            actorNum,                        // 지금(피격자) actor
+                            HookType.Guard,
+                            victimActorNum: activateActorNum,                // 상대는 공격자
+                            forcedOutcome: null,
+                            shouldGuardCinematic: true,                      // Guard 프롤로그 실행(공격자 Prep 재생 + 컷라인 끝난 뒤 Wait!)
+                            skipPoint1DueToGuard: false,
+                            opponentActivateCardCode: activateCardCode,      // 공격자 Activate 카드로 프롤로그 꾸밈
+                            opponentActorNum: activateActorNum
+                        )
+                    );
+                }
+                else
+                {
+                    Debug.Log("[Rendering] Skip Guard cinematic (flag false or no DB)");
+                }
+            }
+            else if (h == HookType.Activate)
+            {
+                // ---------- Activate 렌더링(공격자) ----------
+                bool hasExactAct = CardAnimationRouter.Instance != null &&
+                                   CardAnimationRouter.Instance.HasExactEntry(action.cardcode, HookType.Activate);
+
+                if (hasExactAct)
+                {
+                    // Activate 쪽은 기존처럼 숨김 가능(선택): Point1 스킵이면 숨김 효과도 거의 안 보임
+                    if (CameraLovesAlisha.Instance != null && actorGO != null)
+                        CameraLovesAlisha.Instance.HideEmAll(actorGO);
+
+                    // 메인 액션(어제 작업한 라우터 그대로)
+                    HitResolution? forcedOutcome = EvaluateHitOutcome(actorNum, data1, data2, action);
+
+                    yield return StartCoroutine(
+                        CardAnimationRouter.Instance.PlayCo(
+                            action.cardcode,
+                            actorNum,            // 공격자
+                            HookType.Activate,
+                            victimActorNum: null,
+                            forcedOutcome: forcedOutcome,
+                            shouldGuardCinematic: false,
+                            skipPoint1DueToGuard: shouldGuardAnimationPlay,  // ★ 직전에 Guard를 보여줬다면 Point1 스킵 → Point2부터
+                            opponentActivateCardCode: null,
+                            opponentActorNum: null
+                        )
+                    );
+                }
+                else
+                {
+                    Debug.Log($"[Rendering] Skip Activate: No exact anim for card='{action.cardcode}'.");
+                }
             }
             else
             {
-                // [MOD] 등록이 없을 때는 아무 애니도 재생하지 않고 통과
-                // 숨김도 하지 않았으므로 Unhide 불필요
+                // ---------- Priority/Counter 등 기타 훅 ----------
+                bool hasExact = router.HasExactEntry(action.cardcode, h); // [MOD] 엄격 검사
+                if (hasExact)
+                {
+                    if (CameraLovesAlisha.Instance != null && actorGO != null)
+                        CameraLovesAlisha.Instance.HideEmAll(actorGO);
+
+                    yield return StartCoroutine(
+                        CardAnimationRouter.Instance.PlayCo(
+                            action.cardcode, actorNum, h,
+                            victimActorNum: null,
+                            forcedOutcome: null
+                        )
+                    );
+                }
+                else
+                {
+                    Debug.Log($"[Rendering] Skip {h}: No exact anim for card='{action.cardcode}'.");
+                }
             }
         }
 
@@ -218,8 +295,14 @@ public class LocalRenderingManager : MonoBehaviour
         StealthPlayer(diffs);
         ElementRenderer.Instance.RenderElementsFromDiffs(diffs);
         Debug.Log("자자 노멀 액션 렌더링 다 끝, 이제 렌더링 섭밑만 하면됨");
+
+        // [MOD] 혹시 백드롭을 안 썼거나 중간 스킵 경로였을 때를 대비한 안전 복구
+        CameraLovesAlisha.Instance?.UnhideAutoHiddenNow();
+
         Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
     }
+
+
 
     public void Rendering_Dot_Action(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h)
     {

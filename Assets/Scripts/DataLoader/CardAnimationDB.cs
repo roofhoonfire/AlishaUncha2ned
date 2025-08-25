@@ -35,6 +35,18 @@ public class CardAnimationDB : ScriptableObject
         public string victimDefendTrigger;     // 예: "Trig_Defend"
         public string victimDefendStateName;   // 예: "Base Layer.Defend"
 
+
+        [Header("[MOD] Guard 전용(옵션)")]
+        [Tooltip("Guard 훅에서만 사용할 전용 트리거(비우면 일반 animatorTrigger 사용)")]
+        public string guardAnimatorTrigger;
+
+        [Tooltip("Guard 훅에서만 사용할 전용 상태명(비우면 일반 stateName 사용)")]
+        public string guardStateName;
+
+        [Tooltip("Guard 훅에서만 사용할 전용 클립(비우면 일반 clip 사용)")]
+        public AnimationClip guardClip;
+
+
         [Header("예비동작(Prep) 애니")]
         [Tooltip("Prep으로 진입시키는 트리거(없으면 state로 직접 전환)")]
         public string prepTrigger;

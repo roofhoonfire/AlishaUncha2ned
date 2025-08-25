@@ -12,6 +12,12 @@ public class CameraLovesAlisha : MonoBehaviour
     [Header("Point1: Auto-hide marked children")]
     public bool autoHideMarkedChildren = true;
 
+    // 클래스 상단 필드 근처에 추가
+    [Header("[MOD] Cutscene 'Wait!' Sign")]
+    [Tooltip("Cutscene 캔버스의 'Wait!' 이미지(알파 0~1로 페이드)")]
+    public UnityEngine.UI.Image waitImage;
+    [Tooltip("Wait! 기본 페이드 인/홀드/아웃 (초)")]
+    public float waitFadeIn = 0.08f, waitHold = 0.25f, waitFadeOut = 0.12f;
 
 
 
@@ -549,5 +555,27 @@ public class CameraLovesAlisha : MonoBehaviour
                   .AppendInterval(Mathf.Max(0f, duration))
                   .AppendCallback(() => onComplete());
         }
+    }
+
+    // 클래스 내부 메서드 영역 아무 곳에 추가
+    /// <summary>
+    /// [MOD] Guard 프롤로그에서 쓰는 'Wait!' 표식 연출. 
+    /// overrideHoldSec가 있으면 홀드시간을 그 값으로 사용.
+    /// DOTween Sequence는 SetUpdate(true/Unscaled)로 타임스케일 무시.
+    /// </summary>
+    public void ShowWaitSign(float? overrideHoldSec = null)
+    {
+        if (waitImage == null) return;
+
+        float hold = overrideHoldSec.HasValue ? Mathf.Max(0f, overrideHoldSec.Value) : Mathf.Max(0f, waitHold);
+        var img = waitImage;
+        var c0 = img.color; c0.a = 0f; img.color = c0;
+        img.gameObject.SetActive(true);
+
+        var seq = DG.Tweening.DOTween.Sequence().SetUpdate(backdropUseRealtime);
+        seq.Append(img.DOFade(1f, Mathf.Max(0f, waitFadeIn)));
+        seq.AppendInterval(hold);
+        seq.Append(img.DOFade(0f, Mathf.Max(0f, waitFadeOut)));
+        seq.OnComplete(() => { if (img != null) img.gameObject.SetActive(false); });
     }
 }

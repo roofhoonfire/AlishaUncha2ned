@@ -38,7 +38,7 @@ public enum EffectType {
     Burn_Op,StartDot_Heal,StartDot_Stealth_Off,Stealth_Off,
     Blind_Op,
     Dot_Heal, Dot_Burn, Dot_Stealth_Off, Dot_Blind_Off,
-
+    GA_On, 
     whenDamaged_FlagOn,  Element_Check_FlagOn,  intheRange_FlagOn, 
     Flag_Off, Remove_Element,Invincible_forOneAction,Stealth, Damage, whenAttackedFlagOn, Move, Get_Element, Heal, StackDamage,  GetDefense, DamageMeBangMoo, AddDamage, MoveToSelectedTile, OpNextActionisMoveFlagOn,
      NotRumbleFlagOn, ExtraSelect_Kawari,NextTurn_AddDamage, ReplaceNextOpsMovetoStun, StunRecovery, SelectActionClockChange, UseEnergy, TrueDamage, MakeItTrue, PrevCycleClockFlagOn,  ReduceMyNextTurnActionClock, 
@@ -72,7 +72,13 @@ public class CardEffect
         switch (effectType)
         {
 
+            case EffectType.GA_On:
+                {
 
+                    Overmind.Instance.GA_On = true;
+                    break;
+
+                }
 
             case EffectType.StartDot_Heal:
                 {

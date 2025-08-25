@@ -68,6 +68,16 @@ public class CardAnimationRouter : MonoBehaviour
     [Tooltip("Attack 상태 진입 대기 최대(초)")]
     public float attackEnterMaxWait = 0.5f;
 
+    // [MOD] Guard 프롤로그 기본값
+    [Header("[MOD] Guard Prelude Defaults")]
+    [Tooltip("Activate 엔트리의 prepPoseHoldSec가 없을 때 사용할 대기 시간(초)")]
+    public float guardPreludeHoldDefault = 0.30f;
+    [Tooltip("공격자→피격자 전환 시간(초)")]
+    public float guardMoveToDefenderDuration = 0.22f;
+    [Tooltip("프롤로그 백드롭 기본 페이드(공격자 쪽)")]
+    public float guardPreludeFadeIn = 0.12f;
+    public float guardPreludeFadeOut = 0.10f;
+
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -128,6 +138,7 @@ public class CardAnimationRouter : MonoBehaviour
         return false;
     }
 
+    // 느슨한 조회(폴백) — 내부용
     private bool _TryGetEntry(string cardCode, HookType hook, out CardAnimationDB.CardAnimEntry entry)
     {
         entry = null;
@@ -142,14 +153,20 @@ public class CardAnimationRouter : MonoBehaviour
         return false;
     }
 
-    // ================== [MOD] 정확 일치 조회 API ==================
-    /// <summary>
-    /// [MOD] 해당 (cardCode, hook) 쌍이 DB에 '정확히' 등록돼 있는지 여부만 반환(폴백 없음).
-    /// </summary>
+    // [MOD] 정확 일치 조회 공개 API
     public bool HasExactEntry(string cardCode, HookType hook)
     {
         if (_map == null) BuildMap();
         return _map != null && _map.ContainsKey((Normalize(cardCode), hook));
+    }
+
+    // [MOD] Guard 전용 필드 우선 해석
+    private void ResolveGuardAnim(CardAnimationDB.CardAnimEntry e,
+        out string trig, out string state, out AnimationClip clip)
+    {
+        trig = !string.IsNullOrEmpty(e.guardAnimatorTrigger) ? e.guardAnimatorTrigger : e.animatorTrigger; // [MOD]
+        state = !string.IsNullOrEmpty(e.guardStateName) ? e.guardStateName : e.stateName;       // [MOD]
+        clip = (e.guardClip != null) ? e.guardClip : e.clip;            // [MOD]
     }
 
     // ================== 오케스트레이션 ==================
@@ -157,9 +174,18 @@ public class CardAnimationRouter : MonoBehaviour
         Animator attackerAnim, Animator victimAnim,
         GameObject attackerGO, GameObject victimGO,
         CardAnimationDB.CardAnimEntry entry,
-        HookType hook, HitResolution? forcedOutcome)
+        HookType hook, HitResolution? forcedOutcome,
+        bool skipPoint1Cine // Prep 카메라/백드롭 연출만 스킵(Prep 자체 전이는 수행)
+    )
     {
-        // 미스 여부를 한 번만 계산해 재사용
+        // Guard는 전용 경로 사용
+        if (hook == HookType.Guard)
+        {
+            yield return StartCoroutine(PlayGuardSimple(attackerAnim, attackerGO, entry)); // [MOD]
+            yield break;
+        }
+
+        // ====== 이하 Activate/Counter/Priority ======
         bool missFlow = (hook == HookType.Activate
                          && forcedOutcome.HasValue
                          && forcedOutcome.Value == HitResolution.Missed);
@@ -180,7 +206,7 @@ public class CardAnimationRouter : MonoBehaviour
             yield return WaitForStateEnter(attackerAnim, entry.prepStateName, prepEnterMaxWait);
 
             // 포인트1 카메라
-            if (enableCameraCinematic && camMove_Point1 && CameraLovesAlisha.Instance != null && !string.IsNullOrEmpty(entry.prepStateName))
+            if (!skipPoint1Cine && enableCameraCinematic && camMove_Point1 && CameraLovesAlisha.Instance != null && !string.IsNullOrEmpty(entry.prepStateName))
             {
                 float prepLen = 0f; TryGetTargetStateLength(attackerAnim, entry.prepStateName, animatorLayer, out prepLen);
                 float prepNorm = 0f; TryGetNormTowardsState(attackerAnim, entry.prepStateName, animatorLayer, out prepNorm);
@@ -192,7 +218,7 @@ public class CardAnimationRouter : MonoBehaviour
             yield return WaitForStateEnd(attackerAnim, entry.prepStateName);
 
             // 포즈 홀드 + 백드롭
-            if (entry.prepPoseHoldSec > 0f)
+            if (!skipPoint1Cine && entry.prepPoseHoldSec > 0f)
             {
                 FreezeOnLastFrame(attackerAnim, entry.prepStateName, true);
 
@@ -216,7 +242,7 @@ public class CardAnimationRouter : MonoBehaviour
             }
         }
 
-        // ★ 포인트1 시퀀스가 끝난 '직후' — Miss면 곧바로 복귀 트윈 시작
+        // 포인트1 직후 Miss면 복귀
         if (missFlow && enableCameraCinematic && camMove_Return && CameraLovesAlisha.Instance != null)
         {
             CameraLovesAlisha.Instance.ReturnToDefault(cameraReturnDuration, attackerGO.transform);
@@ -231,7 +257,7 @@ public class CardAnimationRouter : MonoBehaviour
         // Attack 상태 진입 보장
         yield return WaitForStateEnter(attackerAnim, entry.stateName, attackEnterMaxWait);
 
-        // Miss가 아닐 때만 포인트2 이동 (피격자 쪽으로)
+        // Miss가 아닐 때만 포인트2 이동
         if (!missFlow && enableCameraCinematic && camMove_Point2 && CameraLovesAlisha.Instance != null && victimGO != null)
         {
             int nFrame = (entry.hitStops != null && entry.hitStops.Count > 0) ? entry.hitStops.Min(h => h.frame) : -1;
@@ -250,14 +276,44 @@ public class CardAnimationRouter : MonoBehaviour
             }
         }
 
-        // Attack 구간 오케스트레이션
+        // Attack 구간
         yield return StartCoroutine(
             PlayWithVictimAndHitStops(attackerAnim, victimAnim, attackerGO, victimGO, entry, hook, forcedOutcome)
         );
 
-        // 종료 복귀: Miss가 아닐 때만 (Miss는 포인트1 끝나고 이미 복귀 중)
+        // 종료 복귀
         if (!missFlow && enableCameraCinematic && camMove_Return && CameraLovesAlisha.Instance != null)
             CameraLovesAlisha.Instance.ReturnToDefault(cameraReturnDuration, attackerGO.transform);
+    }
+
+    // [MOD] Guard 전용 — 가드 주체(피격자)의 전용 애니만 깔끔히 재생
+    private IEnumerator PlayGuardSimple(Animator guardAnim, GameObject guardGO, CardAnimationDB.CardAnimEntry entry)
+    {
+        ResolveGuardAnim(entry, out var trig, out var state, out var clip); // Guard 전용 해석
+        if (string.IsNullOrEmpty(trig) && string.IsNullOrEmpty(state))
+        {
+            Debug.LogWarning($"[CardAnimationRouter] Guard anim missing: {entry.cardCode}");
+            yield break;
+        }
+
+        // 진입
+        if (!string.IsNullOrEmpty(trig)) guardAnim.SetTrigger(trig);
+        else guardAnim.CrossFadeInFixedTime(Animator.StringToHash(state), crossFade, animatorLayer);
+
+        // 상태 진입 대기
+        string stateToWait = !string.IsNullOrEmpty(state) ? state : entry.stateName; // 안전
+        yield return WaitForStateEnter(guardAnim, stateToWait, attackEnterMaxWait);
+
+        // 카메라 포인트1 느낌으로 살짝 확대(옵션)
+        if (enableCameraCinematic && camMove_Point1 && CameraLovesAlisha.Instance != null && guardGO != null)
+        {
+            // 클립 길이 기준 대략 0.2 ~ 0.3s 정도
+            float approx = 0.25f;
+            CameraLovesAlisha.Instance.MoveToPoint1_Attacker(guardGO.transform, approx, cameraPoint1FOV);
+        }
+
+        // 그냥 끝까지 재생(피해/히트스톱/피격자 리액션 없음)
+        yield return WaitForStateEnd(guardAnim, stateToWait);
     }
 
     private IEnumerator PlayWithVictimAndHitStops(
@@ -434,6 +490,8 @@ public class CardAnimationRouter : MonoBehaviour
         }
     }
 
+
+
     private IEnumerator WaitForStateEnter(Animator anim, string stateName, float maxWaitSec)
     {
         if (string.IsNullOrEmpty(stateName)) yield break;
@@ -452,7 +510,7 @@ public class CardAnimationRouter : MonoBehaviour
     {
         if (string.IsNullOrEmpty(stateName)) yield break;
 
-        // 1) 우선 해당 state에 '한 번이라도' 진입할 때까지 대기(최대 5초)
+        // (네 기존 안전망 로직 그대로)
         float safetyEnd = Time.realtimeSinceStartup + 5f;
         while (Time.realtimeSinceStartup < safetyEnd)
         {
@@ -466,10 +524,7 @@ public class CardAnimationRouter : MonoBehaviour
             yield break;
         }
 
-        // 2) 종료 조건 확대:
-        //    - (a) target state에서 normalizedTime >= 1 && not in transition
-        //    - (b) target state를 '떠났음'(현재/다음 모두 target 아님)
-        safetyEnd = Time.realtimeSinceStartup + 10f; // 2차 안전망
+        safetyEnd = Time.realtimeSinceStartup + 10f;
         while (Time.realtimeSinceStartup < safetyEnd)
         {
             var cur = anim.GetCurrentAnimatorStateInfo(animatorLayer);
@@ -478,11 +533,9 @@ public class CardAnimationRouter : MonoBehaviour
             bool inTargetNow = cur.IsName(stateName);
             bool nextIsTarget = inTransition && anim.GetNextAnimatorStateInfo(animatorLayer).IsName(stateName);
 
-            // (a) 클립 자연 종료
             if (inTargetNow && !inTransition && cur.normalizedTime >= 1f)
                 yield break;
 
-            // (b) 대상 state를 떠남
             if (!inTargetNow && !nextIsTarget)
                 yield break;
 
@@ -517,7 +570,6 @@ public class CardAnimationRouter : MonoBehaviour
         return Mathf.Clamp01(halfFrameSec / vlen);
     }
 
-    // (defend/damage 모두 지원: 선택된 상태명 기준으로 반 프레임 밀기)
     private void NudgeVictimHalfFrame(Animator victimAnim, string chosenStateName, AnimationClip clipOverride = null)
     {
         float vf = (clipOverride != null && clipOverride.frameRate > 0f) ? clipOverride.frameRate : 30f;
@@ -531,17 +583,24 @@ public class CardAnimationRouter : MonoBehaviour
         }
     }
 
-    // 외부 API
-    public IEnumerator PlayCo(string cardCode, int attackerActorNum, HookType hook, int? victimActorNum = null, HitResolution? forcedOutcome = null)
+    // [MOD] 외부 API
+    public IEnumerator PlayCo(
+        string cardCode, int attackerActorNum, HookType hook,
+        int? victimActorNum = null, HitResolution? forcedOutcome = null,
+        bool shouldGuardCinematic = false,          // Guard 프롤로그 수행 여부
+        bool skipPoint1DueToGuard = false,          // Activate를 Point2부터(Prep 카메라 연출 스킵)
+        string opponentActivateCardCode = null,     // Guard 프롤로그에서 참조할 공격자 카드
+        int? opponentActorNum = null                // Guard 프롤로그에서 초점 맞출 공격자 actor
+    )
     {
         if (LocalState.Instance == null || LocalState.Instance.PlayerObDic == null) yield break;
         if (!LocalState.Instance.PlayerObDic.TryGetValue(attackerActorNum, out var attackerGO) || attackerGO == null) yield break;
 
-        // [MOD] 폴백 금지: 정확 일치 엔트리 없으면 '아예' 시작하지 않음
-        if (_map == null) BuildMap(); // 안전
+        // 정확 일치 없으면 시작 안 함
+        if (_map == null) BuildMap();
         if (_map == null || !_map.TryGetValue((Normalize(cardCode), hook), out var entry))
         {
-            Debug.Log($"[CardAnimationRouter] Skip PlayCo: no exact entry for {cardCode}/{hook}"); // [MOD] 로그
+            Debug.Log($"[CardAnimationRouter] Skip PlayCo: no exact entry for {cardCode}/{hook}");
             yield break;
         }
 
@@ -567,8 +626,103 @@ public class CardAnimationRouter : MonoBehaviour
             cam.SetDefault(attackerGO.transform);
         }
 
+        // ===== Guard 프롤로그 =====
+        if (hook == HookType.Guard && shouldGuardCinematic && CameraLovesAlisha.Instance != null)
+        {
+            // 1) "공격자(이번 턴 Activate 주체)"의 Prep을 실제 재생 + Point1 프레이밍 + 컷라인
+            Transform origAttackerT = null;
+            Animator origAttackerAnim = null;
+            CardAnimationDB.CardAnimEntry actEntry = null;
+
+            if (opponentActorNum.HasValue &&
+                LocalState.Instance.PlayerObDic.TryGetValue(opponentActorNum.Value, out var oppGO) &&
+                oppGO != null)
+            {
+                origAttackerT = oppGO.transform;
+                origAttackerAnim = oppGO.GetComponentInChildren<Animator>();
+            }
+
+            if (!string.IsNullOrEmpty(opponentActivateCardCode))
+                _map.TryGetValue((Normalize(opponentActivateCardCode), HookType.Activate), out actEntry);
+
+            float holdSec = guardPreludeHoldDefault;
+            Sprite preBG = null;
+            float preFadeIn = guardPreludeFadeIn, preFadeOut = guardPreludeFadeOut;
+
+            if (actEntry != null)
+            {
+                if (actEntry.prepBackdropSprite != null) preBG = actEntry.prepBackdropSprite;
+                if (actEntry.prepBackdropFadeIn > 0f) preFadeIn = actEntry.prepBackdropFadeIn;
+                if (actEntry.prepBackdropFadeOut > 0f) preFadeOut = actEntry.prepBackdropFadeOut;
+                if (actEntry.prepPoseHoldSec > 0f) holdSec = actEntry.prepPoseHoldSec;
+            }
+
+            if (origAttackerT != null && origAttackerAnim != null && actEntry != null)
+            {
+                // 공격자 Prep 진입
+                if (!string.IsNullOrEmpty(actEntry.prepTrigger))
+                    origAttackerAnim.SetTrigger(actEntry.prepTrigger);
+                else if (!string.IsNullOrEmpty(actEntry.prepStateName))
+                    origAttackerAnim.CrossFadeInFixedTime(Animator.StringToHash(actEntry.prepStateName), crossFade, animatorLayer);
+
+                // 상태 진입
+                yield return WaitForStateEnter(origAttackerAnim, actEntry.prepStateName, prepEnterMaxWait);
+
+                // Point1으로 자연스럽게 이동(Prep 남은 길이에 맞춤)
+                if (enableCameraCinematic && camMove_Point1)
+                {
+                    float prepLen = 0f; TryGetTargetStateLength(origAttackerAnim, actEntry.prepStateName, animatorLayer, out prepLen);
+                    float prepNorm = 0f; TryGetNormTowardsState(origAttackerAnim, actEntry.prepStateName, animatorLayer, out prepNorm);
+                    float remain = Mathf.Max(0f, (prepLen > 0f ? (1f - (prepNorm % 1f)) * prepLen : 0.2f));
+                    CameraLovesAlisha.Instance.MoveToPoint1_Attacker(origAttackerT, remain, cameraPoint1FOV);
+                }
+
+                // Prep 종료까지
+                yield return WaitForStateEnd(origAttackerAnim, actEntry.prepStateName);
+
+                // 마지막 프레임 정지 + 백드롭 + 컷라인
+                FreezeOnLastFrame(origAttackerAnim, actEntry.prepStateName, true);
+
+                if (enableCameraCinematic && preBG != null)
+                    CameraLovesAlisha.Instance.BeginPoint1Backdrop(origAttackerT.gameObject, preBG, preFadeIn, holdSec);
+
+                // [중요] 컷라인 재생 시간 == holdSec 이므로, 그 시간이 끝난 뒤에 Wait!를 띄움
+                yield return new WaitForSecondsRealtime(holdSec);
+
+                // 컷라인 끝난 뒤 "그때!" Wait!
+                CameraLovesAlisha.Instance.ShowWaitSign(0.25f); // 짧게 띄움(원하면 수치 조절)
+
+                // 백드롭 종료 및 정지 해제
+                if (enableCameraCinematic && preBG != null)
+                    CameraLovesAlisha.Instance.EndPoint1Backdrop(preFadeOut);
+
+                FreezeOnLastFrame(origAttackerAnim, actEntry.prepStateName, false);
+            }
+
+            // 2) 카메라를 피격자(Guard 주체=attackerGO)에게 이동(포인트1 스타일)
+            if (attackerGO != null)
+            {
+                CameraLovesAlisha.Instance.MoveToPoint1_Attacker(attackerGO.transform, guardMoveToDefenderDuration, cameraPoint1FOV);
+                yield return new WaitForSecondsRealtime(Mathf.Max(0f, guardMoveToDefenderDuration));
+            }
+
+            // 3) 피격자 가드 애니 재생(가드 전용 경량 루틴)
+            yield return StartCoroutine(PlayGuardSimple(attackerAnim, attackerGO, entry));
+
+            // 4) 카메라를 공격자 쪽 디폴트로 복귀
+            if (enableCameraCinematic && camMove_Return && CameraLovesAlisha.Instance != null && origAttackerT != null)
+            {
+                CameraLovesAlisha.Instance.ReturnToDefault(cameraReturnDuration, origAttackerT);
+                if (cameraReturnDuration > 0f)
+                    yield return new WaitForSecondsRealtime(cameraReturnDuration);
+            }
+
+            yield break; // Guard 완료
+        }
+
+        // ===== 일반/Activate 경로 =====
         yield return StartCoroutine(
-            PlayOrchestrated(attackerAnim, victimAnim, attackerGO, victimGO, entry, hook, forcedOutcome)
+            PlayOrchestrated(attackerAnim, victimAnim, attackerGO, victimGO, entry, hook, forcedOutcome, skipPoint1Cine: skipPoint1DueToGuard)
         );
 
         // 백드롭 페이드아웃 시간 대기(있다면)
@@ -578,7 +732,7 @@ public class CardAnimationRouter : MonoBehaviour
             if (fadeOut > 0f) yield return new WaitForSecondsRealtime(fadeOut);
         }
 
-        // 카메라 복귀 트윈 시간 대기(있다면) — 트윈 자체는 PlayOrchestrated에서 이미 시작됨
+        // 카메라 복귀 트윈 시간 대기(있다면)
         if (enableCameraCinematic && camMove_Return && CameraLovesAlisha.Instance != null)
         {
             float ret = Mathf.Max(0f, cameraReturnDuration);
@@ -586,7 +740,6 @@ public class CardAnimationRouter : MonoBehaviour
         }
     }
 
-    // 레거시 호환
     public void Play(string cardCode, int attackerActorNum, HookType hook, int? victimActorNum = null)
     {
         StartCoroutine(PlayCo(cardCode, attackerActorNum, hook, victimActorNum));

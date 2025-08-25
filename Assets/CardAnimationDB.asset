@@ -17,6 +17,9 @@ MonoBehaviour:
     hook: 0
     victimDefendTrigger: Trig_Defend
     victimDefendStateName: Base Layer.Alisha_Defend
+    guardAnimatorTrigger: 
+    guardStateName: 
+    guardClip: {fileID: 0}
     prepTrigger: Trig_Prep_Slash
     prepStateName: Base Layer.Alisha_Prep_Slash
     prepClip: {fileID: 7400000, guid: 7fb552cbf3b38a749882866e3dc5d288, type: 2}
@@ -46,6 +49,9 @@ MonoBehaviour:
     hook: 0
     victimDefendTrigger: Trig_Defend
     victimDefendStateName: Base Layer.Alisha_Defend
+    guardAnimatorTrigger: 
+    guardStateName: 
+    guardClip: {fileID: 0}
     prepTrigger: Trig_Prep_Slash
     prepStateName: Base Layer.Alisha_Prep_Slash
     prepClip: {fileID: 7400000, guid: 7fb552cbf3b38a749882866e3dc5d288, type: 2}
@@ -75,6 +81,9 @@ MonoBehaviour:
     hook: 0
     victimDefendTrigger: Trig_Defend
     victimDefendStateName: Base Layer.Alisha_Defend
+    guardAnimatorTrigger: 
+    guardStateName: 
+    guardClip: {fileID: 0}
     prepTrigger: Trig_Prep_Slash
     prepStateName: Base Layer.Alisha_Prep_Slash
     prepClip: {fileID: 7400000, guid: 7fb552cbf3b38a749882866e3dc5d288, type: 2}
@@ -100,10 +109,45 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+  - cardCode: c3
+    hook: 4
+    victimDefendTrigger: 
+    victimDefendStateName: 
+    guardAnimatorTrigger: Trig_Guard
+    guardStateName: Base Layer.Alisha_Guard_Buff
+    guardClip: {fileID: 7400000, guid: 6e71e2d7b07bb024cb963f5cb53ac786, type: 2}
+    prepTrigger: Trig_Prep_SpellDam
+    prepStateName: Base Layer.Alisha_Prep_SpellDam
+    prepClip: {fileID: 7400000, guid: 815045b1187f5954f821d1712fb2dbe7, type: 2}
+    prepTotalFramesOverride: 0
+    prepPoseHoldSec: 1
+    animatorTrigger: Trig_Guard
+    stateName: Base Layer.Alisha_Guard_Buff
+    clip: {fileID: 7400000, guid: 6e71e2d7b07bb024cb963f5cb53ac786, type: 2}
+    totalFramesOverride: 0
+    victimAnimatorTrigger: Trig_Damaged
+    victimStateName: Base Layer.Alisha_Damaged
+    victimClip: {fileID: 7400000, guid: 7fd8eff2fb1d3c04288c0e7d00ae7d49, type: 2}
+    victimStartFrames: 01000000
+    usePrepBackdrop: 1
+    prepBackdropSprite: {fileID: 21300000, guid: 2f0421c3c8964b0419d48f65575ebaa0,
+      type: 3}
+    prepBackdropFadeIn: 0.15
+    prepBackdropFadeOut: 0.12
+    hitStops:
+    - frame: 2
+      duration: 0.7
+      pauseAttacker: 1
+      pauseVictim: 1
+      pauseEffects: 1
+      pauseScene: 0
   - cardCode: c4
     hook: 0
     victimDefendTrigger: Trig_Defend
     victimDefendStateName: Base Layer.Alisha_Defend
+    guardAnimatorTrigger: 
+    guardStateName: 
+    guardClip: {fileID: 0}
     prepTrigger: Trig_Prep_Pierce
     prepStateName: Base Layer.Alisha_Prep_Pierce
     prepClip: {fileID: 7400000, guid: 607c46d6cb592fc46b8a3f502feb6f77, type: 2}
@@ -133,6 +177,9 @@ MonoBehaviour:
     hook: 0
     victimDefendTrigger: Trig_Defend
     victimDefendStateName: Base Layer.Alisha_Defend
+    guardAnimatorTrigger: 
+    guardStateName: 
+    guardClip: {fileID: 0}
     prepTrigger: Trig_Prep_Pierce
     prepStateName: Base Layer.Alisha_Prep_Pierce
     prepClip: {fileID: 7400000, guid: 607c46d6cb592fc46b8a3f502feb6f77, type: 2}
@@ -162,6 +209,9 @@ MonoBehaviour:
     hook: 0
     victimDefendTrigger: Trig_Defend
     victimDefendStateName: Base Layer.Alisha_Defend
+    guardAnimatorTrigger: 
+    guardStateName: 
+    guardClip: {fileID: 0}
     prepTrigger: Trig_Prep_Pierce
     prepStateName: Base Layer.Alisha_Prep_Pierce
     prepClip: {fileID: 7400000, guid: 607c46d6cb592fc46b8a3f502feb6f77, type: 2}
@@ -191,6 +241,9 @@ MonoBehaviour:
     hook: 0
     victimDefendTrigger: Trig_Defend
     victimDefendStateName: Base Layer.Alisha_Defend
+    guardAnimatorTrigger: 
+    guardStateName: 
+    guardClip: {fileID: 0}
     prepTrigger: Trig_Prep_Slash
     prepStateName: Base Layer.Alisha_Prep_Slash
     prepClip: {fileID: 7400000, guid: 7fb552cbf3b38a749882866e3dc5d288, type: 2}
@@ -220,6 +273,9 @@ MonoBehaviour:
     hook: 0
     victimDefendTrigger: Trig_Defend
     victimDefendStateName: Base Layer.Alisha_Defend
+    guardAnimatorTrigger: 
+    guardStateName: 
+    guardClip: {fileID: 0}
     prepTrigger: Trig_Prep_SpellDam
     prepStateName: Base Layer.Alisha_Prep_SpellDam
     prepClip: {fileID: 7400000, guid: 815045b1187f5954f821d1712fb2dbe7, type: 2}
