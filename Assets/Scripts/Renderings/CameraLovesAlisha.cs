@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,76 +12,76 @@ public class CameraLovesAlisha : MonoBehaviour
     [Header("Point1: Auto-hide marked children")]
     public bool autoHideMarkedChildren = true;
 
-    // Å¬·¡½º »ó´Ü ÇÊµå ±ÙÃ³¿¡ Ãß°¡
+    // í´ë˜ìŠ¤ ìƒë‹¨ í•„ë“œ ê·¼ì²˜ì— ì¶”ê°€
     [Header("[MOD] Cutscene 'Wait!' Sign")]
-    [Tooltip("Cutscene Äµ¹ö½ºÀÇ 'Wait!' ÀÌ¹ÌÁö(¾ËÆÄ 0~1·Î ÆäÀÌµå)")]
+    [Tooltip("Cutscene ìº”ë²„ìŠ¤ì˜ 'Wait!' ì´ë¯¸ì§€(ì•ŒíŒŒ 0~1ë¡œ í˜ì´ë“œ)")]
     public UnityEngine.UI.Image waitImage;
-    [Tooltip("Wait! ±âº» ÆäÀÌµå ÀÎ/È¦µå/¾Æ¿ô (ÃÊ)")]
+    [Tooltip("Wait! ê¸°ë³¸ í˜ì´ë“œ ì¸/í™€ë“œ/ì•„ì›ƒ (ì´ˆ)")]
     public float waitFadeIn = 0.08f, waitHold = 0.25f, waitFadeOut = 0.12f;
 
 
 
     private readonly List<CineHideDuringPoint1> _autoHidden = new();
     [Header("Point1 Backdrop & Isolation")]
-    [Tooltip("¿À¹ö·¹ÀÌ Ä«¸Ş¶ó(URP, Render Type=Overlay, CullingMask=Cine_Attacker)")]
+    [Tooltip("ì˜¤ë²„ë ˆì´ ì¹´ë©”ë¼(URP, Render Type=Overlay, CullingMask=Cine_Attacker)")]
     public Camera overlayCamera;
-    [Tooltip("¹éµå·Ó Äµ¹ö½º(Screen Space - Camera, Target=¸ŞÀÎ Ä«¸Ş¶ó)")]
+    [Tooltip("ë°±ë“œë¡­ ìº”ë²„ìŠ¤(Screen Space - Camera, Target=ë©”ì¸ ì¹´ë©”ë¼)")]
     public Canvas backdropCanvas;
-    [Tooltip("Äµ¹ö½º ¾ÈÀÇ Ç®½ºÅ©¸° Image")]
+    [Tooltip("ìº”ë²„ìŠ¤ ì•ˆì˜ í’€ìŠ¤í¬ë¦° Image")]
     public Image backdropImage;
-    [Tooltip("°ø°İÀÚ¸¸ ·»´õÇÒ ¶§ ¾µ ·¹ÀÌ¾î ÀÌ¸§(¾À¿¡¼­ ¹Ì¸® ¸¸µé¾îµÑ °Í)")]
+    [Tooltip("ê³µê²©ìë§Œ ë Œë”í•  ë•Œ ì“¸ ë ˆì´ì–´ ì´ë¦„(ì”¬ì—ì„œ ë¯¸ë¦¬ ë§Œë“¤ì–´ë‘˜ ê²ƒ)")]
     public string isolateLayerName = "Cine_Attacker";
-    [Tooltip("¿À¹ö·¹ÀÌ/¹éµå·Ó Å¸ÀÓ½ºÄÉÀÏ ¹«½Ã")]
+    [Tooltip("ì˜¤ë²„ë ˆì´/ë°±ë“œë¡­ íƒ€ì„ìŠ¤ì¼€ì¼ ë¬´ì‹œ")]
     public bool backdropUseRealtime = true;
 
     [Header("Point1 Framing (Viewport Anchors)")]
-    [Tooltip("Æ÷ÀÎÆ®1¿¡¼­ ÀÎ¹°À» È­¸éÀÇ Æ¯Á¤ À§Ä¡(ºäÆ÷Æ® ÁÂÇ¥)¿¡ µÎ´Â ±â´É »ç¿ë")]
+    [Tooltip("í¬ì¸íŠ¸1ì—ì„œ ì¸ë¬¼ì„ í™”ë©´ì˜ íŠ¹ì • ìœ„ì¹˜(ë·°í¬íŠ¸ ì¢Œí‘œ)ì— ë‘ëŠ” ê¸°ëŠ¥ ì‚¬ìš©")]
     public bool point1UseFraming = true;
 
-    // flipX == false(¿À¸¥ÂÊ ¹Ù¶óº½)ÀÏ ¶§ ÀÎ¹° À§Ä¡ (¿ìÇÏ´Ü ´À³¦)
+    // flipX == false(ì˜¤ë¥¸ìª½ ë°”ë¼ë´„)ì¼ ë•Œ ì¸ë¬¼ ìœ„ì¹˜ (ìš°í•˜ë‹¨ ëŠë‚Œ)
     public Vector2 point1AnchorFacingRight = new Vector2(0.78f, 0.30f);
-    // flipX == true(¿ŞÂÊ ¹Ù¶óº½)ÀÏ ¶§ ÀÎ¹° À§Ä¡ (ÁÂÇÏ´Ü ´À³¦)
+    // flipX == true(ì™¼ìª½ ë°”ë¼ë´„)ì¼ ë•Œ ì¸ë¬¼ ìœ„ì¹˜ (ì¢Œí•˜ë‹¨ ëŠë‚Œ)
     public Vector2 point1AnchorFacingLeft = new Vector2(0.22f, 0.30f);
 
-    // ¹Ì¼¼Á¶Á¤(¿ùµå À¯´Ö). ÇÊ¿ä ¾øÀ¸¸é (0,0)
+    // ë¯¸ì„¸ì¡°ì •(ì›”ë“œ ìœ ë‹›). í•„ìš” ì—†ìœ¼ë©´ (0,0)
     public Vector2 point1WorldNudge = Vector2.zero;
 
 
-    [Header("CutLine FX (Point1 Àü¿ë)")]
+    [Header("CutLine FX (Point1 ì „ìš©)")]
     public GameObject cutLineGO;
     public Animator cutLineAnimator;
     public Image cutLineImage;
 
     [Header("CutLine Facing Angle")]
-    [Tooltip("flipX=true(¿ŞÂÊ), false(¿À¸¥ÂÊ)ÀÏ ¶§ CutLineÀÇ Z È¸Àü°¢(µµ)")]
+    [Tooltip("flipX=true(ì™¼ìª½), false(ì˜¤ë¥¸ìª½)ì¼ ë•Œ CutLineì˜ Z íšŒì „ê°(ë„)")]
     public float cutLineZRotWhenFacingLeft = 5f;
     public float cutLineZRotWhenFacingRight = -5f;
 
 
-    [Tooltip("flipX=true(¿ŞÂÊ), false(¿À¸¥ÂÊ)ÀÏ ¶§ CutLineÀÇ Y È¸Àü°¢(µµ)")]
+    [Tooltip("flipX=true(ì™¼ìª½), false(ì˜¤ë¥¸ìª½)ì¼ ë•Œ CutLineì˜ Y íšŒì „ê°(ë„)")]
     public float cutLineYRotWhenFacingLeft = 60f;
     public float cutLineYRotWhenFacingRight = -60f;
 
-    [Tooltip("ÇöÀç ·ÎÄÃ È¸Àü¿¡ À§ °ªÀ» µ¡¼À(¿ÀÇÁ¼Â)ÇÒÁö ¿©ºÎ. ²ô¸é Àı´ë°ªÀ¸·Î ¼¼ÆÃ")]
+    [Tooltip("í˜„ì¬ ë¡œì»¬ íšŒì „ì— ìœ„ ê°’ì„ ë§ì…ˆ(ì˜¤í”„ì…‹)í• ì§€ ì—¬ë¶€. ë„ë©´ ì ˆëŒ€ê°’ìœ¼ë¡œ ì„¸íŒ…")]
     public bool cutLineAngleAsOffset = false;
 
 
-    [Tooltip("Animator Trigger ÀÌ¸§ (Idle¡æPlay)")]
+    [Tooltip("Animator Trigger ì´ë¦„ (Idleâ†’Play)")]
     public string cutLineTrigger = "Trig_Play";
 
-    [Tooltip("Animator Play »óÅÂ ÀÌ¸§(Æ®¸®°Å°¡ ¾øÀ» ¶§ »ç¿ë)")]
+    [Tooltip("Animator Play ìƒíƒœ ì´ë¦„(íŠ¸ë¦¬ê±°ê°€ ì—†ì„ ë•Œ ì‚¬ìš©)")]
     public string cutLineStateName = "Play";
 
-    [Tooltip("Play¿¡ »ç¿ëÇÏ´Â Å¬¸³(±æÀÌ ÀÚµ¿ ¸ÂÃã¿ë, ºñ¿öµÎ¸é 1ÃÊ °¡Á¤)")]
+    [Tooltip("Playì— ì‚¬ìš©í•˜ëŠ” í´ë¦½(ê¸¸ì´ ìë™ ë§ì¶¤ìš©, ë¹„ì›Œë‘ë©´ 1ì´ˆ ê°€ì •)")]
     public AnimationClip cutLineClip;
 
-    [Tooltip("CutLine ¾Ö´Ï ±æÀÌ¸¦ Prep Á¤Áö ½Ã°£¿¡ ¸Â°Ô ÀÚµ¿ ½ºÄÉÀÏ")]
+    [Tooltip("CutLine ì• ë‹ˆ ê¸¸ì´ë¥¼ Prep ì •ì§€ ì‹œê°„ì— ë§ê²Œ ìë™ ìŠ¤ì¼€ì¼")]
     public bool cutLineMatchHold = true;
 
-    [Tooltip("CutLine Animator¸¦ UnscaledTimeÀ¸·Î °»½Å (Prep Á¤Áö ½Ç½Ã°£ ´ë±â¿Í ¸ÂÃã)")]
+    [Tooltip("CutLine Animatorë¥¼ UnscaledTimeìœ¼ë¡œ ê°±ì‹  (Prep ì •ì§€ ì‹¤ì‹œê°„ ëŒ€ê¸°ì™€ ë§ì¶¤)")]
     public bool cutLineUseUnscaled = true;
 
-    [Tooltip("CutLine ÀÌ¹ÌÁö ÆäÀÌµå ÀÎ/¾Æ¿ô")]
+    [Tooltip("CutLine ì´ë¯¸ì§€ í˜ì´ë“œ ì¸/ì•„ì›ƒ")]
     public float cutLineFadeIn = 0.08f;
     public float cutLineFadeOut = 0.10f;
 
@@ -91,31 +91,61 @@ public class CameraLovesAlisha : MonoBehaviour
     public float smoothSpeed = 0.125f;
 
     [Header("Cinematic Defaults")]
-    [Tooltip("µğÆúÆ®·Î µ¹¾Æ°¥ ¶§ ¸ñÇ¥ FOV")]
+    [Tooltip("ë””í´íŠ¸ë¡œ ëŒì•„ê°ˆ ë•Œ ëª©í‘œ FOV")]
     public float defaultFOV = 60f;
-    [Tooltip("µğÆúÆ®·Î µ¹¾Æ°¥ ¶§ Æ®À© ½Ã°£")]
+    [Tooltip("ë””í´íŠ¸ë¡œ ëŒì•„ê°ˆ ë•Œ íŠ¸ìœˆ ì‹œê°„")]
     public float returnDuration = 0.35f;
 
-    [Header("Shake Presets (Inspector Á¶Àı)")]
-    [Tooltip("K ÇÁ·¹ÀÓ(ÇÇ°İ ½ÃÀÛ)¿¡ ¾²´Â ¼ÒÇÁÆ® ½¦ÀÌÅ© XY °­µµ(¿ùµå À¯´Ö)")]
+    [Header("Shake Presets (Inspector ì¡°ì ˆ)")]
+    [Tooltip("K í”„ë ˆì„(í”¼ê²© ì‹œì‘)ì— ì“°ëŠ” ì†Œí”„íŠ¸ ì‰ì´í¬ XY ê°•ë„(ì›”ë“œ ìœ ë‹›)")]
     public Vector2 softXY = new Vector2(0.06f, 0.06f);
     public float softDuration = 0.08f;
     public int softVibrato = 14;
     public float softRandomness = 90f;
 
-    [Tooltip("N ÇÁ·¹ÀÓ(È÷Æ®½ºÅé Á÷Àü/Áß)¿¡ ¾²´Â ÇÏµå ½¦ÀÌÅ© XY °­µµ")]
+    [Tooltip("N í”„ë ˆì„(íˆíŠ¸ìŠ¤í†± ì§ì „/ì¤‘)ì— ì“°ëŠ” í•˜ë“œ ì‰ì´í¬ XY ê°•ë„")]
     public Vector2 hardXY = new Vector2(0.10f, 0.10f);
     public float hardDuration = 0.14f;
     public int hardVibrato = 18;
     public float hardRandomness = 90f;
 
-    [Header("FOV Punch Presets (Inspector Á¶Àı)")]
-    [Tooltip("K ÇÁ·¹ÀÓ¿ë ÆİÄ¡ (À½¼ö¸é ÁÜÀÎ)")]
+    [Header("FOV Punch Presets (Inspector ì¡°ì ˆ)")]
+    [Tooltip("K í”„ë ˆì„ìš© í€ì¹˜ (ìŒìˆ˜ë©´ ì¤Œì¸)")]
     public float softPunchDelta = -2f;
     public float softPunchDuration = 0.10f;
-    [Tooltip("N ÇÁ·¹ÀÓ ÇØÁ¦ ¸®¹Ù¿îµå¿ë ÆİÄ¡ (¾ç¼ö¸é ÁÜ¾Æ¿ô)")]
+    [Tooltip("N í”„ë ˆì„ í•´ì œ ë¦¬ë°”ìš´ë“œìš© í€ì¹˜ (ì–‘ìˆ˜ë©´ ì¤Œì•„ì›ƒ)")]
     public float hardPunchDelta = +1.8f;
     public float hardPunchDuration = 0.12f;
+
+
+
+
+
+
+
+    // CameraLovesAlisha.cs ìƒë‹¨ í•„ë“œë“¤ ê·¼ì²˜ì— ì¶”ê°€
+    [Header("[MOD] Guard Prelude - Wait Pause & Shake")]
+    [Tooltip("Wait!ê°€ ëœ¬ ë’¤ ì¹´ë©”ë¼ê°€ ì •ì§€í•  ì‹œê°„(ì´ˆ)")]
+    public float guardWaitPauseSec = 0.6f;
+
+    [Tooltip("ì •ì§€ ë™ì•ˆ Wait ì´ë¯¸ì§€ë¥¼ í”ë“¤ ê²ƒì¸ì§€")]
+    public bool guardWaitShake = true;
+
+    [Tooltip("ìŠ¤ì¼€ì¼ íŒí•‘ ê°•ë„(0~0.25 ê¶Œì¥)")]
+    [Range(0f, 0.25f)] public float guardWaitShakeScale = 0.06f;
+
+    [Tooltip("Zì¶• íšŒì „ í€ì¹˜ ê°ë„(ë„)")]
+    [Range(0f, 25f)] public float guardWaitShakeRot = 8f;
+
+    [Tooltip("í€ì¹˜/ì‰ì´í¬ ì§„ë™ íšŸìˆ˜")]
+    public int guardWaitShakeVibrato = 8;
+
+    [Tooltip("í€ì¹˜ íƒ„ì„±(0~1)")]
+    [Range(0f, 1f)] public float guardWaitShakeElasticity = 0.75f;
+
+
+
+
 
     private Camera _cam;
     private bool _cinematicLock = false;
@@ -135,11 +165,11 @@ public class CameraLovesAlisha : MonoBehaviour
         if (backdropCanvas != null) backdropCanvas.enabled = false;
         if (overlayCamera != null) overlayCamera.gameObject.SetActive(false);
 
-        // ·¹ÀÌ¾î Ä³½Ã
+        // ë ˆì´ì–´ ìºì‹œ
         _isolateLayer = LayerMask.NameToLayer(isolateLayerName);
         if (_isolateLayer < 0)
   
-            Debug.LogWarning($"[CameraLovesAlisha] ·¹ÀÌ¾î '{isolateLayerName}' °¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù. (Project Settings ¡æ Tags and Layers)");
+            Debug.LogWarning($"[CameraLovesAlisha] ë ˆì´ì–´ '{isolateLayerName}' ê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤. (Project Settings â†’ Tags and Layers)");
 
         if (cutLineImage != null)
         {
@@ -148,7 +178,7 @@ public class CameraLovesAlisha : MonoBehaviour
     }
     void LateUpdate()
     {
-        if (_cinematicLock) return; // ½Ã³×¸ÅÆ½ Áß¿£ ÀÚ¸® °íÁ¤(Æ®À©ÀÌ ¿òÁ÷ÀÓ Á¦¾î)
+        if (_cinematicLock) return; // ì‹œë„¤ë§¤í‹± ì¤‘ì—” ìë¦¬ ê³ ì •(íŠ¸ìœˆì´ ì›€ì§ì„ ì œì–´)
         if (target == null) return;
 
         Vector3 desiredPosition = target.position + offset;
@@ -165,12 +195,12 @@ public class CameraLovesAlisha : MonoBehaviour
         target = attackerDefault;
     }
 
-    /// <summary> Prep ¸¶Áö¸· ÇÁ·¹ÀÓ Á¤Áö ½ÃÁ¡±îÁö °ø°İÀÚ¿¡°Ô Å¬·ÎÁî¾÷(FOV=15) </summary>
+    /// <summary> Prep ë§ˆì§€ë§‰ í”„ë ˆì„ ì •ì§€ ì‹œì ê¹Œì§€ ê³µê²©ìì—ê²Œ í´ë¡œì¦ˆì—…(FOV=15) </summary>
     public void MoveToPoint1_Attacker(Transform attacker, float durationToPrepEnd, float fovPoint1 = 15f)
     {
         if (point1UseFraming && _cam != null && attacker != null)
         {
-            // flipX Å½Áö
+            // flipX íƒì§€
             var sr = attacker.GetComponentInChildren<SpriteRenderer>();
             bool flipX = (sr != null && sr.flipX);
 
@@ -179,15 +209,15 @@ public class CameraLovesAlisha : MonoBehaviour
         }
         else
         {
-            // ±âÁ¸ ¹æ½Ä(Á¤Áß¾Ó) À¯Áö
+            // ê¸°ì¡´ ë°©ì‹(ì •ì¤‘ì•™) ìœ ì§€
             Focus(attacker, fovPoint1, durationToPrepEnd);
         }
     }
-    /// <summary> Attack ½ÃÀÛ~NÇÁ·¹ÀÓ È÷Æ®½ºÅé ½ÃÀÛ±îÁö ÇÇ°İÀÚ¿¡°Ô ÀÌµ¿(FOV=40) </summary>
+    /// <summary> Attack ì‹œì‘~Ní”„ë ˆì„ íˆíŠ¸ìŠ¤í†± ì‹œì‘ê¹Œì§€ í”¼ê²©ìì—ê²Œ ì´ë™(FOV=40) </summary>
     public void MoveToPoint2_Victim(Transform victim, float durationToN, float fovPoint2 = 40f)
         => Focus(victim, fovPoint2, durationToN);
 
-    /// <summary> Attack Á¾·á¿Í µ¿½Ã¿¡ µğÆúÆ®(°ø°İÀÚ)·Î º¹±Í(FOV=60) </summary>
+    /// <summary> Attack ì¢…ë£Œì™€ ë™ì‹œì— ë””í´íŠ¸(ê³µê²©ì)ë¡œ ë³µê·€(FOV=60) </summary>
     public void ReturnToDefault(float? durationOverride = null, Transform attackerOverride = null)
     {
         float d = durationOverride ?? returnDuration;
@@ -195,7 +225,7 @@ public class CameraLovesAlisha : MonoBehaviour
         Focus(t, defaultFOV, d, onComplete: () => { _cinematicLock = false; target = t; });
     }
 
-    // ---- Impact helpers (Inspector ÇÁ¸®¼Â »ç¿ë) ----
+    // ---- Impact helpers (Inspector í”„ë¦¬ì…‹ ì‚¬ìš©) ----
     public void ShakeSoft() => ShakeXY(softXY, softDuration, softVibrato, softRandomness);
     public void ShakeHard(float extraDuration = 0f) => ShakeXY(hardXY, hardDuration + extraDuration, hardVibrato, hardRandomness);
 
@@ -216,7 +246,7 @@ public class CameraLovesAlisha : MonoBehaviour
 
         _moveTW = transform.DOMove(dest, Mathf.Max(0f, duration))
                            .SetEase(Ease.InOutSine)
-                           .SetUpdate(true); // ½Ç½Ã°£
+                           .SetUpdate(true); // ì‹¤ì‹œê°„
 
         if (_cam != null)
         {
@@ -250,18 +280,18 @@ public class CameraLovesAlisha : MonoBehaviour
         }
     }
 
-    /// <summary> XY Æ÷Áö¼Ç¸¸ Èçµé¸². È¸Àü º¯°æ ¾øÀ½. </summary>
+    /// <summary> XY í¬ì§€ì…˜ë§Œ í”ë“¤ë¦¼. íšŒì „ ë³€ê²½ ì—†ìŒ. </summary>
     public void ShakeXY(Vector2 xyStrength, float duration, int vibrato = 18, float randomness = 90f)
     {
-        ResetTiltZ();            // È¤½Ã ³²Àº ±â¿ï±â Á¦°Å
-        _shakeTW?.Kill();        // ÀÌÀü Èçµé¸² Á¤¸®
+        ResetTiltZ();            // í˜¹ì‹œ ë‚¨ì€ ê¸°ìš¸ê¸° ì œê±°
+        _shakeTW?.Kill();        // ì´ì „ í”ë“¤ë¦¼ ì •ë¦¬
         var strength = new Vector3(xyStrength.x, xyStrength.y, 0f);
         _shakeTW = transform.DOShakePosition(duration, strength, vibrato, randomness, false, true)
                             .SetEase(Ease.Linear)
                             .SetUpdate(true);
     }
 
-    /// <summary> FOV ÆİÄ¡(»ìÂ¦ µéÀÌ´ë±â/µÇµ¹¸®±â). delta°¡ À½¼ö¸é ÁÜÀÎ ÆİÄ¡. </summary>
+    /// <summary> FOV í€ì¹˜(ì‚´ì§ ë“¤ì´ëŒ€ê¸°/ë˜ëŒë¦¬ê¸°). deltaê°€ ìŒìˆ˜ë©´ ì¤Œì¸ í€ì¹˜. </summary>
     public void PunchFOV(float delta, float duration)
     {
         if (_cam == null) return;
@@ -297,22 +327,22 @@ public class CameraLovesAlisha : MonoBehaviour
             }
         }
     }
-    // ========== Point1: °ø°İÀÚ¸¸ º¸ÀÌ°Ô + ¹éµå·Ó ==========
+    // ========== Point1: ê³µê²©ìë§Œ ë³´ì´ê²Œ + ë°±ë“œë¡­ ==========
     public void BeginPoint1Backdrop(GameObject attackerRoot, Sprite bg, float fadeIn = 0.15f, float holdWindowSec = -1f)
     {
         if (_isIsolationActive) return;
         if (overlayCamera == null || backdropCanvas == null || backdropImage == null)
         {
-            Debug.LogWarning("[CameraLovesAlisha] overlayCamera/backdropCanvas/backdropImage ¼¼ÆÃ ÇÊ¿ä");
+            Debug.LogWarning("[CameraLovesAlisha] overlayCamera/backdropCanvas/backdropImage ì„¸íŒ… í•„ìš”");
             return;
         }
         if (_isolateLayer < 0)
         {
-            Debug.LogWarning($"[CameraLovesAlisha] '{isolateLayerName}' ·¹ÀÌ¾î°¡ ¾ø½À´Ï´Ù.");
+            Debug.LogWarning($"[CameraLovesAlisha] '{isolateLayerName}' ë ˆì´ì–´ê°€ ì—†ìŠµë‹ˆë‹¤.");
             return;
         }
 
-        // 1) ¹éµå·Ó Ç¥½Ã
+        // 1) ë°±ë“œë¡­ í‘œì‹œ
         backdropImage.sprite = bg;
         var c = backdropImage.color; c.a = 0f; backdropImage.color = c;
         backdropCanvas.enabled = true;
@@ -320,17 +350,17 @@ public class CameraLovesAlisha : MonoBehaviour
         _bdFadeTW = backdropImage.DOFade(1f, Mathf.Max(0f, fadeIn))
             .SetUpdate(backdropUseRealtime);
 
-        // 2) °ø°İÀÚ ·¹ÀÌ¾î °İ¸®
+        // 2) ê³µê²©ì ë ˆì´ì–´ ê²©ë¦¬
         _layerBackup.Clear();
         SetLayerRecursive(attackerRoot.transform, _isolateLayer, _layerBackup);
 
-        // 3) ¿À¹ö·¹ÀÌ Ä«¸Ş¶ó ON
+        // 3) ì˜¤ë²„ë ˆì´ ì¹´ë©”ë¼ ON
         overlayCamera.gameObject.SetActive(true);
 
-        // 4) CutLine Æ®¸®°Å
+        // 4) CutLine íŠ¸ë¦¬ê±°
         TriggerCutLine(holdWindowSec, attackerRoot != null ? attackerRoot.transform : null);
 
-        // 5) ¸¶Ä¿ ºÙÀº ÀÚ½Ä ÀÚµ¿ ¼û±è
+        // 5) ë§ˆì»¤ ë¶™ì€ ìì‹ ìë™ ìˆ¨ê¹€
         /*  if (autoHideMarkedChildren && attackerRoot != null)
           {
               _autoHidden.Clear();
@@ -354,10 +384,64 @@ public class CameraLovesAlisha : MonoBehaviour
 
 
     }
+
+    // CameraLovesAlisha.cs ë‚´ë¶€ ë©”ì„œë“œ ì•„ë¬´ ê³³ì— ì¶”ê°€
+    public float ShowGuardWait(float? overridePauseSec = null)
+    {
+        if (waitImage == null) return 0f;
+
+        // 1) í‘œì‹œ ì‹œê°„ ê²°ì • (ì¸ìŠ¤í™í„°ì—ì„œ ì¡°ì ˆ ê°€ëŠ¥)
+        float pause = Mathf.Max(0f, overridePauseSec ?? guardWaitPauseSec);
+
+        // 2) ê¸°ì¡´ ShowWaitSign ì¬í™œìš©: hold = pause ë¡œ ì„¤ì • (íƒ€ì„ìŠ¤ì¼€ì¼ ë¬´ì‹œ)
+        ShowWaitSign(pause);
+
+        // 3) "ë‘ë‘ë‘ë‘¥" ì‰ì´í¬ (ìŠ¤ì¼€ì¼ + íšŒì „ í€ì¹˜) â€” DOTween ë‘ ê°œë¥¼ ë³‘ë ¬ë¡œ
+        if (guardWaitShake && pause > 0f)
+        {
+            var rt = waitImage.rectTransform;
+            if (rt != null)
+            {
+                // ì´ì „ íŠ¸ìœˆ ì •ë¦¬ + ì›ìƒë³µêµ¬
+                rt.DOKill();
+                rt.localScale = Vector3.one;
+                rt.localRotation = Quaternion.identity;
+
+                // ìŠ¤ì¼€ì¼ ì‰ì´í¬
+                rt.DOShakeScale(
+                    duration: pause,
+                    strength: new Vector3(guardWaitShakeScale, guardWaitShakeScale, 0f),
+                    vibrato: guardWaitShakeVibrato,
+                    randomness: 0f,
+                    fadeOut: false
+                ).SetUpdate(backdropUseRealtime);
+
+                // íšŒì „ í€ì¹˜
+                rt.DOPunchRotation(
+                    punch: new Vector3(0f, 0f, guardWaitShakeRot),
+                    duration: pause,
+                    vibrato: guardWaitShakeVibrato,
+                    elasticity: guardWaitShakeElasticity
+                ).SetUpdate(backdropUseRealtime)
+                 .OnComplete(() =>
+                 {
+                     if (rt != null)
+                     {
+                         rt.localScale = Vector3.one;
+                         rt.localRotation = Quaternion.identity;
+                     }
+                 });
+            }
+        }
+
+        // í˜¸ì¶œìê°€ ì´ ì‹œê°„ì„ â€˜ì‹¤ì œë¡œ ëŒ€ê¸°â€™í•  ìˆ˜ ìˆë„ë¡ ë°˜í™˜
+        return pause;
+    }
+
     private void TriggerCutLine(float windowSec, Transform attacker)
     {
         if (cutLineGO == null) return;
-        // --- 0) flipX È®ÀÎ ---
+        // --- 0) flipX í™•ì¸ ---
         bool flipX = false;
         if (attacker != null)
         {
@@ -366,8 +450,8 @@ public class CameraLovesAlisha : MonoBehaviour
         }
 
 
-        // --- 1) CutLine È¸Àü ¼¼ÆÃ ---
-        var rt = cutLineGO.transform as RectTransform; // UI¶ó¸é RectTransformÀÏ °Í
+        // --- 1) CutLine íšŒì „ ì„¸íŒ… ---
+        var rt = cutLineGO.transform as RectTransform; // UIë¼ë©´ RectTransformì¼ ê²ƒ
         if (rt != null)
         {
             float targetZ = flipX ? cutLineZRotWhenFacingLeft : cutLineZRotWhenFacingRight;
@@ -375,18 +459,18 @@ public class CameraLovesAlisha : MonoBehaviour
 
             if (cutLineAngleAsOffset)
             {
-                // ±âÁ¸ ·ÎÄÃ °¢µµ¿¡ ´õÇØÁÖ±â
+                // ê¸°ì¡´ ë¡œì»¬ ê°ë„ì— ë”í•´ì£¼ê¸°
                 var e = rt.localEulerAngles;
                 rt.localRotation = Quaternion.Euler(e.x, e.y + targetY, e.z + targetZ);
             }
             else
             {
-                // Àı´ë°ªÀ¸·Î ¼¼ÆÃ (X´Â °Çµå¸®Áö ¾ÊÀ½)
+                // ì ˆëŒ€ê°’ìœ¼ë¡œ ì„¸íŒ… (XëŠ” ê±´ë“œë¦¬ì§€ ì•ŠìŒ)
                 var e = rt.localEulerAngles;
                 rt.localRotation = Quaternion.Euler(e.x, targetY, targetZ);
             }
         }
-        // 2) º¸ÀÌ°Ô ÁØºñ
+        // 2) ë³´ì´ê²Œ ì¤€ë¹„
         cutLineGO.SetActive(true);
         if (cutLineImage != null)
         {
@@ -394,7 +478,7 @@ public class CameraLovesAlisha : MonoBehaviour
             cutLineImage.DOFade(1f, cutLineFadeIn).SetUpdate(backdropUseRealtime);
         }
 
-        //3 ¾Ö´Ï ±æÀÌ ¾÷µ« ¤¾
+        //3 ì• ë‹ˆ ê¸¸ì´ ì—…ëƒ ã…
         if (cutLineAnimator != null)
         {
             if (cutLineUseUnscaled) cutLineAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;
@@ -402,10 +486,10 @@ public class CameraLovesAlisha : MonoBehaviour
             float clipLen = 1f;
             if (cutLineClip != null) clipLen = Mathf.Max(0.01f, cutLineClip.length);
 
-            // Prep Á¤Áö ±¸°£(holdWindowSec)¿¡ ±æÀÌ ¸ÂÃß±â (¿É¼Ç)
+            // Prep ì •ì§€ êµ¬ê°„(holdWindowSec)ì— ê¸¸ì´ ë§ì¶”ê¸° (ì˜µì…˜)
             if (cutLineMatchHold && windowSec > 0.01f && clipLen > 0.01f)
             {
-                // ¾Ö´Ï Á¾·á ½Ã°£ = clipLen / speed ¡æ windowSec¿¡ ¸ÂÃß·Á¸é speed = clipLen / windowSec
+                // ì• ë‹ˆ ì¢…ë£Œ ì‹œê°„ = clipLen / speed â†’ windowSecì— ë§ì¶”ë ¤ë©´ speed = clipLen / windowSec
                 cutLineAnimator.speed = Mathf.Max(0.01f, clipLen / windowSec);
             }
             else
@@ -421,7 +505,7 @@ public class CameraLovesAlisha : MonoBehaviour
     }
     public void EndPoint1Backdrop(float fadeOut = 0.12f)
     {
-        // === 0) CutLine °ü·Ã Á¤¸®: Ç×»ó ¼öÇà ===
+        // === 0) CutLine ê´€ë ¨ ì •ë¦¬: í•­ìƒ ìˆ˜í–‰ ===
         if (cutLineImage != null)
         {
             cutLineImage.DOFade(0f, Mathf.Max(0f, cutLineFadeOut))
@@ -429,22 +513,22 @@ public class CameraLovesAlisha : MonoBehaviour
         }
         if (cutLineAnimator != null)
         {
-            // È¤½Ã ¼Óµµ Á¶ÀıÇØµ×´Ù¸é ¿øº¹
+            // í˜¹ì‹œ ì†ë„ ì¡°ì ˆí•´ë’€ë‹¤ë©´ ì›ë³µ
             cutLineAnimator.speed = 1f;
         }
 
-        // === 0.5) ÀÚµ¿ ¼û±è º¹±¸: Ç×»ó ¼öÇà ===
+        // === 0.5) ìë™ ìˆ¨ê¹€ ë³µêµ¬: í•­ìƒ ìˆ˜í–‰ ===
         for (int i = 0; i < _autoHidden.Count; i++)
             if (_autoHidden[i] != null) _autoHidden[i].Show();
         _autoHidden.Clear();
-        //  ¼¿·º¼Ç¹Ù´Â È­¸é¿¡¼­ º¸ÀÌÁö ¾Ê°Ô ¡®´ë±â »óÅÂ¡¯·Î
+        //  ì…€ë ‰ì…˜ë°”ëŠ” í™”ë©´ì—ì„œ ë³´ì´ì§€ ì•Šê²Œ â€˜ëŒ€ê¸° ìƒíƒœâ€™ë¡œ
         SelectionBarManager.Instance?.PrepareHiddenStandby();
 
 
-        // === 1) ¹éµå·Ó/¿À¹ö·¹ÀÌ/·¹ÀÌ¾î º¹±¸: ½ÇÁ¦·Î ÄÒ °æ¿ì¿¡¸¸ ¼öÇà ===
+        // === 1) ë°±ë“œë¡­/ì˜¤ë²„ë ˆì´/ë ˆì´ì–´ ë³µêµ¬: ì‹¤ì œë¡œ ì¼  ê²½ìš°ì—ë§Œ ìˆ˜í–‰ ===
         if (_isIsolationActive && overlayCamera != null && backdropCanvas != null && backdropImage != null)
         {
-            // ¹éµå·Ó ÆäÀÌµå¾Æ¿ô
+            // ë°±ë“œë¡­ í˜ì´ë“œì•„ì›ƒ
             _bdFadeTW?.Kill();
             _bdFadeTW = backdropImage.DOFade(0f, Mathf.Max(0f, fadeOut))
                 .SetUpdate(backdropUseRealtime)
@@ -453,10 +537,10 @@ public class CameraLovesAlisha : MonoBehaviour
                     if (backdropCanvas != null) backdropCanvas.enabled = false;
                 });
 
-            // ¿À¹ö·¹ÀÌ Ä«¸Ş¶ó ²ô±â
+            // ì˜¤ë²„ë ˆì´ ì¹´ë©”ë¼ ë„ê¸°
             overlayCamera.gameObject.SetActive(false);
 
-            // ·¹ÀÌ¾î º¹±¸
+            // ë ˆì´ì–´ ë³µêµ¬
             RestoreLayers(_layerBackup);
             _layerBackup.Clear();
 
@@ -483,7 +567,7 @@ public class CameraLovesAlisha : MonoBehaviour
     }
     public void UnhideAutoHiddenNow()
     {
-        // ¸¶Ä¿·Î ¼û°ÜµĞ ¾ÖµéÀº ¹éµå·Ó »ç¿ë ¿©ºÎ¿Í ¹«°üÇÏ°Ô ¹«Á¶°Ç º¹±¸
+        // ë§ˆì»¤ë¡œ ìˆ¨ê²¨ë‘” ì• ë“¤ì€ ë°±ë“œë¡­ ì‚¬ìš© ì—¬ë¶€ì™€ ë¬´ê´€í•˜ê²Œ ë¬´ì¡°ê±´ ë³µêµ¬
         for (int i = 0; i < _autoHidden.Count; i++)
             if (_autoHidden[i] != null) _autoHidden[i].Show();
         _autoHidden.Clear();
@@ -491,14 +575,14 @@ public class CameraLovesAlisha : MonoBehaviour
 
     private void ResetTiltZ()
     {
-        // È­¸é ±â¿ï¾îÁü ¹æÁö: Z È¸Àü¸¸ 0À¸·Î
+        // í™”ë©´ ê¸°ìš¸ì–´ì§ ë°©ì§€: Z íšŒì „ë§Œ 0ìœ¼ë¡œ
         var e = transform.eulerAngles;
         e.z = 0f;
         transform.eulerAngles = e;
     }
     /// <summary>
-    /// ´ë»óÀÌ ÁÖ¾îÁø ºäÆ÷Æ® ÁÂÇ¥(anchor.x, anchor.y)¿¡ º¸ÀÌµµ·Ï
-    /// Ä«¸Ş¶ó Áß½ÉÀ» °è»êÇØ¼­ Æ®À©. (0~1: ÁÂ->¿ì, ÇÏ->»ó)
+    /// ëŒ€ìƒì´ ì£¼ì–´ì§„ ë·°í¬íŠ¸ ì¢Œí‘œ(anchor.x, anchor.y)ì— ë³´ì´ë„ë¡
+    /// ì¹´ë©”ë¼ ì¤‘ì‹¬ì„ ê³„ì‚°í•´ì„œ íŠ¸ìœˆ. (0~1: ì¢Œ->ìš°, í•˜->ìƒ)
     /// </summary>
     private void FocusWithViewportAnchor(
         Transform t, Vector2 anchor, Vector2 worldNudge,
@@ -509,27 +593,27 @@ public class CameraLovesAlisha : MonoBehaviour
         _moveTW?.Kill();
         _fovTW?.Kill();
 
-        // ¡°´ë»ó ÀÚÃ¼ À§Ä¡ + ±âº» offset + ¿ùµå ¹Ì¼¼Á¶Á¤¡±ÀÌ ¾ŞÄ¿ À§Ä¡¿¡ ¿À°Ô²û
+        // â€œëŒ€ìƒ ìì²´ ìœ„ì¹˜ + ê¸°ë³¸ offset + ì›”ë“œ ë¯¸ì„¸ì¡°ì •â€ì´ ì•µì»¤ ìœ„ì¹˜ì— ì˜¤ê²Œë”
         Vector3 desiredTarget = (t ? t.position : transform.position) + offset;
         desiredTarget += new Vector3(worldNudge.x, worldNudge.y, 0f);
 
-        // ÇöÀç Ä«¸Ş¶ó ±âÁØÀ¸·Î ¾ŞÄ¿ ÁÂÇ¥°¡ °¡¸®Å°´Â ¿ùµå À§Ä¡
+        // í˜„ì¬ ì¹´ë©”ë¼ ê¸°ì¤€ìœ¼ë¡œ ì•µì»¤ ì¢Œí‘œê°€ ê°€ë¦¬í‚¤ëŠ” ì›”ë“œ ìœ„ì¹˜
         float depth = Mathf.Abs((_cam != null ? _cam.transform.position.z : transform.position.z) - desiredTarget.z);
-        if (depth < 0.0001f) depth = 10f; // ¾ÈÀü»§(2D)
+        if (depth < 0.0001f) depth = 10f; // ì•ˆì „ë¹µ(2D)
 
         Vector3 worldAtAnchor = (_cam != null)
             ? _cam.ViewportToWorldPoint(new Vector3(anchor.x, anchor.y, depth))
-            : desiredTarget; // Ä«¸Ş¶ó ¾øÀ¸¸é ±×³É Áß¾Ó
+            : desiredTarget; // ì¹´ë©”ë¼ ì—†ìœ¼ë©´ ê·¸ëƒ¥ ì¤‘ì•™
 
-        // Ä«¸Ş¶ó¸¦ ¾ó¸¶³ª ¿òÁ÷ÀÌ¸é ´ë»óÀÌ ¾ŞÄ¿¿¡ ¸ÂÀ»Áö = (´ë»ó - ÇöÀç ¾ŞÄ¿¿ùµå)
+        // ì¹´ë©”ë¼ë¥¼ ì–¼ë§ˆë‚˜ ì›€ì§ì´ë©´ ëŒ€ìƒì´ ì•µì»¤ì— ë§ì„ì§€ = (ëŒ€ìƒ - í˜„ì¬ ì•µì»¤ì›”ë“œ)
         Vector3 dest = transform.position + (desiredTarget - worldAtAnchor);
-        dest.z = transform.position.z; // Z´Â °íÁ¤
+        dest.z = transform.position.z; // ZëŠ” ê³ ì •
 
         _moveTW = transform.DOMove(dest, Mathf.Max(0f, duration))
                            .SetEase(Ease.InOutSine)
                            .SetUpdate(true);
 
-        // FOV Æ®À©(¸ŞÀÎ/¿À¹ö·¹ÀÌ)
+        // FOV íŠ¸ìœˆ(ë©”ì¸/ì˜¤ë²„ë ˆì´)
         if (_cam != null)
         {
             if (_cam.orthographic)
@@ -557,11 +641,11 @@ public class CameraLovesAlisha : MonoBehaviour
         }
     }
 
-    // Å¬·¡½º ³»ºÎ ¸Ş¼­µå ¿µ¿ª ¾Æ¹« °÷¿¡ Ãß°¡
+    // í´ë˜ìŠ¤ ë‚´ë¶€ ë©”ì„œë“œ ì˜ì—­ ì•„ë¬´ ê³³ì— ì¶”ê°€
     /// <summary>
-    /// [MOD] Guard ÇÁ·Ñ·Î±×¿¡¼­ ¾²´Â 'Wait!' Ç¥½Ä ¿¬Ãâ. 
-    /// overrideHoldSec°¡ ÀÖÀ¸¸é È¦µå½Ã°£À» ±× °ªÀ¸·Î »ç¿ë.
-    /// DOTween Sequence´Â SetUpdate(true/Unscaled)·Î Å¸ÀÓ½ºÄÉÀÏ ¹«½Ã.
+    /// [MOD] Guard í”„ë¡¤ë¡œê·¸ì—ì„œ ì“°ëŠ” 'Wait!' í‘œì‹ ì—°ì¶œ. 
+    /// overrideHoldSecê°€ ìˆìœ¼ë©´ í™€ë“œì‹œê°„ì„ ê·¸ ê°’ìœ¼ë¡œ ì‚¬ìš©.
+    /// DOTween SequenceëŠ” SetUpdate(true/Unscaled)ë¡œ íƒ€ì„ìŠ¤ì¼€ì¼ ë¬´ì‹œ.
     /// </summary>
     public void ShowWaitSign(float? overrideHoldSec = null)
     {

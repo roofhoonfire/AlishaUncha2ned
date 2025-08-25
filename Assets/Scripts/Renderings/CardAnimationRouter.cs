@@ -729,7 +729,10 @@ public class CardAnimationRouter : MonoBehaviour
                 yield return new WaitForSecondsRealtime(holdSec);
 
                 // 컷라인 끝난 뒤 "그때!" Wait!
-                CameraLovesAlisha.Instance.ShowWaitSign(0.25f); // 짧게 띄움(원하면 수치 조절)
+                float guardPause = CameraLovesAlisha.Instance.ShowGuardWait(null); // 인스펙터 값 사용
+                if (guardPause > 0f)
+                    yield return new WaitForSecondsRealtime(guardPause);
+
 
                 // 백드롭 종료 및 정지 해제
                 if (enableCameraCinematic && preBG != null)
