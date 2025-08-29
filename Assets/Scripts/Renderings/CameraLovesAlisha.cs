@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
 
 using DG.Tweening;
 using System.Collections.Generic;
@@ -662,4 +663,29 @@ public class CameraLovesAlisha : MonoBehaviour
         seq.Append(img.DOFade(0f, Mathf.Max(0f, waitFadeOut)));
         seq.OnComplete(() => { if (img != null) img.gameObject.SetActive(false); });
     }
+
+    // CameraLovesAlisha.cs
+
+    // 1) 내부용: 로컬 플레이어 트랜스폼 찾아오기
+    private Transform ResolveLocalPlayerTransform()
+    {
+        try
+        {
+            var ls = LocalState.Instance;
+            if (ls != null && ls.PlayerObDic != null &&
+                ls.PlayerObDic.TryGetValue(PhotonNetwork.LocalPlayer.ActorNumber, out var go) && go != null)
+                return go.transform;
+        }
+        catch { /* no-op */ }
+        return null;
+    }
+
+    // 2) 공개용: 로컬 플레이어에게 카메라 복귀
+    public void ReturnToLocal(float? durationOverride = null)
+    {
+        // 없으면 기존 디폴트/현재 타겟으로 폴백
+        var t = ResolveLocalPlayerTransform() ?? _defaultTargetCache ?? target;
+        ReturnToDefault(durationOverride, t);
+    }
+
 }

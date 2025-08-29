@@ -832,73 +832,106 @@ public class Overmind : MonoBehaviourPunCallbacks
      //   action.InitializeEffects();
 
     }
+    IEnumerator Rumble_Mult_After_Hook(int winner)
+    {
+      
+        //lr 패킷
+        var keys = players.Keys.ToList();
 
-    IEnumerator Rumble_Multi_Action_Calc(int ttActorNum1, int ttActorNum2, ActionData ttAction1, ActionData ttAction2, ActionData ttMainAction1, ActionData ttMainAction2, int RumbleFlag)
+        if (keys.Count < 2)
         {
-        // 1, 2 승자 존재: 승자 번호
-        // 3: 동시발동
-        // 4: 00후 처맞기
-        // 5: 처맞고 00하기하기
-        //6 : 아슬아슬 피하기
-        //7: 비김
-        //3 : 원래 안맞는 놈 , 두 플레이어 모두 이동 , 둘다 헛발질
-        //애니메이션 재생 순서가 중요한 경우
-        //00후 처맞기, 처맞고 00하기, 아슬아슬 피하기
-        //그 외에는 두 액션 모두 동시에 출력되도 됨, 
+            Debug.LogError("플레이어 수가 2명 미만입니다.");
+            yield break;
+        }
+
+        int var1ActorNum = keys[0];
+        int var2ActorNum = keys[1];
+
+        LocalRenderingData var1 = RenderingConverter.FromPlayer(players[var1ActorNum]);
+        LocalRenderingData var2 = RenderingConverter.FromPlayer(players[var2ActorNum]);
+
+        string var1json = JsonConvert.SerializeObject(var1);
+        string var2json = JsonConvert.SerializeObject(var2);
+        //lr 패킷
+
+
+
+
+        //여기서 출력되어야하는 애니메이션을 한번에 보여주면 됨 그냥(순차적으로)
+        //한번의 해프터 후커당 하나의 애니메이션이 출력된다고 생각해라 게이야 
        
+            photonView.RPC(nameof(RPC_Rumble_Play_Multi_Action_M2C), RpcTarget.All, winner, var1json, var2json);
+
+        yield return new WaitUntil(() => syncCount == 2); //나중에 수정하든가 
+        syncCount = 0;
+
+    }
+    IEnumerator Rumble_Multi_Action_Calc(int ttActorNum1, int ttActorNum2, ActionData ttAction1, ActionData ttAction2, ActionData ttMainAction1, ActionData ttMainAction2, int winner)
+        {
+       
+
+
+        // winner 는 액터 넘버 , 0일 경우 그냥 아무 일 도 없음, 3일 경우 둘다 아야함
+
+
+
+
+
         // GuardOrCounter는 현재 행동하는 액터의 상대 액터의 큐에 삽입되있는 바로 다음 액션임
         //action이 지금 발동되는 액션
 
-        if (ttAction2 != ttMainAction2) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
+       /* if (ttAction2 != ttMainAction2) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
         {
             yield return ttMainAction2.Norm_ProcessHook(HookType.Guard, ttActorNum2, ttActorNum1, ttAction1, ttMainAction1, ttMainAction2);
             yield return Norm_After_Hook((ttActorNum2, ttMainAction2), HookType.Guard, false, null); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
         }
-
+       */
 
         yield return ttAction1.Norm_ProcessHook(HookType.Activate, ttActorNum1, ttActorNum2, ttAction1, ttMainAction2, ttMainAction1);
-        yield return Norm_After_Hook((ttActorNum1, ttAction1), HookType.Activate, false, null);
+        //yield return Norm_After_Hook((ttActorNum1, ttAction1), HookType.Activate, false, null);
 
+        yield return ttAction2.Norm_ProcessHook(HookType.Activate, ttActorNum2, ttActorNum1, ttAction2, ttMainAction1, ttMainAction2);
+        //yield return Norm_After_Hook((ttActorNum2, ttAction2), HookType.Activate, false, null);
 
-        //요부분만 노말 훅이아니라 럼블 훅으로 바꿔주면 될지도?
-
-
-        if (ttAction2 != ttMainAction2) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
-        {
-
-            yield return ttMainAction2.Norm_ProcessHook(HookType.Counter, ttActorNum2, ttActorNum1, ttAction1, ttMainAction1, ttMainAction2);
-            yield return Norm_After_Hook((ttActorNum2, ttMainAction2), HookType.Counter, false, null);
-        }
-
-
-
-        if (ttAction1 != ttMainAction1) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
-        {
-            yield return ttMainAction1.Norm_ProcessHook(HookType.Guard, ttActorNum1, ttActorNum2, ttAction2, ttMainAction2, ttMainAction1);
-            yield return Norm_After_Hook((ttActorNum1, ttMainAction1), HookType.Guard, false, null); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
-        }
-
-
-        yield return ttAction1.Norm_ProcessHook(HookType.Activate, ttActorNum2, ttActorNum1, ttAction2, ttMainAction1, ttMainAction2);
-        yield return Norm_After_Hook((ttActorNum2, ttAction2), HookType.Activate, false, null);
-
+        yield return Rumble_Mult_After_Hook(winner);
 
         //요부분만 노말 훅이아니라 럼블 훅으로 바꿔주면 될지도?
 
 
-        if (ttAction1 != ttMainAction1) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
-        {
+        /*  if (ttAction2 != ttMainAction2) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
+          {
 
-            yield return ttMainAction1.Norm_ProcessHook(HookType.Counter, ttActorNum1, ttActorNum2, ttAction2, ttMainAction2, ttMainAction1);
-            yield return Norm_After_Hook((ttActorNum1, ttMainAction1), HookType.Counter, false, null);
-        }
+              yield return ttMainAction2.Norm_ProcessHook(HookType.Counter, ttActorNum2, ttActorNum1, ttAction1, ttMainAction1, ttMainAction2);
+              yield return Norm_After_Hook((ttActorNum2, ttMainAction2), HookType.Counter, false, null);
+          }
+        */
 
+
+        /*     if (ttAction1 != ttMainAction1) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
+             {
+                 yield return ttMainAction1.Norm_ProcessHook(HookType.Guard, ttActorNum1, ttActorNum2, ttAction2, ttMainAction2, ttMainAction1);
+                 yield return Norm_After_Hook((ttActorNum1, ttMainAction1), HookType.Guard, false, null); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
+             }
+        */
+
+
+
+        //요부분만 노말 훅이아니라 럼블 훅으로 바꿔주면 될지도?
+
+        /*
+                if (ttAction1 != ttMainAction1) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
+                {
+
+                    yield return ttMainAction1.Norm_ProcessHook(HookType.Counter, ttActorNum1, ttActorNum2, ttAction2, ttMainAction2, ttMainAction1);
+                    yield return Norm_After_Hook((ttActorNum1, ttMainAction1), HookType.Counter, false, null);
+                }
+        */
 
 
 
 
     }
-    IEnumerator Rumble_Single_Action_Calc(int ttActorNum, ActionData ttAction, ActionData ttOpAction, ActionData ttOpMainAction, ActionData ttMainAction, int RumbleFlag)
+    IEnumerator Rumble_Single_Action_Calc(int ttActorNum, ActionData ttAction, ActionData ttOpAction, ActionData ttOpMainAction, ActionData ttMainAction, int winnerNum)
     {
         // 1, 2 승자 존재: 승자 번호
         // 3: 동시발동
@@ -914,28 +947,28 @@ public class Overmind : MonoBehaviourPunCallbacks
 
         // GuardOrCounter는 현재 행동하는 액터의 상대 액터의 큐에 삽입되있는 바로 다음 액션임
         //action이 지금 발동되는 액션
-
+/*
         if (ttOpAction != ttOpMainAction) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
         {      
             yield return ttOpMainAction.Norm_ProcessHook(HookType.Guard, ttOpActorNum, ttActorNum, ttAction, ttMainAction, ttOpMainAction);
             yield return Norm_After_Hook((ttOpActorNum, ttOpMainAction), HookType.Guard, false, null); //여기서 해당 액션이 추가 선택이 잇다 하면 그것까지 넘겨줌
         }
 
-
+        */
         yield return ttAction.Norm_ProcessHook(HookType.Activate, ttActorNum, ttOpActorNum, ttAction, ttOpMainAction, ttMainAction);
-        yield return Norm_After_Hook((ttActorNum, ttAction), HookType.Activate, false, null);
+        yield return Rumble_Single_After_Hook((ttActorNum, ttAction), HookType.Activate,  null);
 
 
         //요부분만 노말 훅이아니라 럼블 훅으로 바꿔주면 될지도?
 
 
 
-        if (ttOpAction != ttOpMainAction) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
+     /*   if (ttOpAction != ttOpMainAction) //지금 격돌하는 상대의 액션이 메인 아닐때만 가드, 카운터 발동 
         {
 
         yield return ttOpMainAction.Norm_ProcessHook(HookType.Counter, ttOpActorNum, ttActorNum, ttAction, ttMainAction, ttOpMainAction);
         yield return Norm_After_Hook((ttOpActorNum, ttOpMainAction), HookType.Counter, false, null);
-        }
+        }*/
         //nth 액션이랑 비교해서 순서대로 실행하기 
         //여기선 action의 반대 플레이어가 카운터의 주체이므로 헷갈리지 말자 ㅎㅎ
 
@@ -1266,16 +1299,16 @@ public class Overmind : MonoBehaviourPunCallbacks
         List<string> actionJsonList = new List<string>();
 
         foreach (var (actNum, action) in templist)
-        {
-            if (action.actionId == 1)
+        {//여기 고치면 됨
+          //  if (action.actionId == 1)
             {
                 var packet = new Dictionary<string, object>
-            {
-                { "actorNumber", actNum },
-                { "action", action }
-            };
-                actionJsonList.Add(JsonConvert.SerializeObject(packet));
-                howmany++;
+                 {
+                  { "actorNumber", actNum },
+                    { "action", action }
+                };
+                 actionJsonList.Add(JsonConvert.SerializeObject(packet));
+                 howmany++;
             }
         }
 
@@ -1355,6 +1388,35 @@ public class Overmind : MonoBehaviourPunCallbacks
         var data2 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson2);
 
         LocalRenderingManager.Instance.Rendering_Norm_Action(actorNumber, data1, data2, action, h, action2, isGA );
+
+    }
+
+    [PunRPC]
+    void RPC_Rumble_Play_Single_Action_M2C(int actorNumber, string actionJson, string lrjson1, string lrjson2, HookType h, string actionJson2 )
+    {
+        //actionJson2 는 가드시 상대 액션 애니메용
+        var action = JsonConvert.DeserializeObject<ActionData>(actionJson);
+        var action2 = JsonConvert.DeserializeObject<ActionData>(actionJson2);
+        var data1 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson1);
+
+        var data2 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson2);
+
+        LocalRenderingManager.Instance.Rendering_Rumble_Single_Action(actorNumber, data1, data2);
+
+    }
+
+
+    [PunRPC]
+    void RPC_Rumble_Play_Multi_Action_M2C(int winner,  string lrjson1, string lrjson2 )
+    {
+
+        //winner 0 no one 1 2, actor ,m 3 both dam
+        //actionJson2 는 가드시 상대 액션 애니메용
+        var data1 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson1);
+
+        var data2 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson2);
+
+        LocalRenderingManager.Instance.Rendering_Rumble_Single_Action(winner, data1, data2);
 
     }
 
@@ -1492,14 +1554,20 @@ public class Overmind : MonoBehaviourPunCallbacks
         var r1 = JsonConvert.DeserializeObject<LocalRenderingData>(renderJson1);
         var r2 = JsonConvert.DeserializeObject<LocalRenderingData>(renderJson2);
 
+        
        var myAction =  LocalRenderingManager.Instance.Rendering_Before_Tile_Choose_ShowDown(actionList, r1, r2);
-        //
+        //상대 캐릭터 타일 추즈 애니메
+
+        var opGo = LocalState.Instance.PlayerObDic[GetOtherPlayerNumber(PhotonNetwork.LocalPlayer.ActorNumber)];
+        var opAnim = opGo.GetComponentInChildren<Animator>();
+        opAnim.SetTrigger("Trig_TileChoose");
 
 
         //조건을 내 액션은 이동일 경우에는 암것도 안하는 걸로 해야한다리오리우스
         if (myAction.actionId !=1)
         {
             //상대 생각중!
+            //여기서 거르기 때문에 ㄴshow_down_ChoooseTIle 수정 가능
 
 
         }
@@ -1593,7 +1661,44 @@ public class Overmind : MonoBehaviourPunCallbacks
         syncCount = 0;
 
     }
+    IEnumerator Rumble_Single_After_Hook((int actorNum, ActionData action) Nowhooker, HookType h,  ActionData opAction)
+    {
+        if (!Nowhooker.action.effects.Any(effect => effect.hookType == h)) //이번 액션에 해당 훅없으면 스킵.
+            yield break;
 
+        //lr 패킷
+        var keys = players.Keys.ToList();
+
+        if (keys.Count < 2)
+        {
+            Debug.LogError("플레이어 수가 2명 미만입니다.");
+            yield break;
+        }
+
+        int var1ActorNum = keys[0];
+        int var2ActorNum = keys[1];
+
+        LocalRenderingData var1 = RenderingConverter.FromPlayer(players[var1ActorNum]);
+        LocalRenderingData var2 = RenderingConverter.FromPlayer(players[var2ActorNum]);
+
+        string var1json = JsonConvert.SerializeObject(var1);
+        string var2json = JsonConvert.SerializeObject(var2);
+        //lr 패킷
+
+
+
+
+        //여기서 출력되어야하는 애니메이션을 한번에 보여주면 됨 그냥(순차적으로)
+        //한번의 해프터 후커당 하나의 애니메이션이 출력된다고 생각해라 게이야 
+        string actionJson = JsonConvert.SerializeObject(Nowhooker.action);
+        string actionJson2 = JsonConvert.SerializeObject(opAction);
+        Debug.Log($"{Nowhooker.action.nthaction}의 렌더링하라고 마스터 클라이언트 요청 :: 렐렐");
+        photonView.RPC(nameof(RPC_Rumble_Play_Single_Action_M2C), RpcTarget.All, Nowhooker.actorNum, actionJson, var1json, var2json, h, actionJson2);
+
+        yield return new WaitUntil(() => syncCount == 2); //나중에 수정하든가 
+        syncCount = 0;
+
+    }
 
     IEnumerator Dot_After_Hook((int actorNum, ActionData action) Nowhooker, HookType h)
     {
@@ -1829,6 +1934,7 @@ public class Overmind : MonoBehaviourPunCallbacks
                     //비기면 그냥 튕겨나가자 .. 아무 일도 일어나지 않고
                     //yield return Rumble_Action_Calc(a1.actor, a2.actor, a1.action, a2.action, a2soprightnextmove, a1soprightnextmove, showdownCircFlag);
                     //여기엔 걍 멀티 액션 박는게 맞을지도?
+                    yield return Rumble_Multi_Action_Calc(a1.actor, a2.actor, a1.action, a2.action, a1MainAction, a2MainAction, 3);
 
                 }
 
@@ -1840,7 +1946,7 @@ public class Overmind : MonoBehaviourPunCallbacks
             {
                 //생각해보면 안맞추면 발동된다는게 너무 개사기 같아서 
                 showdownCircFlag = 5;
-                yield return Rumble_Single_Action_Calc(a1.actor, a1.action, a2.action, a2MainAction, a1MainAction, showdownCircFlag);
+                yield return Rumble_Single_Action_Calc(a1.actor, a1.action, a2.action, a2MainAction, a1MainAction, a1.actor);
 
             }
 
@@ -1849,15 +1955,17 @@ public class Overmind : MonoBehaviourPunCallbacks
 
                 //생각해보면 안맞추면 발동된다는게 너무 개사기 같아서 
                 showdownCircFlag = 4;
-                yield return Rumble_Single_Action_Calc(a2.actor, a2.action, a1.action, a1MainAction, a2MainAction, showdownCircFlag);
+                yield return Rumble_Single_Action_Calc(a2.actor, a2.action, a1.action, a1MainAction, a2MainAction, a2.actor);
 
             }
             else {
                 //둘다 빗나감
-                showdownCircFlag = 3;
+                showdownCircFlag = 0;
                 //뭔가 젖병신같음 ㅋ
                 //yield return MasterRumbleCalc(a1.actor, a2.actor, a1.action, a2.action, a2soprightnextmove, a1soprightnextmove, showdownCircFlag);
                 //여기엔 걍 멀티 액션 박는게 맞을지도?
+                yield return Rumble_Multi_Action_Calc(a1.actor, a2.actor, a1.action, a2.action, a1MainAction, a2MainAction, showdownCircFlag);
+
             }
         }
         else
@@ -1871,7 +1979,7 @@ public class Overmind : MonoBehaviourPunCallbacks
                     if (IsInEffectRange(a2.actor, a2.action, a1.actor))
                     {
                         //이동 후 처 맞기 플래그 on
-                        showdownCircFlag = 4;
+                        showdownCircFlag = 2;
 
                     }
                     else
@@ -1879,11 +1987,11 @@ public class Overmind : MonoBehaviourPunCallbacks
                         if (a2.action.effectTiles.Contains(prevPos))
                         {
                             //that was close 플래그 온
-                            showdownCircFlag = 6;
+                            showdownCircFlag = 0;
                         }
                         else   //원래 안맞는놈
                         {       
-                            showdownCircFlag = 3;
+                            showdownCircFlag = 0;
                         }
 
                     }
@@ -1895,13 +2003,13 @@ public class Overmind : MonoBehaviourPunCallbacks
                     {
                         //개같이 처맞음 플래그 온
                         //처맞고 이동On
-                        showdownCircFlag = 5;
+                        showdownCircFlag = 1;
 
                     }
                     else
                     {
                         //헛손질 후 이동 on
-                        showdownCircFlag = 3;
+                        showdownCircFlag = 0;
                     }
                 }
 
@@ -1912,7 +2020,7 @@ public class Overmind : MonoBehaviourPunCallbacks
             else //둘다 평화로운 이동이다 
             {
                 showdownCircFlag = 3;
-                yield return Rumble_Multi_Action_Calc(a1.actor, a2.actor, a1.action, a2.action, a1MainAction, a2MainAction, showdownCircFlag);
+                yield return Rumble_Multi_Action_Calc(a1.actor, a2.actor, a1.action, a2.action, a1MainAction, a2MainAction, 0);
 
 
             }

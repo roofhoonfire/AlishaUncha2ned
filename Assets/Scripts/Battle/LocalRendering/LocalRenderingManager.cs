@@ -125,7 +125,17 @@ public class LocalRenderingManager : MonoBehaviour
         AlertDialogue.Instance.StartDialogue(null, 0, 0, nthFaceOff, DialogueType.FaceOff);
 
     }
+    public void Rendering_Rumble_Single_Action(int winner, LocalRenderingData data1, LocalRenderingData data2)
+    {
 
+        //
+        StartCoroutine(RumbleCine.Instance.PlayRumbleAndWait(winner, data1, data2));
+
+
+
+    }
+
+   
     public void Rendering_Norm_Action(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h, ActionData OpAction, bool GA)
     {
         StartCoroutine(Rendering_Norm_Action_Co(actorNum, data1, data2, action, h, OpAction, GA));
@@ -302,6 +312,31 @@ public class LocalRenderingManager : MonoBehaviour
         Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
     }
 
+    public IEnumerator Rendering_After_Anim_Pack(LocalRenderingData data1, LocalRenderingData data2)
+    {
+
+        var diffs = CopyandDifferences(data1, data2);
+        yield return StartCoroutine(AnimateStatChange("defense", diffs));
+        yield return StartCoroutine(AnimateStatChange("hp", diffs));
+        yield return StartCoroutine(AnimateStatChange("remainingCost", diffs));
+
+        Debug.Log("자자 UI 바뀐거 잘밧지?");
+
+        // 위치 최종 스냅(이동 라우터에서 이미 워프했더라도 동일 좌표로 한번 더 정렬 → 문제 없음)
+        //여기서 넉백류 애니메이션 넣으면 좋을 듯 ㅎㅎ
+        //LocalState.Instance.PlayerObDic[data1.actorNum].transform.position = tileIndextoPosition(data1.curpos).position;
+        //LocalState.Instance.PlayerObDic[data2.actorNum].transform.position = tileIndextoPosition(data2.curpos).position;
+
+        ApplyDiffsToLocalRenderingData(diffs);
+        StealthPlayer(diffs);
+        ElementRenderer.Instance.RenderElementsFromDiffs(diffs);
+        Debug.Log("자자 노멀 액션 렌더링 다 끝, 이제 렌더링 섭밑만 하면됨");
+
+        // [MOD] 혹시 백드롭을 안 썼거나 중간 스킵 경로였을 때를 대비한 안전 복구
+        CameraLovesAlisha.Instance?.UnhideAutoHiddenNow();
+
+        Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
+    }
 
 
     public void Rendering_Dot_Action(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h)
@@ -392,15 +427,15 @@ public class LocalRenderingManager : MonoBehaviour
 
         ActionData myAction = myActionTuple.action;
 
-        if (myAction.actionId == 1)
-        {
-            AlertDialogue.Instance.StartDialogue(myAction, 0, 0, 0, DialogueType.TileChoose);
+     //   if (myAction.actionId == 1)
+      //  {
+       //     AlertDialogue.Instance.StartDialogue(myAction, 0, 0, 0, DialogueType.TileChoose);
 
-        }
-        else
-        {
-            AlertDialogue.Instance.StartDialogue(null, 0, 0, 0, DialogueType.Wait);
-        }
+        //}/
+       // else
+        //{
+          //  AlertDialogue.Instance.StartDialogue(null, 0, 0, 0, DialogueType.Wait);
+       // }
 
 
         List<RenderDiff> diffs = CopyandDifferences(data1, data2);

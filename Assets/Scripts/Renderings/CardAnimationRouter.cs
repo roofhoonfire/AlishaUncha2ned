@@ -249,7 +249,10 @@ public class CardAnimationRouter : MonoBehaviour
         // 포인트1 직후 Miss면 복귀
         if (missFlow && enableCameraCinematic && camMove_Return && CameraLovesAlisha.Instance != null)
         {
-            CameraLovesAlisha.Instance.ReturnToDefault(cameraReturnDuration, attackerGO.transform);
+            if (hook == HookType.Activate)
+                CameraLovesAlisha.Instance.ReturnToLocal(cameraReturnDuration);   // ★ 로컬로
+            else
+                CameraLovesAlisha.Instance.ReturnToDefault(cameraReturnDuration, attackerGO.transform);
         }
 
         // === Attack 진입 ===
@@ -310,7 +313,10 @@ public class CardAnimationRouter : MonoBehaviour
 
         // 종료 복귀
         if (!missFlow && enableCameraCinematic && camMove_Return && CameraLovesAlisha.Instance != null)
-            CameraLovesAlisha.Instance.ReturnToDefault(cameraReturnDuration, attackerGO.transform);
+            if (hook == HookType.Activate)
+                CameraLovesAlisha.Instance.ReturnToLocal(cameraReturnDuration);   // ★ 로컬로
+            else
+                CameraLovesAlisha.Instance.ReturnToDefault(cameraReturnDuration, attackerGO.transform);
     }
 
     // [MOD] Guard 전용 — 가드 주체(피격자)의 전용 애니만 깔끔히 재생
