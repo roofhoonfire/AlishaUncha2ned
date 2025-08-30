@@ -1678,6 +1678,7 @@ GameObject:
   - component: {fileID: 385564178}
   - component: {fileID: 385564179}
   - component: {fileID: 385564180}
+  - component: {fileID: 385564182}
   - component: {fileID: 385564181}
   m_Layer: 0
   m_Name: TimeLineCon
@@ -1786,6 +1787,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rumbleDirector: {fileID: 385564176}
+  ctx: {fileID: 385564182}
 --- !u!114 &385564180
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1802,6 +1804,7 @@ MonoBehaviour:
     m_Signals:
     - {fileID: 11400000, guid: ebce3ffb29b14f1479ca13d79c9020f9, type: 2}
     - {fileID: 11400000, guid: ae69e7889f0aa984e9ea4df57d151137, type: 2}
+    - {fileID: 11400000, guid: 36fab48a9ce4b7348941eabda199ec37, type: 2}
     m_Events:
     - m_PersistentCalls:
         m_Calls:
@@ -1831,6 +1834,20 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 385564181}
+          m_TargetAssemblyTypeName: RumbleSignals, Assembly-CSharp
+          m_MethodName: During_Rumble_Position_Change
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!114 &385564181
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1843,6 +1860,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e5434112483539478ffc0f830b2170a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ctx: {fileID: 385564182}
+--- !u!114 &385564182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 385564175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99f7a27ce2020414497274ab28ddafc9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actorNum: 0
 --- !u!1 &412048787
 GameObject:
   m_ObjectHideFlags: 0

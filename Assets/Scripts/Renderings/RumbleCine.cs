@@ -11,6 +11,7 @@ public class RumbleCine : MonoBehaviour
 
     public static RumbleCine Instance;
 
+    [SerializeField] private RumbleContext ctx; // ← 인스펙터에 연결
 
 
 
@@ -28,6 +29,18 @@ public class RumbleCine : MonoBehaviour
     }
     public System.Collections.IEnumerator PlayRumbleAndWait(int actorNum, LocalRenderingData data1, LocalRenderingData data2)
     {
+
+        if (ctx != null)
+        {
+            ctx.actorNum = actorNum;
+            ctx.data1 = data1;
+            ctx.data2 = data2;
+        }
+        else
+        {
+            Debug.LogWarning("[RumbleCine] RumbleContext가 연결되지 않았음.");
+        }
+
         _rumbleDirector.time = 0;
         _rumbleDirector.Evaluate();
         _rumbleDirector.Play();

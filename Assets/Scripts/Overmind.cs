@@ -1300,16 +1300,16 @@ public class Overmind : MonoBehaviourPunCallbacks
 
         foreach (var (actNum, action) in templist)
         {//여기 고치면 됨
-          //  if (action.actionId == 1)
-            {
-                var packet = new Dictionary<string, object>
+            if (action.actionId == 1)
+                howmany++;
+
+            var packet = new Dictionary<string, object>
                  {
                   { "actorNumber", actNum },
                     { "action", action }
                 };
                  actionJsonList.Add(JsonConvert.SerializeObject(packet));
-                 howmany++;
-            }
+            
         }
 
         // 렌더링 정보
