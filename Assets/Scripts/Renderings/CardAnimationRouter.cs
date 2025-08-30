@@ -171,6 +171,8 @@ public class CardAnimationRouter : MonoBehaviour
 
     // ================== 오케스트레이션 ==================
     private IEnumerator PlayOrchestrated(
+        LocalRenderingData data1,
+        LocalRenderingData data2,
         Animator attackerAnim, Animator victimAnim,
         GameObject attackerGO, GameObject victimGO,
         CardAnimationDB.CardAnimEntry entry,
@@ -245,6 +247,13 @@ public class CardAnimationRouter : MonoBehaviour
                 }
             }
         }
+
+
+        //여기다 집어넣어보자//
+        LocalState.Instance.PlayerObDic[data1.actorNum].transform.position = tileIndextoPosition(data1.curpos).position;
+        LocalState.Instance.PlayerObDic[data2.actorNum].transform.position = tileIndextoPosition(data2.curpos).position;
+
+
 
         // 포인트1 직후 Miss면 복귀
         if (missFlow && enableCameraCinematic && camMove_Return && CameraLovesAlisha.Instance != null)
@@ -630,13 +639,16 @@ public class CardAnimationRouter : MonoBehaviour
 
     // [MOD] 외부 API
     public IEnumerator PlayCo(
+        LocalRenderingData data1,
+        LocalRenderingData data2,
         string cardCode, int attackerActorNum, HookType hook,
         int? victimActorNum = null, HitResolution? forcedOutcome = null,
         bool shouldGuardCinematic = false,          // Guard 프롤로그 수행 여부
         bool skipPoint1DueToGuard = false,          // Activate를 Point2부터(Prep 카메라 연출 스킵)
         string opponentActivateCardCode = null,     // Guard 프롤로그에서 참조할 공격자 카드
-        int? opponentActorNum = null                // Guard 프롤로그에서 초점 맞출 공격자 actor
-    )
+        int? opponentActorNum = null               // Guard 프롤로그에서 초점 맞출 공격자 actor
+        
+        )
     {
         if (LocalState.Instance == null || LocalState.Instance.PlayerObDic == null) yield break;
         if (!LocalState.Instance.PlayerObDic.TryGetValue(attackerActorNum, out var attackerGO) || attackerGO == null) yield break;
@@ -775,7 +787,7 @@ public class CardAnimationRouter : MonoBehaviour
 
         // ===== 일반/Activate 경로 =====
         yield return StartCoroutine(
-            PlayOrchestrated(attackerAnim, victimAnim, attackerGO, victimGO, entry, hook, forcedOutcome, skipPoint1Cine: skipPoint1DueToGuard)
+            PlayOrchestrated(data1, data2, attackerAnim, victimAnim, attackerGO, victimGO, entry, hook, forcedOutcome, skipPoint1Cine: skipPoint1DueToGuard)
         );
 
         // 백드롭 페이드아웃 시간 대기(있다면)
@@ -793,11 +805,12 @@ public class CardAnimationRouter : MonoBehaviour
         }
     }
 
-    public void Play(string cardCode, int attackerActorNum, HookType hook, int? victimActorNum = null)
+    //여기도 수정함
+   /* public void Play(string cardCode, int attackerActorNum, HookType hook, int? victimActorNum = null)
     {
         StartCoroutine(PlayCo(cardCode, attackerActorNum, hook, victimActorNum));
     }
-
+   */
     private bool HasLeftState(Animator anim, string stateName, int layer)
     {
         var cur = anim.GetCurrentAnimatorStateInfo(layer);
@@ -808,5 +821,14 @@ public class CardAnimationRouter : MonoBehaviour
             if (next.IsName(stateName)) return false;
         }
         return true;
+    }
+
+    private Transform tileIndextoPosition(int tileindex)
+    {
+
+        //이거 로컬에서도 그리드 초기화 해야함 
+        return GridManagement.Instance?.tileObjects[tileindex].transform.Find("charpoint");
+        //리턴 된 놈은 Transform으로 받고 .transform.position으로 써야 작동
+
     }
 }

@@ -211,6 +211,8 @@ public class LocalRenderingManager : MonoBehaviour
                     // [중요] Guard에서는 피격자 HideEmAll 하지 않음!
                     yield return StartCoroutine(
                         CardAnimationRouter.Instance.PlayCo(
+                             data1,
+                            data2,
                             action.cardcode,                 // 지금(피격자) 카드
                             actorNum,                        // 지금(피격자) actor
                             HookType.Guard,
@@ -245,6 +247,8 @@ public class LocalRenderingManager : MonoBehaviour
 
                     yield return StartCoroutine(
                         CardAnimationRouter.Instance.PlayCo(
+                             data1,
+                            data2,
                             action.cardcode,
                             actorNum,            // 공격자
                             HookType.Activate,
@@ -273,6 +277,8 @@ public class LocalRenderingManager : MonoBehaviour
 
                     yield return StartCoroutine(
                         CardAnimationRouter.Instance.PlayCo(
+                            data1,
+                            data2,
                             action.cardcode, actorNum, h,
                             victimActorNum: null,
                             forcedOutcome: null

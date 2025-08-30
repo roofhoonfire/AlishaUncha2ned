@@ -159,8 +159,14 @@ public class CardModeState : MonoBehaviour
 
             if (apData.isBlinded)
             {
+                Debug.Log("장님련 ㅋㅋ");
                 Transform blood = cardGO.transform.Find("BloodShed");
-                if (blood != null) blood.gameObject.SetActive(true);
+                if (blood != null)
+                {
+                    blood.gameObject.SetActive(true);
+                    Debug.Log("안보여유 ㅋㅋ");
+
+                }
             }
 
             var info = cardGO.GetComponent<EachCardInfo>();

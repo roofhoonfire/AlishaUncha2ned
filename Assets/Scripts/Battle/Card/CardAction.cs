@@ -36,7 +36,7 @@ public class CardAction : MonoBehaviour
 
         ActionData Blindoff = new ActionData
         {
-            actionId = 99,
+            actionId = 203, //Àå´Ô ´«±òÀº 203 ÀÕ´Â °Å ´Ù Áö¿ì°í ÇØ¾ßÇÔ
             actionClock = actualClock,
             rumblePoint = 0,
             defense = 0,
