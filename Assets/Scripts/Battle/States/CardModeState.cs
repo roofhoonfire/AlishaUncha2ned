@@ -160,14 +160,28 @@ public class CardModeState : MonoBehaviour
             if (apData.isBlinded)
             {
                 Debug.Log("장님련 ㅋㅋ");
-                Transform blood = cardGO.transform.Find("BloodShed");
-                if (blood != null)
-                {
-                    blood.gameObject.SetActive(true);
-                    Debug.Log("안보여유 ㅋㅋ");
 
+                // VisualRoot → BloodShed 경로로 찾기
+                Transform visualRoot = cardGO.transform.Find("VisualRoot");
+                if (visualRoot != null)
+                {
+                    Transform blood = visualRoot.Find("BloodShed");
+                    if (blood != null)
+                    {
+                        blood.gameObject.SetActive(true);
+                        Debug.Log("안보여유 ㅋㅋ");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("VisualRoot 아래에 BloodShed 없음");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("VisualRoot 없음");
                 }
             }
+
 
             var info = cardGO.GetComponent<EachCardInfo>();
             if (info == null) { Debug.LogWarning("EachCardInfo 없음"); continue; }

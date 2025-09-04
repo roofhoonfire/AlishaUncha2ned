@@ -30,18 +30,19 @@ public class CardAction : MonoBehaviour
     }
     public void StartDot_Blind_Off(int ActorNum, int amount)
     {
-
-
         int actualClock = amount;    // clock 간격으로 증가
+
+        // 먼저 기존 BlindOff(203) 액션 제거
+        Overmind.Instance.actionQueue.RemoveAll(tuple => tuple.action.actionId == 203);
 
         ActionData Blindoff = new ActionData
         {
-            actionId = 203, //장님 눈깔은 203 잇는 거 다 지우고 해야함
+            actionId = 203, // 장님 눈깔 제거용
             actionClock = actualClock,
             rumblePoint = 0,
             defense = 0,
             hasOtherExecutedSinceInsertion = false,
-            cardname = "앞을 볼수 잇어요 이제 ㅠㅠ",
+            cardname = "앞을 볼 수 있어요 이제 ㅠㅠ",
             nthaction = ++Overmind.Instance.globalaction,
             tileType = -1,
             zoneIndex = 4,
@@ -50,6 +51,7 @@ public class CardAction : MonoBehaviour
         };
 
         Blindoff.effects.Add(new CardEffect(HookType.Dot, EffectType.Dot_Blind_Off, 0, 0));
+
         Overmind.Instance.actionQueue.Add((0, Blindoff, actualClock));
 
         // 정렬
@@ -59,6 +61,7 @@ public class CardAction : MonoBehaviour
                 : a.action.nthaction.CompareTo(b.action.nthaction)
         );
     }
+
     public void Make_Op_Burn(int hOpActorNum, int amount)
     {
         for (int i = 0; i < amount; i++)

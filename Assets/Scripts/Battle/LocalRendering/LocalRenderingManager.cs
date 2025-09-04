@@ -20,7 +20,8 @@ public class LocalRenderingManager : MonoBehaviour
     public TextMeshProUGUI OpBound;
 
     public static LocalRenderingManager Instance;
-
+    [SerializeField] BoundImageConductor myBoundConductor;
+    [SerializeField] BoundImageConductor opBoundConductor;
 
     public class RenderDiff
     {
@@ -47,10 +48,15 @@ public class LocalRenderingManager : MonoBehaviour
 
         //주술 선택 애니메이션 출력 등 
 
+        myBoundConductor.UpdateByIndex(GetMine(data1, data2).boundIndex);
+        //opBoundConductor.UpdateByIndex(Getop(data1, data2).boundIndex);
+
 
         //data1과 기존의 LocalRenderingData.localRenderingDatas 의 값과 다른 것들 을 애니메로 촤촤촤
         ApplyImmediateUI(data1);
         ApplyImmediateUI(data2);
+
+
 
         Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
     }
@@ -86,23 +92,38 @@ public class LocalRenderingManager : MonoBehaviour
         {
             myHP.text = data.hp.ToString();
             mydefense.text = data.defense.ToString();
-            myBound.text = data.bounds[data.boundIndex].ToString(); // 필요하면 다른 방식으로 포맷
+         //   myBound.text = data.bounds[data.boundIndex].ToString(); // 필요하면 다른 방식으로 포맷
         }
         else
         {
             opHP.text = data.hp.ToString();
             opdefense.text = data.defense.ToString();
-            OpBound.text = data.bounds[data.boundIndex].ToString(); // 마찬가지
+            //  OpBound.text = data.bounds[data.boundIndex].ToString(); // 마찬가지
         }
     }
+    // 딱 2개 비교해서 로컬 플레이어와 actorNum이 같은 객체를 리턴
+    public static LocalRenderingData GetMine(LocalRenderingData a, LocalRenderingData b)
+    {
+        var my = PhotonNetwork.LocalPlayer.ActorNumber;
+        if (a != null && a.actorNum == my) return a;
+        if (b != null && b.actorNum == my) return b;
+        return null; // 못 찾으면 null
+    }
 
+    public static LocalRenderingData GetOp(LocalRenderingData a, LocalRenderingData b)
+    {
+        var my = PhotonNetwork.LocalPlayer.ActorNumber;
+        if (a != null && a.actorNum == my) return b;
+        if (b != null && b.actorNum == my) return a;
+        return null; // 못 찾으면 null
+    }
     public void Rendering_GameStart(LocalRenderingData data1, LocalRenderingData data2)
     {
 
         //게임시작 렌더링 연출 넣고 싶은거 집어 옇어라 스발아
-        
-        
-        
+
+
+
         ApplyFacingFromRightOrLeft(data1.actorNum, data1);
         ApplyFacingFromRightOrLeft(data2.actorNum, data2);
 
@@ -113,13 +134,17 @@ public class LocalRenderingManager : MonoBehaviour
         ApplyImmediateUI(data1);
         ApplyImmediateUI(data2);
 
+        myBoundConductor.InitBounds(GetMine(data1, data2).bounds);
+       // opBoundConductor.InitBounds(GetOp(data1, data2).bounds);
+
+
         //싱크는 아래서 넣어준다
         //
         //Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
 
 
     }
-    public  void Rendering_FaceOff_Start(int nthFaceOff)
+    public void Rendering_FaceOff_Start(int nthFaceOff)
     {
 
         AlertDialogue.Instance.StartDialogue(null, 0, 0, nthFaceOff, DialogueType.FaceOff);
