@@ -49,7 +49,7 @@ public class LocalRenderingManager : MonoBehaviour
         //주술 선택 애니메이션 출력 등 
 
         myBoundConductor.UpdateByIndex(GetMine(data1, data2).boundIndex);
-        //opBoundConductor.UpdateByIndex(Getop(data1, data2).boundIndex);
+        opBoundConductor.UpdateByIndex(GetOp(data1, data2).boundIndex);
 
 
         //data1과 기존의 LocalRenderingData.localRenderingDatas 의 값과 다른 것들 을 애니메로 촤촤촤
@@ -135,7 +135,7 @@ public class LocalRenderingManager : MonoBehaviour
         ApplyImmediateUI(data2);
 
         myBoundConductor.InitBounds(GetMine(data1, data2).bounds);
-       // opBoundConductor.InitBounds(GetOp(data1, data2).bounds);
+        opBoundConductor.InitBounds(GetOp(data1, data2).bounds);
 
 
         //싱크는 아래서 넣어준다

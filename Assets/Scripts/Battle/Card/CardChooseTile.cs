@@ -1,4 +1,4 @@
-using Photon.Pun;
+ï»¿using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -7,10 +7,36 @@ using UnityEngine.Rendering.VirtualTexturing;
 
 public class CardChooseTile : MonoBehaviour
 {
+    [Header("Aim Line")]
+    [SerializeField] private bool showAimLine = true;
+    [Tooltip("ë¼ì¸ í”„ë¦¬íŒ¹(ì„ íƒ). ë¹„ìš°ë©´ ëŸ°íƒ€ì„ì— ìë™ ìƒì„±")]
+    [SerializeField] private LineRenderer linePrefab;
+
+    [Tooltip("ë¼ì¸ Z ì˜¤í”„ì…‹(íƒ€ì¼ ìœ„ë¡œ ë„ìš°ê¸°)")]
+    [SerializeField] private float lineZOffset = -0.1f;
+
+    [Tooltip("ê¸°ë³¸ ë‘ê»˜")]
+    [SerializeField] private float lineBaseWidth = 0.035f;
+
+    [Tooltip("ë‘ê»˜ í„ìŠ¤ ì§„í­")]
+    [SerializeField] private float linePulseAmp = 0.015f;
+
+    [Tooltip("ë‘ê»˜ í„ìŠ¤ ì†ë„")]
+    [SerializeField] private float linePulseSpeed = 6f;
+
+    [Tooltip("ìºë¦­í„°ì—ì„œ ë¼ì¸ ì‹œì‘ ìœ„ì¹˜(ìˆìœ¼ë©´ ì‚¬ìš©)")]
+    [SerializeField] private string charAnchorName = "charpoint";
+
+    [Tooltip("ì •ë ¬ ë ˆì´ì–´/ì˜¤ë”(ì„ íƒ)")]
+    [SerializeField] private string lineSortingLayer = "Default";
+    [SerializeField] private int lineSortingOrder = 50;
+
+    private LineRenderer _line;        // ìƒì„±Â·ìºì‹±
+    private Transform _charAnchor;
     public static CardChooseTile Instance;
     // Start is called before the first frame update
-    private GameObject myChara;        // Ä³¸¯ÅÍ ¿ÀºêÁ§Æ®
-    public float angle;                // ¸¶¿ì½º¿Í Ä³¸¯ÅÍ °£ °¢µµ
+    private GameObject myChara;        // ìºë¦­í„° ì˜¤ë¸Œì íŠ¸
+    public float angle;                // ë§ˆìš°ìŠ¤ì™€ ìºë¦­í„° ê°„ ê°ë„
 
     private Coroutine _selectTileCoroutine;
     private bool isActive = false;
@@ -37,7 +63,7 @@ public class CardChooseTile : MonoBehaviour
     {
 
 
-        if (active == isActive) return; // Áßº¹ ÄÚ·çÆ¾ ½ÃÀÛ ¹æÁö
+        if (active == isActive) return; // ì¤‘ë³µ ì½”ë£¨í‹´ ì‹œì‘ ë°©ì§€
 
         isActive = active;
 
@@ -60,29 +86,39 @@ public class CardChooseTile : MonoBehaviour
         int actor = PhotonNetwork.LocalPlayer.ActorNumber;
         playerCoord = GridManagement.Instance.GetCoordFromIndex(LocalRenderingStatic.localRenderingDatas[actor].curpos);
         myChara = LocalState.Instance?.PlayerObDic[actor];
+
+
+
+
+        //ë§ˆìš°ìŠ¤ ë¼ì¸ ì¿ ì¿ 
+        SetupAimLine();
+
+
+
+
         AlertDialogue.Instance.StartDialogue(action, actor, HookType.Activate, 0,DialogueType.TileChoose);
         
-        //Å¸ÀÏÃß½º ¾Ö´Ï¸Ş
+        //íƒ€ì¼ì¶”ìŠ¤ ì• ë‹ˆë©”
         var tile_chooser_anim = myChara.GetComponentInChildren<Animator>();
         if (tile_chooser_anim == null)
         {
-            Debug.LogError("[Å¸ÀÏÃßÁ®] °ø°İÀÚ Animator ¾øÀ½");
+            Debug.LogError("[íƒ€ì¼ì¶”ì ¸] ê³µê²©ì Animator ì—†ìŒ");
             isActive = false;
 
-            _selectTileCoroutine = null; // ¾ÈÀüÇÏ°Ô ÇÚµé ÃÊ±âÈ­
+            _selectTileCoroutine = null; // ì•ˆì „í•˜ê²Œ í•¸ë“¤ ì´ˆê¸°í™”
 
             yield break;
         }
         tile_chooser_anim.SetTrigger("Trig_TileChoose");
 
 
-        // ¡Ú tileTypeÀÌ -1ÀÌ¸é ¹Ù·Î Á¾·á
+        // â˜… tileTypeì´ -1ì´ë©´ ë°”ë¡œ ì¢…ë£Œ
         if (action.tileType == -1)
         {
             Overmind.Instance.SendTileandDirec(PhotonNetwork.LocalPlayer.ActorNumber, new List<int>(), null);
             isActive = false;
 
-            _selectTileCoroutine = null; // ¾ÈÀüÇÏ°Ô ÇÚµé ÃÊ±âÈ­
+            _selectTileCoroutine = null; // ì•ˆì „í•˜ê²Œ í•¸ë“¤ ì´ˆê¸°í™”
 
             yield break;
         }
@@ -90,7 +126,7 @@ public class CardChooseTile : MonoBehaviour
         {
             GridManagement.Instance.HighlightReachableTilesFrom(
                 GridManagement.Instance.coordToIndex[playerCoord],
-                action.tileType, // tileType >= 11ÀÌ¸é LinearSkill Ã³¸®µÊ
+                action.tileType, // tileType >= 11ì´ë©´ LinearSkill ì²˜ë¦¬ë¨
                 Color.cyan,
                 "LinearSkill"
             );
@@ -98,14 +134,15 @@ public class CardChooseTile : MonoBehaviour
         else if (action.tileType != 0) {
             GridManagement.Instance.HighlightReachableTilesFrom(
         GridManagement.Instance.coordToIndex[playerCoord],
-        action.tileType,     // ½ºÅ³ »ç°Å¸®
-        Color.cyan ,    // ½ºÅ³ ¼±ÅÃ ¹üÀ§ »ö
+        action.tileType,     // ìŠ¤í‚¬ ì‚¬ê±°ë¦¬
+        Color.cyan ,    // ìŠ¤í‚¬ ì„ íƒ ë²”ìœ„ ìƒ‰
         "Skill"
         );
         }
         
         while (isActive)
         {
+            UpdateAimLine();
 
             SelectTile(action.tileType, action.zoneIndex);
 
@@ -113,7 +150,7 @@ public class CardChooseTile : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
 
-                //Ä³¸¯ÅÍ ÁÂ¿ì ÆÇÁ¤
+                //ìºë¦­í„° ì¢Œìš° íŒì •
 
                 var cam = Camera.main;
                 if (cam != null && myChara != null)
@@ -122,24 +159,24 @@ public class CardChooseTile : MonoBehaviour
 
                     if (charScreen.z > 0f)
                     {
-                        // Ä³¸¯ÅÍ°¡ Ä«¸Ş¶ó ¾Õ¿¡ ÀÖÀ» ¶§: ½ºÅ©¸° x ±âÁØ
+                        // ìºë¦­í„°ê°€ ì¹´ë©”ë¼ ì•ì— ìˆì„ ë•Œ: ìŠ¤í¬ë¦° x ê¸°ì¤€
                         mouseSide = (Input.mousePosition.x >= charScreen.x) ? "right" : "left";
                     }
                     else
                     {
-                        // Ä³¸¯ÅÍ°¡ Ä«¸Ş¶ó µÚ¿¡ ÀÖ°Å³ª Åõ¿µÀÌ ÀÌ»óÇÒ ¶§: ±×¶ó¿îµå Æò¸é¿¡ ·¹ÀÌÄ³½ºÆ®·Î ´ëÃ¼
-                        var plane = new Plane(Vector3.up, myChara.transform.position); // y-¼öÆòÀÎ Æò¸é(±×¸®µå Æò¸é)
+                        // ìºë¦­í„°ê°€ ì¹´ë©”ë¼ ë’¤ì— ìˆê±°ë‚˜ íˆ¬ì˜ì´ ì´ìƒí•  ë•Œ: ê·¸ë¼ìš´ë“œ í‰ë©´ì— ë ˆì´ìºìŠ¤íŠ¸ë¡œ ëŒ€ì²´
+                        var plane = new Plane(Vector3.up, myChara.transform.position); // y-ìˆ˜í‰ì¸ í‰ë©´(ê·¸ë¦¬ë“œ í‰ë©´)
                         var ray = cam.ScreenPointToRay(Input.mousePosition);
                         if (plane.Raycast(ray, out float dist))
                         {
                             Vector3 hit = ray.GetPoint(dist);
                             Vector3 toHit = hit - myChara.transform.position;
-                            float side = Vector3.Dot(toHit, cam.transform.right); // Ä«¸Ş¶óÀÇ '¿À¸¥ÂÊ' ±âÁØ
+                            float side = Vector3.Dot(toHit, cam.transform.right); // ì¹´ë©”ë¼ì˜ 'ì˜¤ë¥¸ìª½' ê¸°ì¤€
                             mouseSide = (side >= 0f) ? "right" : "left";
                         }
                         else
                         {
-                            mouseSide = "right"; // ·¹ÀÌ ¹Ì½º¸é µğÆúÆ®
+                            mouseSide = "right"; // ë ˆì´ ë¯¸ìŠ¤ë©´ ë””í´íŠ¸
                         }
                     }
                 }
@@ -155,7 +192,11 @@ public class CardChooseTile : MonoBehaviour
         {
             StopCoroutine(_selectTileCoroutine);
             _selectTileCoroutine = null;
-            //¿©±â¼­ ¸¶½ºÅÍ Å¬¶óÀÌ¾ğÆ®ÇÑÅ× ³Ñ°ÜÁÖ¸é µÈ´Ù
+            //ì—¬ê¸°ì„œ ë§ˆìŠ¤í„° í´ë¼ì´ì–¸íŠ¸í•œí…Œ ë„˜ê²¨ì£¼ë©´ ëœë‹¤
+
+            TeardownAimLine();
+
+
 
             Overmind.Instance.SendTileandDirec(PhotonNetwork.LocalPlayer.ActorNumber, CoordsToIndices(debugYong), mouseSide);
             isActive = false;
@@ -179,7 +220,7 @@ public class CardChooseTile : MonoBehaviour
                 playerCoord
             );
         }
-        else if (tiletype > 0 && tiletype<11)//º£ÀÌ°¡ wÀÇ °æ¿ì
+        else if (tiletype > 0 && tiletype<11)//ë² ì´ê°€ wì˜ ê²½ìš°
         {
             GameObject hoveredTIle = GridManagement.Instance.GetTileUnderMouse();
             if (hoveredTIle == null) return;
@@ -205,7 +246,7 @@ public class CardChooseTile : MonoBehaviour
 
             Vector3Int targetCoord = GridManagement.Instance.GetCoordFromIndex(tile.tileIndex);
 
-            // HexSkill¿¡¼­ °è»ê ¿äÃ»
+            // HexSkillì—ì„œ ê³„ì‚° ìš”ì²­
             debugYong = HexSkill.GetTilesBetweenPlayerAndTarget(playerCoord, targetCoord);
 
 
@@ -217,12 +258,12 @@ public class CardChooseTile : MonoBehaviour
     {
         if (myChara == null) return;
 
-        Vector2 mousePos = Input.mousePosition; // ¸¶¿ì½ºÀÇ ½ºÅ©¸° ÁÂÇ¥
-        Vector2 plPos = Camera.main.WorldToScreenPoint(myChara.transform.position); // ÇÃ·¹ÀÌ¾îÀÇ ½ºÅ©¸° ÁÂÇ¥
-        Vector2 dir = (plPos - mousePos).normalized; // ¸¶¿ì½º ¡æ ÇÃ·¹ÀÌ¾î ¹æÇâ º¤ÅÍ
-         angle = Vector2.SignedAngle(Vector2.up, dir); // À§ÂÊ°ú ÀÌ·ç´Â °¢µµ
+        Vector2 mousePos = Input.mousePosition; // ë§ˆìš°ìŠ¤ì˜ ìŠ¤í¬ë¦° ì¢Œí‘œ
+        Vector2 plPos = Camera.main.WorldToScreenPoint(myChara.transform.position); // í”Œë ˆì´ì–´ì˜ ìŠ¤í¬ë¦° ì¢Œí‘œ
+        Vector2 dir = (plPos - mousePos).normalized; // ë§ˆìš°ìŠ¤ â†’ í”Œë ˆì´ì–´ ë°©í–¥ ë²¡í„°
+         angle = Vector2.SignedAngle(Vector2.up, dir); // ìœ„ìª½ê³¼ ì´ë£¨ëŠ” ê°ë„
 
-        //    Debug.Log($"¸¶¿ì½º¿Í Player°¡ ÀÌ·ç´Â °¢µµ: {angle}µµ");
+        //    Debug.Log($"ë§ˆìš°ìŠ¤ì™€ Playerê°€ ì´ë£¨ëŠ” ê°ë„: {angle}ë„");
     }
  
 
@@ -234,7 +275,7 @@ public class CardChooseTile : MonoBehaviour
         if (deg < 0f && deg >= -60f) return new Vector3Int(0, 1, -1);
         if (deg < -60f && deg >= -120f) return new Vector3Int(-1, 1, 0);
         if (deg < -120f && deg >= -180f) return new Vector3Int(1, 0, -1);
-        throw new System.ArgumentOutOfRangeException(nameof(deg), deg, "Áö¿øµÇÁö ¾Ê´Â °¢µµÀÔ´Ï´Ù.");
+        throw new System.ArgumentOutOfRangeException(nameof(deg), deg, "ì§€ì›ë˜ì§€ ì•ŠëŠ” ê°ë„ì…ë‹ˆë‹¤.");
     }
 
     public void HighlightTiles(List<Vector3Int> coordsToHighlight)
@@ -259,8 +300,8 @@ public class CardChooseTile : MonoBehaviour
     }
     private List<int> CoordsToIndices(List<Vector3Int> coords)
     {
-        // coords°¡ nullÀÌ¸é ºó ¸®½ºÆ® ¸®ÅÏ
-        if (coords == null) //µğ¹ö±×¿ëÀÌ ³Î Áï tiletypeÀÌ -1ÀÎ°æ¿ì
+        // coordsê°€ nullì´ë©´ ë¹ˆ ë¦¬ìŠ¤íŠ¸ ë¦¬í„´
+        if (coords == null) //ë””ë²„ê·¸ìš©ì´ ë„ ì¦‰ tiletypeì´ -1ì¸ê²½ìš°
             return new List<int>();
 
         var indices = new List<int>(coords.Count);
@@ -271,6 +312,101 @@ public class CardChooseTile : MonoBehaviour
                 indices.Add(idx);
         }
         return indices;
+    }
+
+
+    private void SetupAimLine()
+    {
+        if (!showAimLine) return;
+        if (myChara == null) return;
+
+        // ì‹œì‘ì  ì•µì»¤ ìºì‹±(ì—†ìœ¼ë©´ ìºë¦­í„° ìì²´)
+        _charAnchor = myChara.transform.Find(charAnchorName) ?? myChara.transform;
+
+        if (_line == null)
+        {
+            if (linePrefab != null) {
+
+                _line = Instantiate(linePrefab, transform); // ê´€ë¦¬ ìŠ¤í¬ë¦½íŠ¸ ì•„ë˜ì— ìƒì„±
+                Debug.Log("ì„ë§ˆì´ê±° ì¤„ ì˜ ë§Œë“¤ì—‡ë‹¤");
+            }
+            else
+                _line = CreateRuntimeLine();
+
+            // ì •ë ¬
+            _line.sortingLayerName = lineSortingLayer;
+            _line.sortingOrder = lineSortingOrder;
+        }
+
+        _line.enabled = true;
+        _line.positionCount = 2;
+    }
+
+    private void UpdateAimLine()
+    {
+        if (!showAimLine || _line == null || !_line.enabled) return;
+        if (Camera.main == null || _charAnchor == null) return;
+
+        Vector3 start = _charAnchor.position;
+        start.z += lineZOffset;
+
+        Vector3 end = GetMouseWorldOnPlane(start.y); // ìºë¦­í„° ë†’ì´(y) ê¸°ì¤€ í‰ë©´
+        end.z += lineZOffset;
+
+        _line.SetPosition(0, start);
+        _line.SetPosition(1, end);
+
+        // ë‘ê»˜ í„ìŠ¤
+        float w = lineBaseWidth + Mathf.Sin(Time.unscaledTime * linePulseSpeed) * linePulseAmp;
+        _line.startWidth = w;
+        _line.endWidth = w * 0.9f;
+    }
+
+    private void TeardownAimLine()
+    {
+        Debug.Log("ì ì¤„ ì—†ì•±ë‹ˆë‹¤ ");
+        if (_line != null)
+            _line.enabled = false;
+        _charAnchor = null;
+    }
+
+    private LineRenderer CreateRuntimeLine()
+    {
+        var go = new GameObject("~AimLine");
+        go.transform.SetParent(transform, false);
+        var lr = go.AddComponent<LineRenderer>();
+        lr.useWorldSpace = true;
+        lr.alignment = LineAlignment.View;
+        lr.numCornerVertices = 4;
+        lr.numCapVertices = 4;
+        lr.startWidth = lineBaseWidth;
+        lr.endWidth = lineBaseWidth;
+
+        // ê¸°ë³¸ ë¨¸í‹°ë¦¬ì–¼(ì—†ìœ¼ë©´ Sprites/Default)
+        var shader = Shader.Find("Sprites/Default");
+        lr.material = new Material(shader);
+
+        // ê¸°ë³¸ ìƒ‰(ì›í•˜ë©´ ì¸ìŠ¤í™í„°ì—ì„œ í”„ë¦¬íŒ¹ìœ¼ë¡œ ëŒ€ì²´)
+        var grad = new Gradient();
+        grad.SetKeys(
+            new[] { new GradientColorKey(Color.cyan, 0f), new GradientColorKey(Color.white, 1f) },
+            new[] { new GradientAlphaKey(0.8f, 0f), new GradientAlphaKey(0.8f, 1f) }
+        );
+        lr.colorGradient = grad;
+        return lr;
+    }
+
+    private Vector3 GetMouseWorldOnPlane(float y)
+    {
+        var cam = Camera.main;
+        var ray = cam.ScreenPointToRay(Input.mousePosition);
+        var plane = new Plane(Vector3.up, new Vector3(0f, y, 0f)); // y=ìºë¦­í„° ë†’ì´ í‰ë©´
+        if (plane.Raycast(ray, out float dist))
+            return ray.GetPoint(dist);
+
+        // í´ë°±(ì§ì ‘ zê¹Œì§€ íˆ¬ì˜) â€” ì •ë°€ë„ ë–¨ì–´ì§ˆ ìˆ˜ ìˆìŒ
+        var wp = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Mathf.Abs(cam.transform.position.y - y)));
+        return new Vector3(wp.x, y, wp.z);
     }
 
 }

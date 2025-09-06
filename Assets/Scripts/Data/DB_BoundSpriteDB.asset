@@ -15,17 +15,40 @@ MonoBehaviour:
   entries:
   - bound: b1
     sprite: {fileID: 21300000, guid: 85d9d0f23885b224f9e49fb13fa6983f, type: 3}
+    description: "\uC9D1\uC911\uB9C8\uD06C\n\n\uC774\uBC88 \uC2F8\uC774\uD074\uC774
+      \uB05D\uB0A0 \uB54C\n\uC0C1\uB300\uC640\uC758 \uAC70\uB9AC\uAC00 1\uC774\uC5B4\uC57C\uD569\uB2C8\uB2E4"
   - bound: b2
     sprite: {fileID: 21300000, guid: f634bad879380034088eeba205ec116f, type: 3}
+    description: "\uBBF8\uB798 \uC608\uC9C0\n\n\uC774\uBC88 \uC2F8\uC774\uD074\uC5D0\uC11C
+      \uC561\uC158\uC740 \uD53C\uACA9 \uBC94\uC704\uB97C \uBBF8\uB9AC \uC120\uD0DD\uD574\uC57C
+      \uD569\uB2C8\uB2E4"
   - bound: b3
     sprite: {fileID: 21300000, guid: 88ca7b8a29a90cf42be2b8c83812ed45, type: 3}
+    description: "\uC790\uC2E0 \uB9CC\uB9CC\n\n\uC774\uBC88 \uC2F8\uC774\uD074\uC774
+      \uB05D\uB0A0 \uB54C \uCE90\uC2A4\uD305 \uB418\uACE0 \uC788\uB294 \uC561\uC158\uC758
+      \uBC29\uC5B4\uB3C4\uB294 0\uC774\uC5B4\uC57C \uD569\uB2C8\uB2E4"
   - bound: b4
     sprite: {fileID: 21300000, guid: 0450cfc74ea6c514891e4b4d8d2ece85, type: 3}
+    description: "\uD3C9\uD654\uC8FC\uC758\uC790\n\n\uC774\uBC88 \uC2F8\uC774\uD074\uC5D0\uC11C
+      \uC0C1\uB300\uC5D0\uAC8C \uD53C\uD574\uB97C \uC918\uC120 \uC548\uB429\uB2C8\uB2E4 "
   - bound: b5
     sprite: {fileID: 21300000, guid: 3db26899416e74042a2a473ad6e14cb7, type: 3}
+    description: "\uACFC\uC18C\uBE44\n\n\uC774\uBC88 \uC2F8\uC774\uD074\uC5D0\uC11C
+      2\uC7A5\uC758 \uBA54\uC778 \uC561\uC158\uC744 \uB0B4\uB824\uC57C \uD569\uB2C8\uB2E4"
   - bound: b6
     sprite: {fileID: 21300000, guid: 79d86973565335743a3f0b412ba5e8dd, type: 3}
+    description: "\uD788\uD2B8 \uC564 \uB7F0\n\n\uC774\uBC88 \uC2F8\uC774\uD074\uC774
+      \uB05D\uB0A0 \uB54C \uC774\uB3D9\uC774 \uCE90\uC2A4\uD305 \uB418\uACE0 \uC788\uC5B4\uC57C
+      \uD569\uB2C8\uB2E4"
   - bound: b7
     sprite: {fileID: 21300000, guid: f9ae7a0f875cf7f448df84b972f424ac, type: 3}
+    description: "\uACF5\uC815 \uAC70\uB798\n\n\uC774\uBC88 \uC2F8\uC774\uD074 \uB3D9\uC548
+      \uC0C1\uB300\uC758 \uB2E4\uC74C \uC561\uC158\uACFC \uCC28\uC774\uAC00 3\uC774\uC0C1\uC778
+      \uC561\uC158\uB9CC \uB0B4\uB824\uC57C \uD569\uB2C8\uB2E4 "
   - bound: b8
     sprite: {fileID: 21300000, guid: a328851e644f2734da44ac7dddffabef, type: 3}
+    description: "\uC694\uC9C0\uBD80\uB3D9\n\n\uC774\uBC88 \uC2F8\uC774\uD074 \uB3D9\uC548\uC740
+      \uC774\uB3D9\uD574\uC11C\uB294 \uC548\uB429\uB2C8\uB2E4"
+  - bound: b0
+    sprite: {fileID: 21300000, guid: 5716f969f6a177740babed9540a901d7, type: 3}
+    description: "\uBB58\uAE4C"
