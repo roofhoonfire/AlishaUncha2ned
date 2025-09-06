@@ -516,6 +516,8 @@ public class Overmind : MonoBehaviourPunCallbacks
                 return card != null && card.cardType == 0;
             });
 
+        //여기서 서포트 카드는 제외하는 처리가 이미 되잇네 휴
+
         for (int i = 0; i < neededCount; i++)
         {
             if (playerData.DeckCodes.Count == 0)
@@ -1132,8 +1134,17 @@ public class Overmind : MonoBehaviourPunCallbacks
             if (myPlayerData.hands.Contains(code))
             {
                 myPlayerData.hands.Remove(code);
-                myPlayerData.trash.Add(code);
 
+
+                //메인 액션 만 트래쉬로 가게 해논거임
+                //만약에 사용한 서포트카드나 
+                if (CardCSVLoader.Instance.GetCardByCode(code).disappear == 0)
+                    myPlayerData.trash.Add(code);
+                else
+                {
+                    Debug.Log($"{CardCSVLoader.Instance.GetCardByCode(code).name}은 소멸 카드라 사라진다 트래쉬로도 안감;");
+
+                }
             }
             else
             {
@@ -2185,7 +2196,7 @@ public class Overmind : MonoBehaviourPunCallbacks
     }
 
 
-    private void RefillDeckFromTrash(PlayerData player)
+    /*private void RefillDeckFromTrash(PlayerData player)
     {
         if (player.trash.Count == 0)
         {
@@ -2203,7 +2214,60 @@ public class Overmind : MonoBehaviourPunCallbacks
         Debug.Log($"[RefillDeckFromTrash] Deck refilled with {player.DeckCodes.Count} cards.");
 
 
+    }*/
+    private void RefillDeckFromTrash(PlayerData player)
+    {
+        if (player == null)
+        {
+            Debug.LogError("[RefillDeckFromTrash] player == null");
+            return;
+        }
+        if (player.trash == null || player.trash.Count == 0)
+        {
+            Debug.Log("[RefillDeckFromTrash] Trash is empty, cannot refill deck.");
+            return;
+        }
+
+        var toMove = new List<string>();
+        foreach (var code in player.trash)
+        {
+            var card = CardCSVLoader.Instance?.GetCardByCode(code);
+            if (card == null)
+            {
+                Debug.LogWarning($"[RefillDeckFromTrash] Unknown code '{code}', skipped.");
+                continue;
+            }
+            if (card.cardType == 0)
+                toMove.Add(code);
+        }
+
+        if (toMove.Count == 0)
+        {
+            Debug.Log("[RefillDeckFromTrash] No eligible (cardType==0) cards in trash.");
+            // 상태 출력
+            Debug.Log($"[RefillDeckFromTrash] Deck ({player.DeckCodes.Count}): [{string.Join(", ", player.DeckCodes)}]");
+            Debug.Log($"[RefillDeckFromTrash] Trash ({player.trash.Count}): [{string.Join(", ", player.trash)}]");
+            return;
+        }
+
+        // 덱으로 이동
+        player.DeckCodes.AddRange(toMove);
+
+        // 트래시에서 옮긴 것만 제거
+        var movedSet = new HashSet<string>(toMove);
+        player.trash.RemoveAll(code => movedSet.Contains(code));
+
+        // 셔플
+        ShuffleList(player.DeckCodes);
+
+        // 결과 로그
+        //Debug.Log($"[RefillDeckFromTrash] Moved {toMove.Count} card(s) from trash to deck (type==0).");
+       // Debug.Log($"[RefillDeckFromTrash] Deck now has {player.DeckCodes.Count} cards; Trash left {player.trash.Count}.");
+
+//        Debug.Log($"[RefillDeckFromTrash] Deck: [{string.Join(", ", player.DeckCodes)}]");
+  //      Debug.Log($"[RefillDeckFromTrash] Trash: [{string.Join(", ", player.trash)}]");
     }
+
     void ShuffleList<T>(List<T> list)
     {
         for (int i = list.Count - 1; i > 0; i--)

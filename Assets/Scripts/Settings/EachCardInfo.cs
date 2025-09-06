@@ -16,17 +16,36 @@ public class EachCardInfo : MonoBehaviour
     // cardData를 외부에서 할당한 뒤 이 메서드를 호출할 것
     public void ApplyCardData()
     {
-        if (cardData != null && nameText != null)
-        {
-            nameText.text = cardData.name;
-            playtext.text = cardData.cardText.Replace("\\n", "\n"); ;
-            rumble.text = cardData.rumblePoint.ToString();
-            defense.text = cardData.defense.ToString();
-            clock.text= cardData.actionClock.ToString();
+        if (cardData.cardType == 0) {
+            if (cardData != null && nameText != null)
+            {
+                nameText.text = cardData.name;
+                playtext.text = cardData.cardText.Replace("\\n", "\n"); ;
+                rumble.text = cardData.rumblePoint.ToString();
+                defense.text = cardData.defense.ToString();
+                clock.text = cardData.actionClock.ToString();
+            }
+            else
+            {
+                Debug.LogWarning("[EachCardInfo] CardData 또는 nameText가 비어있습니다.");
+            }
         }
+
         else
         {
-            Debug.LogWarning("[EachCardInfo] CardData 또는 nameText가 비어있습니다.");
+            if (cardData != null && nameText != null)
+            {
+                nameText.text = cardData.name;
+                playtext.text = cardData.cardText.Replace("\\n", "\n"); ;
+               
+            }
+            else
+            {
+                Debug.LogWarning("[EachCardInfo] CardData 또는 nameText가 비어있습니다.");
+            }
+
+
         }
+        
     }
 }

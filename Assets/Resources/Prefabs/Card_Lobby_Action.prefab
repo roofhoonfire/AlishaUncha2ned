@@ -34,8 +34,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -44.9, y: 72.2}
-  m_SizeDelta: {x: 105.4159, y: 45.4363}
+  m_AnchoredPosition: {x: 96.349, y: 142.04814}
+  m_SizeDelta: {x: 33.091, y: 71.9399}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2951784524705919396
 CanvasRenderer:
@@ -93,8 +93,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 15.14
-  m_fontSizeBase: 15.14
+  m_fontSize: 22.6
+  m_fontSizeBase: 22.6
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -169,8 +169,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.0000088215, y: -54.765625}
-  m_SizeDelta: {x: 105.4159, y: 45.4363}
+  m_AnchoredPosition: {x: -21.1021, y: -132.17857}
+  m_SizeDelta: {x: 201.8118, y: 63.1934}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &374877636993691325
 CanvasRenderer:
@@ -210,8 +210,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -228,15 +228,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 7.3
-  m_fontSizeBase: 7.3
+  m_fontSize: 16.5
+  m_fontSizeBase: 16.5
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
+  m_HorizontalAlignment: 1
+  m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -284,7 +284,7 @@ GameObject:
   - component: {fileID: 7172570734510747438}
   - component: {fileID: 6117006263775159746}
   m_Layer: 5
-  m_Name: CardVisual
+  m_Name: Card_Lobby_Action
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -312,7 +312,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -25, y: 52}
-  m_SizeDelta: {x: 135.6581, y: 180.1333}
+  m_SizeDelta: {x: 300, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3927338784492268857
 CanvasRenderer:
@@ -342,7 +342,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 74690ff3fd1aaee479464069fdac86b7, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bced7a3b2e9690b40b1adab8c1694710, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -366,6 +366,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardData:
     code: 
+    cardType: 0
     name: 
     sprite: {fileID: 0}
     animations: []
@@ -376,6 +377,8 @@ MonoBehaviour:
     mana: 0
     tileType: 0
     zoneIndex: 0
+    energy: 0
+    damage: 0
     cardText: 
   nameText: {fileID: 6702601358757108359}
   playtext: {fileID: 6525403682266496942}
@@ -431,8 +434,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 40.3, y: 72.2}
-  m_SizeDelta: {x: 105.4159, y: 45.4363}
+  m_AnchoredPosition: {x: -100.5, y: 155.3}
+  m_SizeDelta: {x: 73.7016, y: 61.7739}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8060378284136852044
 CanvasRenderer:
@@ -462,7 +465,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 12
+  m_text: '32
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: eaf776cc513ff71479945ff66262c284, type: 2}
   m_sharedMaterial: {fileID: -2122021243548641323, guid: eaf776cc513ff71479945ff66262c284,
@@ -490,8 +495,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 11.65
-  m_fontSizeBase: 11.65
+  m_fontSize: 28.89
+  m_fontSizeBase: 28.89
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -566,8 +571,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.0000088215, y: -19.1}
-  m_SizeDelta: {x: 105.4159, y: 19.9051}
+  m_AnchoredPosition: {x: 0, y: -61.87}
+  m_SizeDelta: {x: 254.3547, y: 37.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &829726524983425403
 CanvasRenderer:
@@ -597,7 +602,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Card Name
+  m_text: "\uBB34\uBAA8\uD55C \uC791\uC804 "
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: eaf776cc513ff71479945ff66262c284, type: 2}
   m_sharedMaterial: {fileID: -2122021243548641323, guid: eaf776cc513ff71479945ff66262c284,
@@ -625,15 +630,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 13.9
-  m_fontSizeBase: 13.9
+  m_fontSize: 27.8
+  m_fontSizeBase: 27.8
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 256
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -701,8 +706,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 44.9, y: 0.000015259}
-  m_SizeDelta: {x: 105.4159, y: 45.4363}
+  m_AnchoredPosition: {x: 114.8, y: -162.81549}
+  m_SizeDelta: {x: 42.1902, y: 48.2673}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &926304030996287043
 CanvasRenderer:
@@ -760,8 +765,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 10.28
-  m_fontSizeBase: 10.28
+  m_fontSize: 28
+  m_fontSizeBase: 28
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
