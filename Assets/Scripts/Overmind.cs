@@ -111,6 +111,7 @@ public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 
 
     public PlayerData(int actorNumber, List<string> deckCodes, int initialHP = 100)
     {
+        //세번째 매
         ActorNumber = actorNumber;
         DeckCodes = deckCodes;
         HP = initialHP;
@@ -308,7 +309,7 @@ public class Overmind : MonoBehaviourPunCallbacks
 
     public bool GA_On = false;
 
-
+    public int initialHP = 100;
 
 
 
@@ -379,7 +380,7 @@ public class Overmind : MonoBehaviourPunCallbacks
 
         if (!players.ContainsKey(actorNumber))
         {
-            players[actorNumber] = new PlayerData(actorNumber, codeList, 100);
+            players[actorNumber] = new PlayerData(actorNumber, codeList, initialHP);
         }
         else
         {

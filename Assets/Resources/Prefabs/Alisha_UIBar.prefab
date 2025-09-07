@@ -55,22 +55,22 @@ MonoBehaviour:
     _srBackground: {fileID: 0}
     _srPrimaryBar: {fileID: 0}
     _srGhostBar: {fileID: 0}
-    _uiBackground: {fileID: 0}
-    _uiPrimaryBar: {fileID: 0}
-    _uiGhostBar: {fileID: 0}
+    _uiBackground: {fileID: 8615194741368719036}
+    _uiPrimaryBar: {fileID: 6770988671081973103}
+    _uiGhostBar: {fileID: 5521805096293915113}
     _adaptiveColor: 1
     _barPrimaryColor: {r: 1, g: 1, b: 1, a: 1}
-    _barAdaptiveColor: {r: 1, g: 0, b: 0, a: 1}
+    _barAdaptiveColor: {r: 1, g: 0.9315591, b: 0, a: 1}
     _useGhostBar: 1
     _dualGhostBars: 0
-    _ghostBarDamageColor: {r: 1, g: 0, b: 0, a: 1}
+    _ghostBarDamageColor: {r: 0.990566, g: 0.50900054, b: 0.107467085, a: 1}
     _ghostBarHealColor: {r: 1, g: 1, b: 1, a: 1}
-    _damageAnim: 0
+    _damageAnim: 1
     _damageAnimDuration: 0.5
     _damageAnimDelay: 0
     _damageFlashColor: {r: 1, g: 1, b: 1, a: 1}
     _damageAnimStrength: 0.5
-    _healAnim: 0
+    _healAnim: 1
     _healAnimDuration: 0.5
     _healAnimDelay: 0
     _healFlashColor: {r: 1, g: 1, b: 1, a: 1}

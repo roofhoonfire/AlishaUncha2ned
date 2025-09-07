@@ -1,3 +1,4 @@
+using Microlight.MicroBar;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
@@ -322,6 +323,9 @@ public class LocalRenderingManager : MonoBehaviour
         // ===== 여기부터는 공통 사후 처리(기존 유지) =====
         var diffs = CopyandDifferences(data1, data2);
         yield return StartCoroutine(AnimateStatChange("defense", diffs));
+
+        HPBarManager.Instance.DamageMe(GetMine(data1,data2).hp);
+        HPBarManager.Instance.DamageOp(GetOp(data1, data2).hp);
         yield return StartCoroutine(AnimateStatChange("hp", diffs));
         yield return StartCoroutine(AnimateStatChange("remainingCost", diffs));
 
@@ -333,6 +337,8 @@ public class LocalRenderingManager : MonoBehaviour
         //LocalState.Instance.PlayerObDic[data2.actorNum].transform.position = tileIndextoPosition(data2.curpos).position;
 
         ApplyDiffsToLocalRenderingData(diffs);
+
+
         StealthPlayer(diffs);
         ElementRenderer.Instance.RenderElementsFromDiffs(diffs);
         Debug.Log("자자 노멀 액션 렌더링 다 끝, 이제 렌더링 섭밑만 하면됨");
@@ -348,6 +354,10 @@ public class LocalRenderingManager : MonoBehaviour
 
         var diffs = CopyandDifferences(data1, data2);
         yield return StartCoroutine(AnimateStatChange("defense", diffs));
+
+        HPBarManager.Instance.DamageMe(GetMine(data1, data2).hp);
+        HPBarManager.Instance.DamageOp(GetOp(data1, data2).hp);
+
         yield return StartCoroutine(AnimateStatChange("hp", diffs));
         yield return StartCoroutine(AnimateStatChange("remainingCost", diffs));
 
@@ -382,6 +392,9 @@ public class LocalRenderingManager : MonoBehaviour
 
         List<RenderDiff> diffs = CopyandDifferences(data1, data2);
         StartCoroutine(AnimateStatChange("defense", diffs));
+        HPBarManager.Instance.DamageMe(GetMine(data1, data2).hp);
+        HPBarManager.Instance.DamageOp(GetOp(data1, data2).hp);
+
         StartCoroutine(AnimateStatChange("hp", diffs));
         StartCoroutine(AnimateStatChange("remainingCost", diffs));
 

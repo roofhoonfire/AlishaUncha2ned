@@ -10,6 +10,7 @@ using System.Reflection.Emit;
 using System.Linq;
 using UnityEditor.Rendering;
 using Newtonsoft.Json;
+using Microlight.MicroBar;
 
 public class LocalState : MonoBehaviour
 {
@@ -142,18 +143,24 @@ public class LocalState : MonoBehaviour
                 SelectionBarManager.Instance.JM.gameObject.SetActive(false);
                 CameraLovesAlisha.Instance.target = temp.GetComponent<Transform>();
 
+                //HP ¹Ù ¼ÂÆÃ
+
+                HPBarManager.Instance.mycharBarHolder = temp.GetComponent<Transform>().Find("HPHolder");
+
             }
             else
             {
                 LocalRenderingManager.Instance.opHP = charinfo.Hp;
                 LocalRenderingManager.Instance.opdefense = charinfo.Def;
                 mcChecker.SetActive(false);
+                HPBarManager.Instance.opcharBarHolder = temp.GetComponent<Transform>().Find("HPHolder");
+
             }
             PlayerObDic.Add(pinfo.Value.actorNum, temp);
 
         }
 
-
+        HPBarManager.Instance.HPBar_Init(Overmind.Instance.initialHP);
     }
 
     private Transform tileIndextoPosition(int tileindex)
