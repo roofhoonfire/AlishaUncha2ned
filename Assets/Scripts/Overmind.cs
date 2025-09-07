@@ -2085,11 +2085,20 @@ public class Overmind : MonoBehaviourPunCallbacks
 
            if (cycleState != 0)
             {
-                BoundChecker.BoundCheck(cycleState);
+             var BC_ret =    BoundChecker.BoundCheck(cycleState);
+                //    yield return new WaitUntil(() => syncCount == 2);
+                //   syncCount = 0;
+
+                CallRPCJuju(cycleState, BC_ret.ret_bound, BC_ret.ret_check);
                 yield return new WaitUntil(() => syncCount == 2);
                 syncCount = 0;
+                BoundChecker.After_CallRPCJuju(cycleState);
+                //여기서 불러야함 콜주주랑
+                //웨이트 여기서 걸어주고 ㅋ.ㅋ.ㅋ.ㅋ .ㅋ .ㅋ
+                //애프터 
 
-               // 바운드 & 주술 결과 동기화
+
+                // 바운드 & 주술 결과 동기화
                 var keys = players.Keys.ToList();
 
                 if (keys.Count < 2)
@@ -2129,10 +2138,10 @@ public class Overmind : MonoBehaviourPunCallbacks
     }
 
 
-
+    
     //summary//
     //오버마인드에서 제약 코드에 맞게 생성할 주술 선택지를 클라이언트에게 넘겨주기 위한 연산//
-    public void CallRPCJuju(int actorNum, string boundCode)
+     public void  CallRPCJuju(int actorNum, string boundCode, bool missionclear)
     {
 
         int boundPointThreshold = BoundLoader.boundDataBase[boundCode].boundPoint;
@@ -2191,7 +2200,12 @@ public class Overmind : MonoBehaviourPunCallbacks
 
 
 
-        photonView.RPC(nameof(RPC_SelectJuju_M2C), RpcTarget.All, actorNum, boundCode, jujuJson);
+        photonView.RPC(nameof(RPC_SelectJuju_M2C), RpcTarget.All, actorNum, boundCode, jujuJson, missionclear, players[actorNum].boundIndex);
+        // yield return new WaitUntil(() => syncCount == 2);
+       // syncCount = 0;
+        //여기서 이 함수 코루틘으로 맹글어서 그냥 기달려부려~
+
+        //BoundChecker.After_CallRPCJuju(actorNum);
 
 
     }
@@ -2305,22 +2319,30 @@ public class Overmind : MonoBehaviourPunCallbacks
 
 
     [PunRPC]
-    void RPC_SelectJuju_M2C(int actorNum, string boundCode, string jujuJson )
+    void RPC_SelectJuju_M2C(int actorNum, string boundCode, string jujuJson, bool missionClear, int index )
     {
+        //여기에 불값 넣어서 
+        
         List <string > jujucodes = JsonConvert.DeserializeObject < List<string>>(jujuJson);
 
 
         if (actorNum == PhotonNetwork.LocalPlayer.ActorNumber)
         {
-            LocalState.Instance.SelectJuju(actorNum, boundCode, jujucodes);
+            if (missionClear)
+                LocalState.Instance.SelectJuju(actorNum, boundCode, jujucodes);
+            else
+            {
+                Submit_Juju(actorNum, null);
+
+            }
         }
 
 
 
         else
         {
-            Submit_Juju(actorNum,null);
-
+            //여기서 상대 제약이 뭐였는지 판단하는 함수 호출 
+            LocalState.Instance.GuessJuju(index);
 
         }
     }

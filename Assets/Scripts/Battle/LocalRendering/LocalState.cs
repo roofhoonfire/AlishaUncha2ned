@@ -305,6 +305,9 @@ public class LocalState : MonoBehaviour
 
     }
 
-
+    public void GuessJuju(int index)
+    {
+        JujuGuessMode.Instance.SetActive(true, index);
+    }
 
 }

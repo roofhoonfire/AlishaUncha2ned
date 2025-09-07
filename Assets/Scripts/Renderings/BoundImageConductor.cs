@@ -1,4 +1,5 @@
 // BoundImageConductor.cs (발췌/변경)
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,6 +31,10 @@ public class BoundImageConductor : MonoBehaviour
     [Header("Tooltip 연동 (선택)")]
     [SerializeField] private TooltipTriggerUI tooltipTrigger; // ★ 인스펙터에 드롭
 
+    [Header("바운드예차크")]
+    [SerializeField] public List<String> boundGuesses; // ★ 인스펙터에 드롭
+
+
     // 내부 상태
     private readonly List<string> _bounds = new();
     private int _index = -1;
@@ -55,9 +60,26 @@ public class BoundImageConductor : MonoBehaviour
 
         string key = (_bounds.Count > 0) ? _bounds[0] : null;
 
-        if (isOp) key = "b0"; // 상대는 가림
+        if (isOp) {
 
-        ApplyByKeyImmediate(key);  // ★ 키 기반으로 스프라이트+툴팁 동시 세팅
+
+            key = "b0"; // 상대는 가림
+            for(int i = 0; i < boundsFromData.Count; i++)
+            {
+                boundGuesses.Add("상대의 행동에 집중해서 바운드를 예측하자");
+
+
+            }
+
+        }
+
+
+
+
+
+
+
+        ApplyByKeyImmediate(key,0);  // ★ 키 기반으로 스프라이트+툴팁 동시 세팅
         SetAlphaImmediate(1f);
         return key;
     }
@@ -72,7 +94,7 @@ public class BoundImageConductor : MonoBehaviour
         if (isOp) key = "b0"; // 상대는 가림
 
         // 애니 생략 분기(지금은 즉시 적용)
-        ApplyByKeyImmediate(key);
+        ApplyByKeyImmediate(key, newIndex);
         SetAlphaImmediate(1f);
         _index = newIndex;
     }
@@ -80,27 +102,30 @@ public class BoundImageConductor : MonoBehaviour
     // ───────── 내부 유틸 ─────────
 
     // ★ 키로 DB에서 엔트리 통째로 가져와 스프라이트+툴팁 동시 반영
-    void ApplyByKeyImmediate(string key)
+    void ApplyByKeyImmediate(string key, int index)
     {
         if (targetImage == null) return;
 
         if (string.IsNullOrWhiteSpace(key) || database == null || !database.TryGet(key, out var entry))
         {
             targetImage.overrideSprite = null;
-            UpdateTooltipDesc(null);
+            UpdateTooltipDesc(null, index);
             return;
         }
 
-        ApplyEntryImmediate(entry);
+        ApplyEntryImmediate(entry, index);
     }
 
     // ★ 엔트리 단위 적용: 스프라이트 + 툴팁 설명
-    void ApplyEntryImmediate(BoundSpriteDB.Entry entry)
+    void ApplyEntryImmediate(BoundSpriteDB.Entry entry, int index)
     {
         if (targetImage == null) return;
         targetImage.overrideSprite = entry.sprite;
         targetImage.SetVerticesDirty();
-        UpdateTooltipDesc(entry.description);
+        
+        
+        UpdateTooltipDesc(entry.description, index);
+
     }
 
     // (기존 스프라이트 전용 함수는 남겨두되, 설명 갱신은 없음)
@@ -112,8 +137,17 @@ public class BoundImageConductor : MonoBehaviour
         // 설명은 키가 없으면 갱신 불가 → 필요 시 CallSite에서 ApplyByKeyImmediate 사용
     }
 
-    void UpdateTooltipDesc(string desc)
+    void UpdateTooltipDesc(string desc, int index)
     {
+
+        //이게 만약 op가 트루면 트루먼 쇼 ㅋ.ㅋ.ㅋ.ㅋ 
+        if (isOp && tooltipTrigger != null) {
+
+            tooltipTrigger.description = boundGuesses[index];
+
+            return;
+
+        }
         if (tooltipTrigger != null)
             tooltipTrigger.description = desc ?? string.Empty;
     }
