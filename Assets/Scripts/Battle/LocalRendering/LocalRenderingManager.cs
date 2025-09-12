@@ -143,7 +143,7 @@ public class LocalRenderingManager : MonoBehaviour
         //
         //Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
 
-
+        StartCoroutine(CineManager.Instance.PlayGameStartAndWait());
     }
     public void Rendering_FaceOff_Start(int nthFaceOff)
     {
@@ -155,13 +155,12 @@ public class LocalRenderingManager : MonoBehaviour
     {
 
         //
-        StartCoroutine(RumbleCine.Instance.PlayRumbleAndWait(winner, data1, data2));
+        StartCoroutine(CineManager.Instance.PlayRumbleAndWait(winner, data1, data2));
 
 
 
     }
 
-   
     public void Rendering_Norm_Action(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h, ActionData OpAction, bool GA)
     {
         StartCoroutine(Rendering_Norm_Action_Co(actorNum, data1, data2, action, h, OpAction, GA));

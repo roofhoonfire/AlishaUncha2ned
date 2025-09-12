@@ -484,9 +484,11 @@ public class Overmind : MonoBehaviourPunCallbacks
         LocalState.Instance?.GameStart(data);
 
         // 마스터 포함 모든 클라이언트가 완료 보고
-        photonView.RPC(nameof(RPC_InitGameSyncDone_C2M), RpcTarget.MasterClient,
-            PhotonNetwork.LocalPlayer.ActorNumber);
+       //시작 연출로 인한 위치 변경
+        // photonView.RPC(nameof(RPC_InitGameSyncDone_C2M), RpcTarget.MasterClient,
+         //   PhotonNetwork.LocalPlayer.ActorNumber);
     }
+
 
 
 
@@ -2382,6 +2384,12 @@ public class Overmind : MonoBehaviourPunCallbacks
     }
    
 
+    public void Submit_GameStart_SyncDone()
+    {
+        //시작연출로 인해 ㅎㅎ.
+        photonView.RPC(nameof(RPC_InitGameSyncDone_C2M), RpcTarget.MasterClient,
+         PhotonNetwork.LocalPlayer.ActorNumber);
+    }
 
     [PunRPC]
     void RPC_JustSync_C2M(int actorNum)
