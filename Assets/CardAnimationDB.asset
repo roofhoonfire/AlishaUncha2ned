@@ -168,7 +168,7 @@ MonoBehaviour:
     prepBackdropFadeOut: 0.12
     hitStops:
     - frame: 2
-      duration: 0.7
+      duration: 0.3
       pauseAttacker: 1
       pauseVictim: 1
       pauseEffects: 1
