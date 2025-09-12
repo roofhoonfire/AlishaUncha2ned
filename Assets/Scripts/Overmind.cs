@@ -120,7 +120,7 @@ public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 
         energy = 3;
 
         //기찮으므로로로로루뢰뢰
-        Bounds = new List<string> {"b1", "b3", "b4","b5","b6","b7","b8" };
+        Bounds = new List<string> {"b1", "b3", "b4","b5","b6","b7" };
         JujuCode = new List<string> { "j1", "j2", "j3", "j4" };
 
 
