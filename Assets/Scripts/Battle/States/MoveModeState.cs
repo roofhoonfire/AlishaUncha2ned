@@ -8,14 +8,19 @@ using UnityEngine;
 
 public class MoveModeState : MonoBehaviour
 {
-
     public static MoveModeState Instance;
+
     public bool isActive = false;
     private EachTile hoveredTile = null;
     private EachTile selectedTile = null;
     private Coroutine _selectDestCoroutine;
     public GameObject alim;
     private int actorNum;
+
+    // Raging(분노 애니) 관리용 집합
+    private HashSet<int> _ragingNow = new();  // 현재 Raging 유지 중인 타일 인덱스
+    private HashSet<int> _scratch = new();  // 매 프레임 임시 집합(할당 줄이기용)
+
     private static readonly Vector3Int[] directions = new Vector3Int[]
     {
         new Vector3Int(-1, 0, 1),  // 좌상
@@ -25,6 +30,7 @@ public class MoveModeState : MonoBehaviour
         new Vector3Int(0, 1, -1),  // 좌하
         new Vector3Int(1, 0, -1)   // 우하
     };
+
     void Awake()
     {
         if (Instance == null)
@@ -35,11 +41,8 @@ public class MoveModeState : MonoBehaviour
         {
             Destroy(gameObject);
         }
-
     }
 
-    //추가됨 낄렵
-    //
     public void SetActive(bool active, ActionPacketData apData)
     {
         if (active == isActive) return;
@@ -47,53 +50,48 @@ public class MoveModeState : MonoBehaviour
         if (isActive) StartSelectDestLoop(apData);
         else StopSelectDestLoop();
     }
-    /*
-    public void SetActive(bool active, ActionPacketData apData)
-    {
-        if (active == isActive) return; //이미중복 코루틴 시작 방지
-        isActive = active;
-        if (isActive) StartSelectDestLoop(apData);
-        else StopSelectDestLoop();
-    }*/
 
     private void StartSelectDestLoop(ActionPacketData apData)
     {
+        // 연출: 생각 포즈
+        LocalState.Instance.PlayerObDic[PhotonNetwork.LocalPlayer.ActorNumber]
+            .GetComponentInChildren<Animator>().SetTrigger("Trig_Think");
 
-        LocalState.Instance.PlayerObDic[PhotonNetwork.LocalPlayer.ActorNumber].GetComponentInChildren<Animator>().SetTrigger("Trig_Think");
-
+        // 이동 가능 타일 하이라이트
         TilePreprocessing(apData);
+
+        // Raging 트리거/상태 초기화 (이전 라운드 잔여 트리거로 튀는 것 방지)
+        _ragingNow.Clear();
         GridManagement.Instance.ClearAllRageTriggers();
 
-        GridManagement.Instance.RageOnWhereCanMove();
+        // ✅ 기존처럼 "가능 타일 전체 Rage ON"은 하지 않는다 (hover만 켬)
+        // GridManagement.Instance.RageOnWhereCanMove();
 
         if (_selectDestCoroutine == null)
             _selectDestCoroutine = StartCoroutine(SelectDestLoop(apData));
     }
+
     private void TilePreprocessing(ActionPacketData apData)
     {
-
-
         actorNum = Photon.Pun.PhotonNetwork.LocalPlayer.ActorNumber;
 
         var data = LocalRenderingStatic.localRenderingDatas[actorNum];
         int startIndex = data.curpos;
 
+        // 이동 가능 범위(Cyan) 표시만 하고, Raging은 hover에서만 담당
         GridManagement.Instance.HighlightReachableTilesFrom(
             startIndex,
             apData.defaultMove,
             Color.cyan,
-            "Move"// 이동 가능 타일
+            "Move"
         );
-
-
     }
 
-    //추가됨 낄렵
     private IEnumerator SelectDestLoop(ActionPacketData apData)
     {
         while (isActive)
         {
-            // ★ ESC 취소
+            // ESC 취소
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 CancelAndReturn();
@@ -107,40 +105,37 @@ public class MoveModeState : MonoBehaviour
 
     private void CancelAndReturn()
     {
-        StopSelectDestLoop();                // 하이라이트/코루틴 정리
+        // 하이라이트/코루틴/연출 정리
+        StopSelectDestLoop();
         isActive = false;
-        hoveredTile = null; selectedTile = null;
+        hoveredTile = null;
+        selectedTile = null;
         if (alim) alim.SetActive(false);
-        GridManagement.Instance.RageDone();
 
-        LocalState.Instance.PlayerObDic[PhotonNetwork.LocalPlayer.ActorNumber].GetComponentInChildren<Animator>().SetTrigger("Trig_Think_Done");
-
-        LocalState.Instance.ReturnToChooseLoop();   // ★ 중앙 게이트 호출
+        // 중앙 게이트 복귀
+        LocalState.Instance.ReturnToChooseLoop();
     }
-    /*
-    private IEnumerator SelectDestLoop(ActionPacketData apData)
-    {
-        while (isActive)
-        {
-            SelectDest(apData);     // 매 프레임 목적지 선택 로직
-            yield return null;
-        }
-    }*/
-
 
     private void StopSelectDestLoop()
     {
-
         if (_selectDestCoroutine != null)
         {
+            // 모든 타일 Raging 끄고 상태 초기화
             GridManagement.Instance.RageDone();
+            _ragingNow.Clear();
 
-            LocalState.Instance.PlayerObDic[PhotonNetwork.LocalPlayer.ActorNumber].GetComponentInChildren<Animator>().SetTrigger("Trig_Think_Done");
+            // 연출 종료
+            LocalState.Instance.PlayerObDic[PhotonNetwork.LocalPlayer.ActorNumber]
+                .GetComponentInChildren<Animator>().SetTrigger("Trig_Think_Done");
+
+            // 타일 색상/상태 원복
             GridManagement.Instance.ResetAllTiles();
+
             StopCoroutine(_selectDestCoroutine);
             _selectDestCoroutine = null;
         }
     }
+
     void SelectDest(ActionPacketData apData)
     {
         int destinationIndex;
@@ -154,35 +149,41 @@ public class MoveModeState : MonoBehaviour
 
             if (currentTile != null && currentTile.canMove)
             {
-                alim.SetActive(true);
+                // 안내 UI
+                if (alim) alim.SetActive(true);
 
                 // 이전 hover 색 원복 (선택된 타일은 유지)
                 if (hoveredTile != null && hoveredTile != selectedTile)
                     hoveredTile.GetComponent<SpriteRenderer>().color = hoveredTile.defaultColor;
 
-                // 현재 hover 타일 색 노란색으로 변경
+                // 현재 hover 타일 색 강조
                 if (currentTile != selectedTile)
                     hoveredObj.GetComponent<SpriteRenderer>().color = Color.yellow;
 
                 distance = currentTile.cost;
-                alim.GetComponent<TextMeshProUGUI>().text = $"이동까지 {distance} 행동 소모";
+                if (alim)
+                    alim.GetComponent<TextMeshProUGUI>().text = $"이동까지 {distance} 행동 소모";
+
                 hoveredTile = currentTile;
+
+                // ✅ hover 타일만 Raging 유지 (카드 모드와 동일 방식)
+                UpdateRageForHoveredTile(currentTile);
 
                 // 클릭 처리
                 if (Input.GetMouseButtonDown(0))
                 {
                     if (currentTile.canMove == false)
                     {
-                        alim.GetComponent<TextMeshProUGUI>().text = $"해당 위치로는 이동할 수 없다";
-
+                        if (alim) alim.GetComponent<TextMeshProUGUI>().text = $"해당 위치로는 이동할 수 없다";
+                        return;
                     }
+
                     destinationIndex = currentTile.tileIndex;
 
-
-
-
+                    // 코루틴/연출 정리 먼저
                     StopSelectDestLoop();
 
+                    // 액션 제출
                     ActionData action = new ActionData
                     {
                         actionId = 0,
@@ -190,16 +191,20 @@ public class MoveModeState : MonoBehaviour
                     };
                     CardEffect moveEffect = new CardEffect(HookType.Activate, EffectType.Move, destinationIndex, 0);
                     action.effects.Add(moveEffect);
+
                     int actualCost = Mathf.Min(distance, apData.defaultMoveCast);
-
-
                     Overmind.Instance?.SubmitSelection(action, actualCost, actorNum, LocalState.Instance.btmPacket);
 
                     isActive = false;
                     hoveredTile = null;
                     selectedTile = null;
-                    alim.SetActive(false);
+                    if (alim) alim.SetActive(false);
                 }
+            }
+            else
+            {
+                // 이동 불가 타일 위면 Raging 끄기
+                UpdateRageForHoveredTile(null);
             }
         }
         else
@@ -210,37 +215,27 @@ public class MoveModeState : MonoBehaviour
                 hoveredTile.GetComponent<SpriteRenderer>().color = hoveredTile.defaultColor;
                 hoveredTile = null;
             }
+            // Raging 대상 비우기
+            UpdateRageForHoveredTile(null);
         }
     }
 
-    /* IEnumerator ExitMoveModeAfterFrame()
-     {
-         yield return new WaitForSecondsRealtime(0.05f); ; // 1 프레임 기다린 후 종료 (클릭과 색 갱신 충돌 방지)
+    /// <summary>
+    /// hover 중인 타일 1개만 Raging 유지되도록 prev/next 차이만 반영
+    /// </summary>
+    private void UpdateRageForHoveredTile(EachTile tile)
+    {
+        _scratch.Clear();
+        if (tile != null && tile.canMove)
+            _scratch.Add(tile.tileIndex);
 
-         foreach (var obj in grid.tileObjects.Values)
-         {
-             var sr = obj.GetComponent<SpriteRenderer>();
-             sr.color = Color.white;
-         }
+        GridManagement.Instance.RageApplyDiff(_ragingNow, _scratch);
 
+        // 집합 스왑(할당 없이 유지)
+        var t = _ragingNow; _ragingNow = _scratch; _scratch = t;
+    }
 
-         //캐릭터 위치 이동
-         if (selectedTile != null)
-         {
-             Transform charPoint = selectedTile.transform.Find("charpoint");
-             if (charPoint != null)
-             {
-                 chara.transform.position = charPoint.position;
-             }
-             else
-             {
-                 Debug.LogWarning("선택된 타일에 'charpoint' 오브젝트가 없습니다.");
-             }
-         }
-
-         isActive = false;
-         hoveredTile = null;
-         selectedTile = null;
-     }
- */
+    /* 필요시 사용하던 이전 코드 참고용
+    IEnumerator ExitMoveModeAfterFrame() { ... }
+    */
 }
