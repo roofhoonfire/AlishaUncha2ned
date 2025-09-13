@@ -365,6 +365,38 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+  - cardCode: c14
+    hook: 0
+    victimDefendTrigger: Trig_Defend
+    victimDefendStateName: Base Layer.Alisha_Defend
+    guardAnimatorTrigger: 
+    guardStateName: 
+    guardClip: {fileID: 0}
+    prepTrigger: Trig_Prep_Pierce
+    prepStateName: Base Layer.Alisha_Prep_Pierce
+    prepClip: {fileID: 7400000, guid: 607c46d6cb592fc46b8a3f502feb6f77, type: 2}
+    prepTotalFramesOverride: 0
+    prepPoseHoldSec: 1
+    animatorTrigger: Trig_Pierce
+    stateName: Base Layer.Alisha_Pierce
+    clip: {fileID: 7400000, guid: 491a1a6fe8ea7244a9a975ccc9132b13, type: 2}
+    totalFramesOverride: 0
+    victimAnimatorTrigger: Trig_Damaged
+    victimStateName: Base Layer.Alisha_Damaged
+    victimClip: {fileID: 7400000, guid: 7fd8eff2fb1d3c04288c0e7d00ae7d49, type: 2}
+    victimStartFrames: 01000000
+    usePrepBackdrop: 1
+    prepBackdropSprite: {fileID: 21300000, guid: 2f0421c3c8964b0419d48f65575ebaa0,
+      type: 3}
+    prepBackdropFadeIn: 0.15
+    prepBackdropFadeOut: 0.12
+    hitStops:
+    - frame: 2
+      duration: 0.3
+      pauseAttacker: 1
+      pauseVictim: 1
+      pauseEffects: 1
+      pauseScene: 0
   - cardCode: c16
     hook: 0
     victimDefendTrigger: Trig_Defend

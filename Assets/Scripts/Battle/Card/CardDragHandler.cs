@@ -168,6 +168,9 @@ public class CardDragHandler : MonoBehaviour,
 
                 btmPacketAdd(thisCardData.code);
                 Destroy(gameObject);
+
+                LocalState.Instance.PlayerObDic[PhotonNetwork.LocalPlayer.ActorNumber].GetComponentInChildren<Animator>().SetTrigger("Trig_Support_Buff");
+
             }
             else if (thisCardData.cardType == 2)
             {

@@ -1,4 +1,9 @@
 #code,type,name,sprite,animation,addingCard,boundPoint,onlyOnce,require,isUsed,cardText
-j1,handAdd,마무리 일격,,,c7,1,0,none,,메인 액션에 피해를 20추가하는 “마무리 일격”을 손 패에 추가합니다
+j1,handAdd,마무리 일격,,,c7,1,0,none,,메인 액션에 피해를 10추가하는 “마무리 일격”을 손 패에 추가합니다
 j2,handAdd,속임수 주사위,,,c8,2,0,none,,캐스팅을 +-3 조절할 수 있는 “속임수 주사위”를 손 패에 추가합니다
+j3,handAdd,가속,,,c10,2,0,none,,선공 시 유리해지는 멋진 카드를 손 패에 추가합니다 
 j4,Reinforce,전광석화,,,,2,1,none,,이제 부터 이동하는데 더 이상 캐스팅이 소요되지 않습니다
+j5,handAdd,술법 두루마리,,,c15,2,0,none,,바꿔치기 술법의 두루마리를 손 패에 추가합니다
+j6,handAdd,조금 빠르게,,,c32,2,0,none,,일단 서두르는 카드를 손 패에 추가합니다
+j7,handAdd,유비무환,,,c33,2,0,none,,약점 보험 카드를 손 패에 추가합니다
+j8,handAdd,우직한 남자,,,c34,1,0,none,,우직해지는 카드를 손 패에 추가합니다

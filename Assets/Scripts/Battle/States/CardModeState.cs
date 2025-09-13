@@ -1,4 +1,4 @@
-// CardModeState.cs 발췌/패치
+// CardModeState.cs (원파일 통짜 교체본)
 using DG.Tweening;
 using Photon.Pun;
 using System.Collections;
@@ -13,9 +13,6 @@ public class CardModeState : MonoBehaviour
     [Header("Card UI")]
     public GameObject cardPrefab;
     public RectTransform cardContentArea;
-
-    //[Header("Hands Orchestrator")]
-    //public BothArmsAnimator hands; // 인스펙터에 BothArmsAnimator 할당
 
     // Buffer
     public ActionData curAction;
@@ -43,6 +40,16 @@ public class CardModeState : MonoBehaviour
 
     private void StartSelectCardLoop(ActionPacketData apdata)
     {
+        // 생각 모션 트리거
+        var me = PhotonNetwork.LocalPlayer.ActorNumber;
+        if (LocalState.Instance?.PlayerObDic != null &&
+            LocalState.Instance.PlayerObDic.TryGetValue(me, out var meGo) &&
+            meGo != null)
+        {
+            var anim = meGo.GetComponentInChildren<Animator>();
+            if (anim) anim.SetTrigger("Trig_Think");
+        }
+
         apDataRef = apdata;
         if (_selectCardCoroutine == null)
             _selectCardCoroutine = StartCoroutine(SelectCardFlow(apdata));
@@ -113,6 +120,16 @@ public class CardModeState : MonoBehaviour
         yield return BothArmsAnimator.Instance.PlayExit();
 
         if (LocalState.Instance?.alim) LocalState.Instance.alim.SetActive(false);
+
+        var me = PhotonNetwork.LocalPlayer.ActorNumber;
+        if (LocalState.Instance?.PlayerObDic != null &&
+            LocalState.Instance.PlayerObDic.TryGetValue(me, out var meGo) &&
+            meGo != null)
+        {
+            var anim = meGo.GetComponentInChildren<Animator>();
+            if (anim) anim.SetTrigger("Trig_Think_Done");
+        }
+
         LocalState.Instance.ReturnToChooseLoop();
     }
 
@@ -124,6 +141,15 @@ public class CardModeState : MonoBehaviour
             _selectCardCoroutine = null;
         }
         isActive = false;
+
+        var me = PhotonNetwork.LocalPlayer.ActorNumber;
+        if (LocalState.Instance?.PlayerObDic != null &&
+            LocalState.Instance.PlayerObDic.TryGetValue(me, out var meGo) &&
+            meGo != null)
+        {
+            var anim = meGo.GetComponentInChildren<Animator>();
+            if (anim) anim.SetTrigger("Trig_Think_Done");
+        }
 
         StartCoroutine(CloseHandsThenSubmit(action));
     }
@@ -161,7 +187,7 @@ public class CardModeState : MonoBehaviour
             {
                 Debug.Log("장님련 ㅋㅋ");
 
-                // VisualRoot → BloodShed 경로로 찾기
+                // VisualRoot → BloodShed 경로로 찾기 (자식의 자식 대응)
                 Transform visualRoot = cardGO.transform.Find("VisualRoot");
                 if (visualRoot != null)
                 {
@@ -182,7 +208,6 @@ public class CardModeState : MonoBehaviour
                 }
             }
 
-
             var info = cardGO.GetComponent<EachCardInfo>();
             if (info == null) { Debug.LogWarning("EachCardInfo 없음"); continue; }
 
@@ -196,19 +221,19 @@ public class CardModeState : MonoBehaviour
     public void ClearAllCards()
     {
         for (int i = cardContentArea.childCount - 1; i >= 0; i--)
-        {
             Destroy(cardContentArea.GetChild(i).gameObject);
-        }
+
         spawnedCards.Clear();
     }
 
     private void SelectCard()
     {
-        // 너의 기존 로직 그대로 사용 (드래그핸들러에서 StopSelectCardLoop 호출)
+        // 드래그핸들러에서 StopSelectCardLoop 호출하는 기존 구조 사용
     }
 
     public void ActionPacketUpgrade(ActionPacketData apData)
     {
+        Debug.Log("손패 업글 눈에 보이지예?");
         int delta_cast = apData.permCast + apData.tempCast;
         int delta_def = apData.tempDef + apData.permDef;
 
@@ -218,16 +243,34 @@ public class CardModeState : MonoBehaviour
         {
             if (card == null) continue;
 
-            var timeTf = card.transform.Find("TimeClock");
-            var defTf = card.transform.Find("Defense");
-            if (timeTf == null || defTf == null) continue;
+            var info = card.GetComponentInChildren<EachCardInfo>();
+            if (info == null || info.cardData.cardType == 1) continue; // 카드타입 1은 스킵
 
-            var tmp = timeTf.GetComponent<TextMeshProUGUI>();
-            var tmpDef = defTf.GetComponent<TextMeshProUGUI>();
-            if (tmp != null && int.TryParse(tmp.text, out int v1))
-                tmp.text = Mathf.Max(apData.CastingMinumum, v1 + delta_cast).ToString();
+            // 이름 기준 깊이 탐색으로 TMP 바로 가져오기 (자식의 자식 대응)
+            var tmpTime = card.transform.FindComponentByNameDeep<TextMeshProUGUI>("TimeClock");
+            var tmpDef = card.transform.FindComponentByNameDeep<TextMeshProUGUI>("Defense");
+
+            if (tmpTime != null && int.TryParse(tmpTime.text, out int v1))
+                tmpTime.text = Mathf.Max(apData.CastingMinumum, v1 + delta_cast).ToString();
+
             if (tmpDef != null && int.TryParse(tmpDef.text, out int v2))
                 tmpDef.text = Mathf.Max(0, v2 + delta_def).ToString();
         }
+    }
+}
+
+// ===== 여기부터 같은 파일 바깥(전역)에 두는 확장 메서드 유틸 =====
+public static class TransformUtil
+{
+    /// <summary>
+    /// 이름이 targetName인 자손 노드 어디에서든 컴포넌트 T를 찾아 반환.
+    /// 존재하지 않으면 null. 비활성 포함(true).
+    /// </summary>
+    public static T FindComponentByNameDeep<T>(this Transform root, string targetName) where T : Component
+    {
+        if (root == null || string.IsNullOrEmpty(targetName)) return null;
+        foreach (var c in root.GetComponentsInChildren<T>(true))
+            if (c != null && c.name == targetName) return c;
+        return null;
     }
 }

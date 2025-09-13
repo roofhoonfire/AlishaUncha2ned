@@ -58,6 +58,8 @@ public class MoveModeState : MonoBehaviour
 
     private void StartSelectDestLoop(ActionPacketData apData)
     {
+        LocalState.Instance.PlayerObDic[PhotonNetwork.LocalPlayer.ActorNumber].GetComponentInChildren<Animator>().SetTrigger("Trig_Think");
+
         TilePreprocessing(apData);
         if (_selectDestCoroutine == null)
             _selectDestCoroutine = StartCoroutine(SelectDestLoop(apData));
@@ -105,6 +107,8 @@ public class MoveModeState : MonoBehaviour
         hoveredTile = null; selectedTile = null;
         if (alim) alim.SetActive(false);
 
+        LocalState.Instance.PlayerObDic[PhotonNetwork.LocalPlayer.ActorNumber].GetComponentInChildren<Animator>().SetTrigger("Trig_Think_Done");
+
         LocalState.Instance.ReturnToChooseLoop();   // ★ 중앙 게이트 호출
     }
     /*
@@ -123,6 +127,8 @@ public class MoveModeState : MonoBehaviour
 
         if (_selectDestCoroutine != null)
         {
+
+            LocalState.Instance.PlayerObDic[PhotonNetwork.LocalPlayer.ActorNumber].GetComponentInChildren<Animator>().SetTrigger("Trig_Think_Done");
             GridManagement.Instance.ResetAllTiles();
             StopCoroutine(_selectDestCoroutine);
             _selectDestCoroutine = null;
