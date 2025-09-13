@@ -64,8 +64,12 @@ public class MoveModeState : MonoBehaviour
         _ragingNow.Clear();
         GridManagement.Instance.ClearAllRageTriggers();
 
-        // ✅ 기존처럼 "가능 타일 전체 Rage ON"은 하지 않는다 (hover만 켬)
+
+        //  기존처럼 "가능 타일 전체 Rage ON"은 하지 않는다 (hover만 켬)
         // GridManagement.Instance.RageOnWhereCanMove();
+
+       //캐스팅박스
+        AnimTriggerManager.Instance.FireByLabel("myCasting", "Trig_Open");
 
         if (_selectDestCoroutine == null)
             _selectDestCoroutine = StartCoroutine(SelectDestLoop(apData));
@@ -112,6 +116,9 @@ public class MoveModeState : MonoBehaviour
         selectedTile = null;
         if (alim) alim.SetActive(false);
 
+        //캐스팅 박스는 이때만 닫음 제출때는 열어둠
+        AnimTriggerManager.Instance.FireByLabel("myCasting", "Trig_Close");
+
         // 중앙 게이트 복귀
         LocalState.Instance.ReturnToChooseLoop();
     }
@@ -131,6 +138,7 @@ public class MoveModeState : MonoBehaviour
             // 타일 색상/상태 원복
             GridManagement.Instance.ResetAllTiles();
 
+            
             StopCoroutine(_selectDestCoroutine);
             _selectDestCoroutine = null;
         }
