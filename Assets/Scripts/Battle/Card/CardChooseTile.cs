@@ -46,6 +46,10 @@ public class CardChooseTile : MonoBehaviour
     public List<Vector3Int> debugYong;
     public string mouseSide;
 
+    //레이징용
+    private HashSet<int> _ragingNow = new HashSet<int>();
+
+
     void Awake()
     {
         if (Instance == null)
@@ -94,7 +98,8 @@ public class CardChooseTile : MonoBehaviour
         SetupAimLine();
 
 
-
+        _ragingNow.Clear();
+        GridManagement.Instance.ClearAllRageTriggers();
 
         AlertDialogue.Instance.StartDialogue(action, actor, HookType.Activate, 0,DialogueType.TileChoose);
         
@@ -110,7 +115,7 @@ public class CardChooseTile : MonoBehaviour
             yield break;
         }
         tile_chooser_anim.SetTrigger("Trig_TileChoose");
-        GridManagement.Instance.RageOn();
+      //  GridManagement.Instance.RageOn();
 
 
         // ★ tileType이 -1이면 바로 종료
@@ -120,6 +125,9 @@ public class CardChooseTile : MonoBehaviour
             isActive = false;
 
             _selectTileCoroutine = null; // 안전하게 핸들 초기화
+
+            GridManagement.Instance.RageDone();
+            _ragingNow.Clear();
 
             yield break;
         }
@@ -182,7 +190,7 @@ public class CardChooseTile : MonoBehaviour
                     }
                 }
                 //
-                GridManagement.Instance.RageDone();
+               
 
                 GridManagement.Instance.ResetAllTiles();
                 StopSelectTileLoop();
@@ -200,7 +208,8 @@ public class CardChooseTile : MonoBehaviour
             TeardownAimLine();
 
 
-
+            GridManagement.Instance.RageDone();
+            _ragingNow.Clear();
             Overmind.Instance.SendTileandDirec(PhotonNetwork.LocalPlayer.ActorNumber, CoordsToIndices(debugYong), mouseSide);
             isActive = false;
 
@@ -255,8 +264,10 @@ public class CardChooseTile : MonoBehaviour
 
         }
         HighlightTiles(debugYong);
+        UpdateRageForDebugYong();
+
     }
- 
+
     private void CalculateAndLogAngleWithMouseToPlayer()
     {
         if (myChara == null) return;
@@ -411,5 +422,27 @@ public class CardChooseTile : MonoBehaviour
         var wp = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Mathf.Abs(cam.transform.position.y - y)));
         return new Vector3(wp.x, y, wp.z);
     }
+
+    private void UpdateRageForDebugYong()
+    {
+        // debugYong(List<Vector3Int>) → 인덱스 Set
+        var next = new HashSet<int>();
+        if (debugYong != null)
+        {
+            foreach (var c in debugYong)
+            {
+                int idx = GridManagement.Instance.GetIndexFromCoord(c);
+                if (idx >= 0) next.Add(idx);
+            }
+        }
+
+        // 차이만 반영해 트리거 (재발사/깜빡임 방지)
+        GridManagement.Instance.RageApplyDiff(_ragingNow, next);
+
+        _ragingNow = next;
+    }
+
+
+
 
 }

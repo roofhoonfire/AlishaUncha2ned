@@ -444,4 +444,83 @@ public class GridManagement : MonoBehaviour
             tileObj.GetComponent<SpriteRenderer>().color = tile.defaultColor;
         }
     }
+
+
+    // 선택 집합(인덱스)의 증감 차이만 반영해서 Rage 트리거 적용
+    // GridManagement.cs
+    public void RageApplyDiff(HashSet<int> prev, HashSet<int> next)
+    {
+        if (tileObjects == null) return;
+        prev ??= new HashSet<int>();
+        next ??= new HashSet<int>();
+
+        // 1) 새로 들어온 타일만 Raging ON
+        foreach (var idx in next)
+        {
+            if (!prev.Contains(idx) && tileObjects.TryGetValue(idx, out var go) && go)
+            {
+                var anim = go.GetComponentInChildren<Animator>(true);
+                if (!anim) continue;
+                anim.ResetTrigger("Trig_Raging_Done"); // 남아있던 Done 제거
+                anim.SetTrigger("Trig_Raging");
+            }
+        }
+
+        // 2) 세트에서 빠진 타일만 Raging_Done (← 여기가 prev를 돈다!)
+        foreach (var idx in prev)
+        {
+            if (!next.Contains(idx) && tileObjects.TryGetValue(idx, out var go) && go)
+            {
+                var anim = go.GetComponentInChildren<Animator>(true);
+                if (!anim) continue;
+                anim.ResetTrigger("Trig_Raging"); // 혹시 남아있을 수 있는 On 정리(옵션)
+                anim.SetTrigger("Trig_Raging_Done");
+            }
+        }
+    }
+
+
+    // 지정된 인덱스들만 즉시 Rage ON (무브 모드에서 1회용으로 사용)
+    public void RageOnForIndices(IEnumerable<int> indices)
+    {
+        if (tileObjects == null) return;
+        foreach (var idx in indices)
+        {
+            if (tileObjects.TryGetValue(idx, out var go) && go != null)
+            {
+                var anim = go.GetComponentInChildren<Animator>(true);
+                if (anim) anim.SetTrigger("Trig_Raging");
+            }
+        }
+    }
+
+    // 현재 canMove가 true인 타일들만 Rage ON (무브 모드 진입 시 1회 호출)
+    public void RageOnWhereCanMove()
+    {
+        if (tileObjects == null) return;
+        foreach (var kv in tileObjects)
+        {
+            var go = kv.Value;
+            if (!go) continue;
+            var tile = go.GetComponent<EachTile>();
+            if (tile != null && tile.canMove)
+            {
+                var anim = go.GetComponentInChildren<Animator>(true);
+                if (anim) anim.SetTrigger("Trig_Raging");
+            }
+        }
+    }
+
+    public void ClearAllRageTriggers()
+    {
+        if (tileObjects == null) return;
+        foreach (var go in tileObjects.Values)
+        {
+            var anim = go ? go.GetComponentInChildren<Animator>(true) : null;
+            if (!anim) continue;
+            anim.ResetTrigger("Trig_Raging");
+            anim.ResetTrigger("Trig_Raging_Done");
+        }
+    }
+
 }

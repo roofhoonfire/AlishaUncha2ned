@@ -58,11 +58,14 @@ public class MoveModeState : MonoBehaviour
 
     private void StartSelectDestLoop(ActionPacketData apData)
     {
-        GridManagement.Instance.RageOn();
 
         LocalState.Instance.PlayerObDic[PhotonNetwork.LocalPlayer.ActorNumber].GetComponentInChildren<Animator>().SetTrigger("Trig_Think");
 
         TilePreprocessing(apData);
+        GridManagement.Instance.ClearAllRageTriggers();
+
+        GridManagement.Instance.RageOnWhereCanMove();
+
         if (_selectDestCoroutine == null)
             _selectDestCoroutine = StartCoroutine(SelectDestLoop(apData));
     }
