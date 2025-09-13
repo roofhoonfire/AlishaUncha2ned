@@ -116,6 +116,29 @@ public class GridManagement : MonoBehaviour
             return default;
         }
     }
+    public void RageOn()
+    {
+        if (tileObjects == null || tileObjects.Count == 0) return;
+
+        foreach (var go in tileObjects.Values)
+        {
+            if (go == null) continue;
+            var anim = go.GetComponentInChildren<Animator>(true); // 자식에 붙어있어도 대응
+            if (anim != null) anim.SetTrigger("Trig_Raging");
+        }
+    }
+
+    public void RageDone()
+    {
+        if (tileObjects == null || tileObjects.Count == 0) return;
+
+        foreach (var go in tileObjects.Values)
+        {
+            if (go == null) continue;
+            var anim = go.GetComponentInChildren<Animator>(true);
+            if (anim != null) anim.SetTrigger("Trig_Raging_Done");
+        }
+    }
 
     public List<int> ReturnEveryTile()
     {

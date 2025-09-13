@@ -417,7 +417,7 @@ Transform:
   m_GameObject: {fileID: 105230982}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -608,6 +608,7 @@ GameObject:
   - component: {fileID: 187938556}
   - component: {fileID: 187938555}
   - component: {fileID: 187938557}
+  - component: {fileID: 187938558}
   m_Layer: 0
   m_Name: Tile 25
   m_TagString: Tile
@@ -625,7 +626,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -1.8700004, y: -0.47000027, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1119952242}
@@ -688,7 +689,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -718,8 +719,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &187938558
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 187938553}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &195360713
 GameObject:
   m_ObjectHideFlags: 0
@@ -856,7 +878,7 @@ Transform:
   m_GameObject: {fileID: 205218997}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -887,7 +909,7 @@ Transform:
   m_GameObject: {fileID: 218452198}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1011,6 +1033,7 @@ GameObject:
   - component: {fileID: 252134913}
   - component: {fileID: 252134914}
   - component: {fileID: 252134915}
+  - component: {fileID: 252134916}
   m_Layer: 0
   m_Name: Tile 34
   m_TagString: Tile
@@ -1028,7 +1051,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.8, y: -3.83, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 600116544}
@@ -1075,7 +1098,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1121,8 +1144,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &252134916
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 252134911}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &258835098
 GameObject:
   m_ObjectHideFlags: 0
@@ -1135,6 +1179,7 @@ GameObject:
   - component: {fileID: 258835100}
   - component: {fileID: 258835101}
   - component: {fileID: 258835102}
+  - component: {fileID: 258835103}
   m_Layer: 0
   m_Name: Tile 17
   m_TagString: Tile
@@ -1152,7 +1197,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -6.2700005, y: 1.2499999, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1515367263}
@@ -1199,7 +1244,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1245,8 +1290,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &258835103
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 258835098}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &274414054
 GameObject:
   m_ObjectHideFlags: 0
@@ -1571,7 +1637,7 @@ Transform:
   m_GameObject: {fileID: 282049241}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2113,7 +2179,7 @@ Transform:
   m_GameObject: {fileID: 357883929}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2169,6 +2235,7 @@ GameObject:
   - component: {fileID: 379649611}
   - component: {fileID: 379649612}
   - component: {fileID: 379649613}
+  - component: {fileID: 379649614}
   m_Layer: 0
   m_Name: Tile 14
   m_TagString: Tile
@@ -2186,7 +2253,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 4.09, y: 2.7599998, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 357883930}
@@ -2233,7 +2300,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -2279,8 +2346,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &379649614
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379649609}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &385564175
 GameObject:
   m_ObjectHideFlags: 0
@@ -2529,6 +2617,7 @@ GameObject:
   - component: {fileID: 412048790}
   - component: {fileID: 412048789}
   - component: {fileID: 412048791}
+  - component: {fileID: 412048792}
   m_Layer: 0
   m_Name: Tile 24
   m_TagString: Tile
@@ -2546,7 +2635,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -4.71, y: -0.47000027, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 541717660}
@@ -2609,7 +2698,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -2639,8 +2728,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &412048792
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 412048787}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &412093230
 GameObject:
   m_ObjectHideFlags: 0
@@ -2666,7 +2776,7 @@ Transform:
   m_GameObject: {fileID: 412093230}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2832,7 +2942,7 @@ Transform:
   m_GameObject: {fileID: 478201991}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.3, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2956,7 +3066,7 @@ Transform:
   m_GameObject: {fileID: 492828711}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2987,7 +3097,7 @@ Transform:
   m_GameObject: {fileID: 495259663}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3097,6 +3207,7 @@ GameObject:
   - component: {fileID: 518308693}
   - component: {fileID: 518308692}
   - component: {fileID: 518308694}
+  - component: {fileID: 518308695}
   m_Layer: 0
   m_Name: Tile 26
   m_TagString: Tile
@@ -3114,7 +3225,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.6599997, y: -0.41000032, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 105230983}
@@ -3177,7 +3288,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -3207,8 +3318,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &518308695
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 518308690}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &527470016
 GameObject:
   m_ObjectHideFlags: 0
@@ -3356,6 +3488,7 @@ GameObject:
   - component: {fileID: 529749227}
   - component: {fileID: 529749228}
   - component: {fileID: 529749229}
+  - component: {fileID: 529749230}
   m_Layer: 0
   m_Name: Tile 11
   m_TagString: Tile
@@ -3373,7 +3506,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -4.71, y: 2.6999998, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1514762907}
@@ -3420,7 +3553,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -3466,8 +3599,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &529749230
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 529749225}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &535476075
 GameObject:
   m_ObjectHideFlags: 0
@@ -3628,7 +3782,7 @@ Transform:
   m_GameObject: {fileID: 541717659}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3696,7 +3850,7 @@ Transform:
   m_GameObject: {fileID: 589298907}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3727,7 +3881,7 @@ Transform:
   m_GameObject: {fileID: 592864146}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3758,7 +3912,7 @@ Transform:
   m_GameObject: {fileID: 600116543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4116,6 +4270,7 @@ GameObject:
   - component: {fileID: 664580996}
   - component: {fileID: 664580995}
   - component: {fileID: 664580997}
+  - component: {fileID: 664580998}
   m_Layer: 0
   m_Name: Tile 20
   m_TagString: Tile
@@ -4133,7 +4288,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 2.35, y: 1.2499999, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 495259664}
@@ -4196,7 +4351,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -4226,8 +4381,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &664580998
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 664580993}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &670943448
 GameObject:
   m_ObjectHideFlags: 0
@@ -4240,6 +4416,7 @@ GameObject:
   - component: {fileID: 670943451}
   - component: {fileID: 670943450}
   - component: {fileID: 670943452}
+  - component: {fileID: 670943453}
   m_Layer: 0
   m_Name: Tile 27
   m_TagString: Tile
@@ -4257,7 +4434,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 4.09, y: -0.41000032, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 589298908}
@@ -4320,7 +4497,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -4350,8 +4527,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &670943453
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 670943448}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &713844639
 GameObject:
   m_ObjectHideFlags: 0
@@ -4580,7 +4778,7 @@ Transform:
   m_GameObject: {fileID: 729798788}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4611,7 +4809,7 @@ Transform:
   m_GameObject: {fileID: 745465192}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4642,7 +4840,7 @@ Transform:
   m_GameObject: {fileID: 749356433}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4673,7 +4871,7 @@ Transform:
   m_GameObject: {fileID: 762752359}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4777,7 +4975,7 @@ Transform:
   m_GameObject: {fileID: 804669803}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4808,7 +5006,7 @@ Transform:
   m_GameObject: {fileID: 820226681}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5150,7 +5348,7 @@ Transform:
   m_GameObject: {fileID: 879137368}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5181,7 +5379,7 @@ Transform:
   m_GameObject: {fileID: 886797679}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5212,7 +5410,7 @@ Transform:
   m_GameObject: {fileID: 887847687}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5230,6 +5428,7 @@ GameObject:
   - component: {fileID: 903743407}
   - component: {fileID: 903743408}
   - component: {fileID: 903743409}
+  - component: {fileID: 903743410}
   m_Layer: 0
   m_Name: Tile 37
   m_TagString: Tile
@@ -5247,7 +5446,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 4.55, y: -3.82, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2129246725}
@@ -5294,7 +5493,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -5340,8 +5539,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 0.19999999}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &903743410
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 903743405}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &909436045
 GameObject:
   m_ObjectHideFlags: 0
@@ -5354,6 +5574,7 @@ GameObject:
   - component: {fileID: 909436047}
   - component: {fileID: 909436048}
   - component: {fileID: 909436049}
+  - component: {fileID: 909436050}
   m_Layer: 0
   m_Name: Tile 16
   m_TagString: Tile
@@ -5371,7 +5592,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -9.110001, y: 1.2499999, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 412093231}
@@ -5418,7 +5639,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -5464,8 +5685,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &909436050
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 909436045}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &941629508
 GameObject:
   m_ObjectHideFlags: 0
@@ -5478,6 +5720,7 @@ GameObject:
   - component: {fileID: 941629510}
   - component: {fileID: 941629511}
   - component: {fileID: 941629512}
+  - component: {fileID: 941629513}
   m_Layer: 0
   m_Name: Tile 36
   m_TagString: Tile
@@ -5495,7 +5738,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.68, y: -3.84, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 886797680}
@@ -5542,7 +5785,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -5588,8 +5831,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &941629513
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 941629508}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &955902407
 GameObject:
   m_ObjectHideFlags: 0
@@ -5615,7 +5879,7 @@ Transform:
   m_GameObject: {fileID: 955902407}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6003,6 +6267,7 @@ GameObject:
   - component: {fileID: 995616313}
   - component: {fileID: 995616312}
   - component: {fileID: 995616314}
+  - component: {fileID: 995616315}
   m_Layer: 0
   m_Name: Tile 29
   m_TagString: Tile
@@ -6020,7 +6285,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -6.05, y: -2.1500003, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2059618537}
@@ -6083,7 +6348,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -6113,8 +6378,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &995616315
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 995616310}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &998290675
 GameObject:
   m_ObjectHideFlags: 0
@@ -6238,7 +6524,7 @@ Transform:
   m_GameObject: {fileID: 1000556374}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6344,7 +6630,7 @@ Transform:
   m_GameObject: {fileID: 1018877937}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6752,6 +7038,7 @@ GameObject:
   - component: {fileID: 1107438211}
   - component: {fileID: 1107438210}
   - component: {fileID: 1107438212}
+  - component: {fileID: 1107438213}
   m_Layer: 0
   m_Name: Tile 32
   m_TagString: Tile
@@ -6769,7 +7056,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 2.43, y: -2.0900006, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1227188847}
@@ -6832,7 +7119,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -6862,8 +7149,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1107438213
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1107438208}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1119952241
 GameObject:
   m_ObjectHideFlags: 0
@@ -6889,7 +7197,7 @@ Transform:
   m_GameObject: {fileID: 1119952241}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6907,6 +7215,7 @@ GameObject:
   - component: {fileID: 1140553799}
   - component: {fileID: 1140553798}
   - component: {fileID: 1140553800}
+  - component: {fileID: 1140553801}
   m_Layer: 0
   m_Name: Tile 28
   m_TagString: Tile
@@ -6924,7 +7233,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 7.11, y: -0.41000032, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1000556375}
@@ -6987,7 +7296,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -7017,8 +7326,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1140553801
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1140553796}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1150598455
 GameObject:
   m_ObjectHideFlags: 0
@@ -7128,6 +7458,7 @@ GameObject:
   - component: {fileID: 1157431727}
   - component: {fileID: 1157431726}
   - component: {fileID: 1157431728}
+  - component: {fileID: 1157431729}
   m_Layer: 0
   m_Name: Tile 23
   m_TagString: Tile
@@ -7145,7 +7476,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -7.5, y: -0.41000032, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1383063911}
@@ -7208,7 +7539,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -7238,8 +7569,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1157431729
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1157431724}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1163808912
 GameObject:
   m_ObjectHideFlags: 0
@@ -7252,6 +7604,7 @@ GameObject:
   - component: {fileID: 1163808915}
   - component: {fileID: 1163808914}
   - component: {fileID: 1163808916}
+  - component: {fileID: 1163808917}
   m_Layer: 0
   m_Name: Tile 1
   m_TagString: Tile
@@ -7269,7 +7622,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -4.24, y: 5.7, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 478201992}
@@ -7332,7 +7685,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -7362,8 +7715,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1163808917
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163808912}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1182906955
 GameObject:
   m_ObjectHideFlags: 0
@@ -7376,6 +7750,7 @@ GameObject:
   - component: {fileID: 1182906958}
   - component: {fileID: 1182906957}
   - component: {fileID: 1182906959}
+  - component: {fileID: 1182906960}
   m_Layer: 0
   m_Name: Tile 5
   m_TagString: Tile
@@ -7393,7 +7768,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -5.82, y: 4.29, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 745465193}
@@ -7456,7 +7831,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -7486,8 +7861,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1182906960
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1182906955}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1201915035
 GameObject:
   m_ObjectHideFlags: 0
@@ -7500,6 +7896,7 @@ GameObject:
   - component: {fileID: 1201915038}
   - component: {fileID: 1201915037}
   - component: {fileID: 1201915039}
+  - component: {fileID: 1201915040}
   m_Layer: 0
   m_Name: Tile 3
   m_TagString: Tile
@@ -7517,7 +7914,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.97, y: 5.73, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 205218998}
@@ -7580,7 +7977,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -7610,8 +8007,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1201915040
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1201915035}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1214995070
 GameObject:
   m_ObjectHideFlags: 0
@@ -7624,6 +8042,7 @@ GameObject:
   - component: {fileID: 1214995073}
   - component: {fileID: 1214995072}
   - component: {fileID: 1214995074}
+  - component: {fileID: 1214995075}
   m_Layer: 0
   m_Name: Tile 21
   m_TagString: Tile
@@ -7641,7 +8060,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 5.14, y: 1.3099997, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1689765670}
@@ -7704,7 +8123,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -7734,8 +8153,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1214995075
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1214995070}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1227188846
 GameObject:
   m_ObjectHideFlags: 0
@@ -7761,7 +8201,7 @@ Transform:
   m_GameObject: {fileID: 1227188846}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7779,6 +8219,7 @@ GameObject:
   - component: {fileID: 1233021888}
   - component: {fileID: 1233021887}
   - component: {fileID: 1233021889}
+  - component: {fileID: 1233021890}
   m_Layer: 0
   m_Name: Tile 22
   m_TagString: Tile
@@ -7796,7 +8237,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 8.56, y: 1.3099998, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 729798789}
@@ -7859,7 +8300,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -7889,8 +8330,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1233021890
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1233021885}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1245416446
 GameObject:
   m_ObjectHideFlags: 0
@@ -7903,6 +8365,7 @@ GameObject:
   - component: {fileID: 1245416448}
   - component: {fileID: 1245416449}
   - component: {fileID: 1245416450}
+  - component: {fileID: 1245416451}
   m_Layer: 0
   m_Name: Tile 6
   m_TagString: Tile
@@ -7920,7 +8383,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -2.98, y: 4.27, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 887847688}
@@ -7967,7 +8430,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -8013,8 +8476,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1245416451
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1245416446}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1248244944
 GameObject:
   m_ObjectHideFlags: 0
@@ -8162,6 +8646,7 @@ GameObject:
   - component: {fileID: 1271468938}
   - component: {fileID: 1271468937}
   - component: {fileID: 1271468939}
+  - component: {fileID: 1271468940}
   m_Layer: 0
   m_Name: Tile 2
   m_TagString: Tile
@@ -8179,7 +8664,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -1.69, y: 5.74, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 820226682}
@@ -8242,7 +8727,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -8272,8 +8757,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1271468940
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1271468935}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1293044639
 GameObject:
   m_ObjectHideFlags: 0
@@ -8678,6 +9184,7 @@ GameObject:
   - component: {fileID: 1334508148}
   - component: {fileID: 1334508147}
   - component: {fileID: 1334508149}
+  - component: {fileID: 1334508150}
   m_Layer: 0
   m_Name: Tile 10
   m_TagString: Tile
@@ -8695,7 +9202,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -7.5, y: 2.7599998, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1756300771}
@@ -8758,7 +9265,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -8788,8 +9295,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1334508150
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334508145}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1356683214
 GameObject:
   m_ObjectHideFlags: 0
@@ -9077,7 +9605,7 @@ Transform:
   m_GameObject: {fileID: 1383063910}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9095,6 +9623,7 @@ GameObject:
   - component: {fileID: 1401319521}
   - component: {fileID: 1401319522}
   - component: {fileID: 1401319523}
+  - component: {fileID: 1401319524}
   m_Layer: 0
   m_Name: Tile 13
   m_TagString: Tile
@@ -9112,7 +9641,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.6599997, y: 2.7599998, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 218452199}
@@ -9159,7 +9688,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -9205,8 +9734,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1401319524
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1401319519}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1430700022
 GameObject:
   m_ObjectHideFlags: 0
@@ -9219,6 +9769,7 @@ GameObject:
   - component: {fileID: 1430700024}
   - component: {fileID: 1430700025}
   - component: {fileID: 1430700026}
+  - component: {fileID: 1430700027}
   m_Layer: 0
   m_Name: Tile 35
   m_TagString: Tile
@@ -9236,7 +9787,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -1.08, y: -3.89, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2023344982}
@@ -9283,7 +9834,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -9329,8 +9880,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1430700027
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1430700022}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1433090537
 GameObject:
   m_ObjectHideFlags: 0
@@ -9478,6 +10050,7 @@ GameObject:
   - component: {fileID: 1458758901}
   - component: {fileID: 1458758900}
   - component: {fileID: 1458758902}
+  - component: {fileID: 1458758903}
   m_Layer: 0
   m_Name: Tile 31
   m_TagString: Tile
@@ -9495,7 +10068,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.22, y: -2.0900006, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 804669804}
@@ -9558,7 +10131,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -9588,8 +10161,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1458758903
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1458758898}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1459267567
 GameObject:
   m_ObjectHideFlags: 0
@@ -9737,6 +10331,7 @@ GameObject:
   - component: {fileID: 1462083231}
   - component: {fileID: 1462083230}
   - component: {fileID: 1462083232}
+  - component: {fileID: 1462083233}
   m_Layer: 0
   m_Name: Tile 4
   m_TagString: Tile
@@ -9754,7 +10349,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 3.68, y: 5.69, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 955902408}
@@ -9817,7 +10412,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -9847,8 +10442,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1462083233
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1462083228}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1478413083
 GameObject:
   m_ObjectHideFlags: 0
@@ -10173,6 +10789,7 @@ GameObject:
   - component: {fileID: 1511241825}
   - component: {fileID: 1511241824}
   - component: {fileID: 1511241826}
+  - component: {fileID: 1511241827}
   m_Layer: 0
   m_Name: Tile 15
   m_TagString: Tile
@@ -10190,7 +10807,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 7.11, y: 2.7599998, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 592864147}
@@ -10253,7 +10870,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -10283,8 +10900,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1511241827
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511241822}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1514762906
 GameObject:
   m_ObjectHideFlags: 0
@@ -10310,7 +10948,7 @@ Transform:
   m_GameObject: {fileID: 1514762906}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10341,7 +10979,7 @@ Transform:
   m_GameObject: {fileID: 1515367262}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10359,6 +10997,7 @@ GameObject:
   - component: {fileID: 1538919562}
   - component: {fileID: 1538919563}
   - component: {fileID: 1538919564}
+  - component: {fileID: 1538919565}
   m_Layer: 0
   m_Name: Tile 7
   m_TagString: Tile
@@ -10376,7 +11015,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.31, y: 4.29, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 749356434}
@@ -10423,7 +11062,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -10469,8 +11108,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1538919565
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1538919560}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1578708057
 GameObject:
   m_ObjectHideFlags: 0
@@ -11134,7 +11794,7 @@ Transform:
   m_GameObject: {fileID: 1689765669}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11319,6 +11979,7 @@ GameObject:
   - component: {fileID: 1713110895}
   - component: {fileID: 1713110896}
   - component: {fileID: 1713110897}
+  - component: {fileID: 1713110898}
   m_Layer: 0
   m_Name: Tile 12
   m_TagString: Tile
@@ -11336,7 +11997,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -1.8700004, y: 2.6999998, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 492828712}
@@ -11383,7 +12044,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -11429,8 +12090,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1713110898
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1713110893}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1734600830
 GameObject:
   m_ObjectHideFlags: 0
@@ -11443,6 +12125,7 @@ GameObject:
   - component: {fileID: 1734600833}
   - component: {fileID: 1734600832}
   - component: {fileID: 1734600834}
+  - component: {fileID: 1734600835}
   m_Layer: 0
   m_Name: Tile 30
   m_TagString: Tile
@@ -11460,7 +12143,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -2.95, y: -2.1500006, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 879137369}
@@ -11523,7 +12206,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -11553,8 +12236,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1734600835
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1734600830}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1756300770
 GameObject:
   m_ObjectHideFlags: 0
@@ -11580,7 +12284,7 @@ Transform:
   m_GameObject: {fileID: 1756300770}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11795,7 +12499,7 @@ Transform:
   m_GameObject: {fileID: 1868749781}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11813,6 +12517,7 @@ GameObject:
   - component: {fileID: 1871250366}
   - component: {fileID: 1871250367}
   - component: {fileID: 1871250368}
+  - component: {fileID: 1871250369}
   m_Layer: 0
   m_Name: Tile 18
   m_TagString: Tile
@@ -11830,7 +12535,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.08, y: 1.3099997, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1868749782}
@@ -11877,7 +12582,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -11923,8 +12628,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1871250369
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1871250364}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1876878054
 GameObject:
   m_ObjectHideFlags: 0
@@ -11937,6 +12663,7 @@ GameObject:
   - component: {fileID: 1876878056}
   - component: {fileID: 1876878057}
   - component: {fileID: 1876878058}
+  - component: {fileID: 1876878059}
   m_Layer: 0
   m_Name: Tile 9
   m_TagString: Tile
@@ -11954,7 +12681,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 5.25, y: 4.3599997, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 762752360}
@@ -12001,7 +12728,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -12047,8 +12774,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1876878059
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1876878054}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1881724363
 GameObject:
   m_ObjectHideFlags: 0
@@ -12136,6 +12884,7 @@ GameObject:
   - component: {fileID: 1899042516}
   - component: {fileID: 1899042517}
   - component: {fileID: 1899042518}
+  - component: {fileID: 1899042519}
   m_Layer: 0
   m_Name: Tile 8
   m_TagString: Tile
@@ -12153,7 +12902,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 2.4299994, y: 4.2199984, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1018877938}
@@ -12200,7 +12949,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -12246,8 +12995,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1899042519
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1899042514}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1917372438
 GameObject:
   m_ObjectHideFlags: 0
@@ -12951,7 +13721,7 @@ Transform:
   m_GameObject: {fileID: 2023344981}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13221,7 +13991,7 @@ Transform:
   m_GameObject: {fileID: 2059618536}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13527,7 +14297,7 @@ Transform:
   m_GameObject: {fileID: 2110314168}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13545,6 +14315,7 @@ GameObject:
   - component: {fileID: 2127227036}
   - component: {fileID: 2127227037}
   - component: {fileID: 2127227038}
+  - component: {fileID: 2127227039}
   m_Layer: 0
   m_Name: Tile 19
   m_TagString: Tile
@@ -13562,7 +14333,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.54, y: 1.3099998, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2110314169}
@@ -13609,7 +14380,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -13655,8 +14426,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &2127227039
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2127227034}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &2129246724
 GameObject:
   m_ObjectHideFlags: 0
@@ -13682,7 +14474,7 @@ Transform:
   m_GameObject: {fileID: 2129246724}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7.300001, z: 0}
+  m_LocalPosition: {x: -0.07, y: 1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13700,6 +14492,7 @@ GameObject:
   - component: {fileID: 2144392613}
   - component: {fileID: 2144392612}
   - component: {fileID: 2144392614}
+  - component: {fileID: 2144392615}
   m_Layer: 0
   m_Name: Tile 33
   m_TagString: Tile
@@ -13717,7 +14510,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 5.25, y: -1.9500008, z: 0}
-  m_LocalScale: {x: 0.12872465, y: 0.12872465, z: 0.12872465}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 282049242}
@@ -13780,7 +14573,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 92fefd610842dc54f9e54f7a863e7f15, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6786488222a02d742a9524e5d7a07cd8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -13810,8 +14603,29 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.799999, y: 10.799999, z: 0.19999999}
+  m_Size: {x: 1.25, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &2144392615
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2144392610}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9a129ca948619ea4fa75a53535aafba3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!95 &275722024547678862
 Animator:
   serializedVersion: 5

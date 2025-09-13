@@ -110,6 +110,7 @@ public class CardChooseTile : MonoBehaviour
             yield break;
         }
         tile_chooser_anim.SetTrigger("Trig_TileChoose");
+        GridManagement.Instance.RageOn();
 
 
         // ★ tileType이 -1이면 바로 종료
@@ -181,6 +182,8 @@ public class CardChooseTile : MonoBehaviour
                     }
                 }
                 //
+                GridManagement.Instance.RageDone();
+
                 GridManagement.Instance.ResetAllTiles();
                 StopSelectTileLoop();
             }

@@ -58,6 +58,8 @@ public class MoveModeState : MonoBehaviour
 
     private void StartSelectDestLoop(ActionPacketData apData)
     {
+        GridManagement.Instance.RageOn();
+
         LocalState.Instance.PlayerObDic[PhotonNetwork.LocalPlayer.ActorNumber].GetComponentInChildren<Animator>().SetTrigger("Trig_Think");
 
         TilePreprocessing(apData);
@@ -106,6 +108,7 @@ public class MoveModeState : MonoBehaviour
         isActive = false;
         hoveredTile = null; selectedTile = null;
         if (alim) alim.SetActive(false);
+        GridManagement.Instance.RageDone();
 
         LocalState.Instance.PlayerObDic[PhotonNetwork.LocalPlayer.ActorNumber].GetComponentInChildren<Animator>().SetTrigger("Trig_Think_Done");
 
@@ -127,6 +130,7 @@ public class MoveModeState : MonoBehaviour
 
         if (_selectDestCoroutine != null)
         {
+            GridManagement.Instance.RageDone();
 
             LocalState.Instance.PlayerObDic[PhotonNetwork.LocalPlayer.ActorNumber].GetComponentInChildren<Animator>().SetTrigger("Trig_Think_Done");
             GridManagement.Instance.ResetAllTiles();
