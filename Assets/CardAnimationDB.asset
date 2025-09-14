@@ -340,14 +340,14 @@ MonoBehaviour:
     guardAnimatorTrigger: 
     guardStateName: 
     guardClip: {fileID: 0}
-    prepTrigger: Trig_Prep_Slash
-    prepStateName: Base Layer.Alisha_Prep_Slash
-    prepClip: {fileID: 7400000, guid: 7fb552cbf3b38a749882866e3dc5d288, type: 2}
+    prepTrigger: Trig_Prep_NonAttack
+    prepStateName: Base Layer.Alisha_Prep_NonAttack
+    prepClip: {fileID: 7400000, guid: fad60273e97fe4b46b33708f33ca6a6e, type: 2}
     prepTotalFramesOverride: 0
     prepPoseHoldSec: 1
-    animatorTrigger: Trig_Slash
-    stateName: Base Layer.Alisha_Slash
-    clip: {fileID: 7400000, guid: c052ebee4afb8ff4aac20e219294e11a, type: 2}
+    animatorTrigger: Trig_NonAttack
+    stateName: Base Layer.Alisha_NonAttack
+    clip: {fileID: 7400000, guid: 27469a599d5cf4a49aca0f5ec7f15661, type: 2}
     totalFramesOverride: 0
     victimAnimatorTrigger: Trig_Damaged
     victimStateName: Base Layer.Alisha_Damaged
@@ -404,26 +404,26 @@ MonoBehaviour:
     guardAnimatorTrigger: 
     guardStateName: 
     guardClip: {fileID: 0}
-    prepTrigger: Trig_Prep_SpellDam
-    prepStateName: Base Layer.Alisha_Prep_SpellDam
-    prepClip: {fileID: 7400000, guid: 815045b1187f5954f821d1712fb2dbe7, type: 2}
+    prepTrigger: Trig_Prep_NonAttack
+    prepStateName: Base Layer.Alisha_Prep_NonAttack
+    prepClip: {fileID: 7400000, guid: fad60273e97fe4b46b33708f33ca6a6e, type: 2}
     prepTotalFramesOverride: 0
     prepPoseHoldSec: 1
-    animatorTrigger: Trig_SpellDam
-    stateName: Base Layer.Alisha_SpellDam
-    clip: {fileID: 7400000, guid: fdfca1722f13df34bb359b2494759738, type: 2}
+    animatorTrigger: Trig_NonAttack
+    stateName: Base Layer.Alisha_NonAttack
+    clip: {fileID: 7400000, guid: 27469a599d5cf4a49aca0f5ec7f15661, type: 2}
     totalFramesOverride: 0
     victimAnimatorTrigger: Trig_Damaged
     victimStateName: Base Layer.Alisha_Damaged
     victimClip: {fileID: 7400000, guid: 7fd8eff2fb1d3c04288c0e7d00ae7d49, type: 2}
-    victimStartFrames: 01000000
+    victimStartFrames: 02000000
     usePrepBackdrop: 1
     prepBackdropSprite: {fileID: 21300000, guid: 2f0421c3c8964b0419d48f65575ebaa0,
       type: 3}
     prepBackdropFadeIn: 0.15
     prepBackdropFadeOut: 0.12
     hitStops:
-    - frame: 2
+    - frame: 3
       duration: 0.7
       pauseAttacker: 1
       pauseVictim: 1
@@ -660,26 +660,26 @@ MonoBehaviour:
     guardAnimatorTrigger: 
     guardStateName: 
     guardClip: {fileID: 0}
-    prepTrigger: Trig_Prep_SpellDam
-    prepStateName: Base Layer.Alisha_Prep_SpellDam
-    prepClip: {fileID: 7400000, guid: 815045b1187f5954f821d1712fb2dbe7, type: 2}
+    prepTrigger: Trig_Prep_NonAttack
+    prepStateName: Base Layer.Alisha_Prep_NonAttack
+    prepClip: {fileID: 7400000, guid: fad60273e97fe4b46b33708f33ca6a6e, type: 2}
     prepTotalFramesOverride: 0
     prepPoseHoldSec: 1
-    animatorTrigger: Trig_SpellDam
-    stateName: Base Layer.Alisha_SpellDam
-    clip: {fileID: 7400000, guid: fdfca1722f13df34bb359b2494759738, type: 2}
+    animatorTrigger: Trig_NonAttack
+    stateName: Base Layer.Alisha_NonAttack
+    clip: {fileID: 7400000, guid: 27469a599d5cf4a49aca0f5ec7f15661, type: 2}
     totalFramesOverride: 0
     victimAnimatorTrigger: Trig_Damaged
     victimStateName: Base Layer.Alisha_Damaged
     victimClip: {fileID: 7400000, guid: 7fd8eff2fb1d3c04288c0e7d00ae7d49, type: 2}
-    victimStartFrames: 01000000
+    victimStartFrames: 02000000
     usePrepBackdrop: 1
     prepBackdropSprite: {fileID: 21300000, guid: 2f0421c3c8964b0419d48f65575ebaa0,
       type: 3}
     prepBackdropFadeIn: 0.15
     prepBackdropFadeOut: 0.12
     hitStops:
-    - frame: 2
+    - frame: 3
       duration: 0.7
       pauseAttacker: 1
       pauseVictim: 1
@@ -852,26 +852,58 @@ MonoBehaviour:
     guardAnimatorTrigger: 
     guardStateName: 
     guardClip: {fileID: 0}
-    prepTrigger: Trig_Prep_SpellDam
-    prepStateName: Base Layer.Alisha_Prep_SpellDam
-    prepClip: {fileID: 7400000, guid: 815045b1187f5954f821d1712fb2dbe7, type: 2}
+    prepTrigger: Trig_Prep_NonAttack
+    prepStateName: Base Layer.Alisha_Prep_NonAttack
+    prepClip: {fileID: 7400000, guid: fad60273e97fe4b46b33708f33ca6a6e, type: 2}
     prepTotalFramesOverride: 0
     prepPoseHoldSec: 1
-    animatorTrigger: Trig_SpellDam
-    stateName: Base Layer.Alisha_SpellDam
-    clip: {fileID: 7400000, guid: fdfca1722f13df34bb359b2494759738, type: 2}
+    animatorTrigger: Trig_NonAttack
+    stateName: Base Layer.Alisha_NonAttack
+    clip: {fileID: 7400000, guid: 27469a599d5cf4a49aca0f5ec7f15661, type: 2}
     totalFramesOverride: 0
     victimAnimatorTrigger: Trig_Damaged
     victimStateName: Base Layer.Alisha_Damaged
     victimClip: {fileID: 7400000, guid: 7fd8eff2fb1d3c04288c0e7d00ae7d49, type: 2}
-    victimStartFrames: 01000000
+    victimStartFrames: 02000000
     usePrepBackdrop: 1
     prepBackdropSprite: {fileID: 21300000, guid: 2f0421c3c8964b0419d48f65575ebaa0,
       type: 3}
     prepBackdropFadeIn: 0.15
     prepBackdropFadeOut: 0.12
     hitStops:
-    - frame: 2
+    - frame: 3
+      duration: 0.7
+      pauseAttacker: 1
+      pauseVictim: 1
+      pauseEffects: 1
+      pauseScene: 0
+  - cardCode: c35
+    hook: 0
+    victimDefendTrigger: Trig_Defend
+    victimDefendStateName: Base Layer.Alisha_Defend
+    guardAnimatorTrigger: 
+    guardStateName: 
+    guardClip: {fileID: 0}
+    prepTrigger: Trig_Prep_NonAttack
+    prepStateName: Base Layer.Alisha_Prep_NonAttack
+    prepClip: {fileID: 7400000, guid: fad60273e97fe4b46b33708f33ca6a6e, type: 2}
+    prepTotalFramesOverride: 0
+    prepPoseHoldSec: 1
+    animatorTrigger: Trig_NonAttack
+    stateName: Base Layer.Alisha_NonAttack
+    clip: {fileID: 7400000, guid: 27469a599d5cf4a49aca0f5ec7f15661, type: 2}
+    totalFramesOverride: 0
+    victimAnimatorTrigger: Trig_Damaged
+    victimStateName: Base Layer.Alisha_Damaged
+    victimClip: {fileID: 7400000, guid: 7fd8eff2fb1d3c04288c0e7d00ae7d49, type: 2}
+    victimStartFrames: 02000000
+    usePrepBackdrop: 1
+    prepBackdropSprite: {fileID: 21300000, guid: 2f0421c3c8964b0419d48f65575ebaa0,
+      type: 3}
+    prepBackdropFadeIn: 0.15
+    prepBackdropFadeOut: 0.12
+    hitStops:
+    - frame: 3
       duration: 0.7
       pauseAttacker: 1
       pauseVictim: 1

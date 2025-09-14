@@ -1,5 +1,6 @@
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +40,7 @@ public enum EffectType {
     Blind_Op,
     Dot_Heal, Dot_Burn, Dot_Stealth_Off, Dot_Blind_Off,
     GA_On, 
-    whenDamaged_FlagOn,  Element_Check_FlagOn,  intheRange_FlagOn, 
+    whenDamaged_FlagOn,  Element_Check_FlagOn,  intheRange_FlagOn, withOutFlag_FlagOn,
     Flag_Off, Remove_Element,Invincible_forOneAction,Stealth, Damage, whenAttackedFlagOn, Move, Get_Element, Heal, StackDamage,  GetDefense, DamageMeBangMoo, AddDamage, MoveToSelectedTile, OpNextActionisMoveFlagOn,
      NotRumbleFlagOn, ExtraSelect_Kawari,NextTurn_AddDamage, ReplaceNextOpsMovetoStun, StunRecovery, SelectActionClockChange, UseEnergy, TrueDamage, MakeItTrue, PrevCycleClockFlagOn,  ReduceMyNextTurnActionClock, 
 }
@@ -172,6 +173,35 @@ public class CardEffect
                     Debug.Log("플래그는 제 역할을 다했다 ㅂㅂ");
                 break;
             }
+
+
+                //
+            case EffectType.withOutFlag_FlagOn:
+                
+                int flag2Check = amount / 100;
+                int flagToAdd_ = amount % 100;
+
+                bool nono = false;
+                foreach (int val in hAction.flags)
+{
+                    if (val == flag2Check)
+                    {
+                        Debug.Log("응 이 플래그잇으면 안됨ㅋㅋ");
+                        nono = true;
+                        break;
+                    }
+
+                }
+
+                if (!nono)
+                {
+                    Debug.Log($"응{flag2Check} flag 없으니까 플래그 On요우 ");
+                    CardAction.Instance.FlagOn(hActorNum, hAction, flagToAdd_);
+
+
+                }
+                break;
+
             case EffectType.Add_ActionClock_Op:
                 {
                     bool existsInQueue = Overmind.Instance.actionQueue
@@ -267,7 +297,7 @@ public class CardEffect
                 break;
             case EffectType.Blind_Op:
                 Overmind.Instance.players[hOpActorNum].isBlinded = true;
-                CardAction.Instance.StartDot_Blind_Off(hOpActorNum, amount);
+                CardAction.Instance.StartDot_Blind_Off(hOpActorNum, amount, hOpMainAction);
                 Debug.Log("눈깔을 파버렸다 ㄷ ㄷ");
                 break;
 

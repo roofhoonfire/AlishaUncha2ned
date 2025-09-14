@@ -28,10 +28,13 @@ public class CardAction : MonoBehaviour
 
 
     }
-    public void StartDot_Blind_Off(int ActorNum, int amount)
+    public void StartDot_Blind_Off(int ActorNum, int amount, ActionData hOpMainAction)
     {
         int actualClock = amount;    // clock 간격으로 증가
 
+        if (hOpMainAction != null)
+            actualClock += hOpMainAction.actionClock;
+        
         // 먼저 기존 BlindOff(203) 액션 제거
         Overmind.Instance.actionQueue.RemoveAll(tuple => tuple.action.actionId == 203);
 
@@ -47,7 +50,8 @@ public class CardAction : MonoBehaviour
             tileType = -1,
             zoneIndex = 4,
             cardcode = "미싱노",
-            Dot_to = ActorNum
+            Dot_to = ActorNum,
+            isDot = true,
         };
 
         Blindoff.effects.Add(new CardEffect(HookType.Dot, EffectType.Dot_Blind_Off, 0, 0));
@@ -80,7 +84,8 @@ public class CardAction : MonoBehaviour
                 tileType = -1,
                 zoneIndex = 4,
                 cardcode = "미싱노",
-                Dot_to = hOpActorNum
+                Dot_to = hOpActorNum,
+                isDot = true,
             };
 
             burn.effects.Add(new CardEffect(HookType.Dot, EffectType.Dot_Burn, 5, 0));
@@ -210,7 +215,8 @@ public class CardAction : MonoBehaviour
                 tileType = -1,
                 zoneIndex = 4,
                 cardcode = "미싱노",
-                Dot_to = hActorNum
+                Dot_to = hActorNum,
+                isDot = true,
             };
 
             heal.effects.Add(new CardEffect(HookType.Dot, EffectType.Heal, value, 0));
@@ -242,7 +248,8 @@ public class CardAction : MonoBehaviour
                 tileType = -1,
                 zoneIndex = 4,
                 cardcode = "미싱노",
-                Dot_to = hActorNum
+                Dot_to = hActorNum,
+                isDot = true,
             };
 
         stealthoff.effects.Add(new CardEffect(HookType.Dot, EffectType.Stealth_Off, 0, 0));

@@ -178,7 +178,7 @@ public class ActionData //여기 뭐 추가할 거면 carddragHandler로 수정�
     public bool hasOtherExecutedSinceInsertion = false; //선공, 대처 결정용 변수
 
     public int nthaction =0;
-
+    public bool isDot = false;
 
     public void InitializeEffects()
     {
@@ -590,6 +590,8 @@ public class Overmind : MonoBehaviourPunCallbacks
                 ? a.remainingCost.CompareTo(b.remainingCost)
                 : a.action.nthaction.CompareTo(b.action.nthaction)
         ); pendingSelections.Clear();
+
+
     }
 
    
@@ -597,7 +599,7 @@ public class Overmind : MonoBehaviourPunCallbacks
     {
 
 
-
+        
 
         var keys = players.Keys.ToList();
 
@@ -616,9 +618,10 @@ public class Overmind : MonoBehaviourPunCallbacks
         string var1json = JsonConvert.SerializeObject(var1);
         string var2json = JsonConvert.SerializeObject(var2);
 
-        photonView.RPC(nameof(RPC_After_Action_Selection_Sync_M2C), RpcTarget.All, var1json, var2json);
+        photonView.RPC(nameof(RPC_After_Action_Selection_Sync_M2C), RpcTarget.All, var1json, var2json, cycleState);
         yield return new WaitUntil(() => syncCount == 2);
         syncCount = 0;
+
 
     }
 
@@ -659,7 +662,7 @@ public class Overmind : MonoBehaviourPunCallbacks
                         continue;
                     }
 
-                    if (actionQueue[tempIndex].action.actionId == 99)
+                    if (actionQueue[tempIndex].action.isDot ==true)
                     {
                         var dotAction = actionQueue[tempIndex].action;
                         var dotActorNum = dotAction.Dot_to;
@@ -1213,7 +1216,8 @@ public class Overmind : MonoBehaviourPunCallbacks
     [PunRPC]
     void RPC_FaceOff_ChooseAction_M2C(int actorNumber,  int nthFaceOff, string apjson)
     {
-
+        //여기서 방어도 렌더링 
+        //싸이클 리셋터
         LocalRenderingManager.Instance.Rendering_FaceOff_Start(nthFaceOff);
         if (actorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
         {
@@ -1226,7 +1230,9 @@ public class Overmind : MonoBehaviourPunCallbacks
     [PunRPC]
     void RPC_Norm_ChooseAction_M2C(int actorNumber, string apjson)
     {
-
+        //여기서 방어도 렌더링
+        //여기서 방어도 렌더링 
+        //싸이클 리셋터
         if (actorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
         {
             LocalState.Instance?.Start_NormChoose_Phase(actorNumber, apjson);
@@ -2311,14 +2317,14 @@ public class Overmind : MonoBehaviourPunCallbacks
 
 
     [PunRPC]
-   public void RPC_After_Action_Selection_Sync_M2C(string json1, string json2)
+   public void RPC_After_Action_Selection_Sync_M2C(string json1, string json2, int who_Select)
     {
 
         LocalRenderingData packet1 = JsonConvert.DeserializeObject<LocalRenderingData>(json1);
         LocalRenderingData packet2 = JsonConvert.DeserializeObject<LocalRenderingData>(json2);
 
 
-        LocalRenderingManager.Instance.Rendering_AfterActionSelect(packet1, packet2);
+        LocalRenderingManager.Instance.Rendering_AfterActionSelect(packet1, packet2, who_Select);
 
 
     }

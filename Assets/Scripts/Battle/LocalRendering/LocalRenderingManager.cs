@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Microlight.MicroBar;
 using Photon.Pun;
 using System.Collections;
@@ -20,9 +21,14 @@ public class LocalRenderingManager : MonoBehaviour
     public TextMeshProUGUI myBound;
     public TextMeshProUGUI OpBound;
 
+    public GameObject paching_Op;
+
     public static LocalRenderingManager Instance;
     [SerializeField] BoundImageConductor myBoundConductor;
     [SerializeField] BoundImageConductor opBoundConductor;
+
+    private Coroutine _runningRAAS; // 애프터 액션 추즈를 위한 (코스트 등좡  똭을 위한 코루튄)
+
 
     public class RenderDiff
     {
@@ -40,6 +46,18 @@ public class LocalRenderingManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+
+
+
+    public void Rendering_On_Action_Select(LocalRenderingData data1, LocalRenderingData data2)
+    {
+        //여기서 할꺼 싸이클 업뎃이랑
+
+        //방어도 업뎃
+
+
     }
 
 
@@ -62,8 +80,8 @@ public class LocalRenderingManager : MonoBehaviour
         Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
     }
 
-
-    public  void Rendering_AfterActionSelect(LocalRenderingData data1, LocalRenderingData data2)
+    /*
+    public  void Rendering_AfterActionSelect(LocalRenderingData data1, LocalRenderingData data2, int whoselect)
     {
 
         List<RenderDiff> diffs = CopyandDifferences(data1, data2);
@@ -76,6 +94,11 @@ public class LocalRenderingManager : MonoBehaviour
         //ApplyDiffsToLocalRenderingData(diffs);
         //Debug.Log("문제없다");
 
+
+
+
+
+
         //뚜왕 하는 느낌으루다가!
         ApplyImmediateUI(data1);
         ApplyImmediateUI(data2);
@@ -84,8 +107,95 @@ public class LocalRenderingManager : MonoBehaviour
         Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
 
 
+    }*/
+    public void Rendering_AfterActionSelect(LocalRenderingData data1, LocalRenderingData data2, int whoselect)
+    {
+        // 진행 중이면 정리하고 새로 시작 (원하면 Kill 생략 가능)
+        if (_runningRAAS != null) StopCoroutine(_runningRAAS);
+        _runningRAAS = StartCoroutine(Rendering_AfterActionSelect_Coroutine(data1, data2, whoselect));
     }
-   public void ApplyImmediateUI(LocalRenderingData data)
+    public IEnumerator Rendering_AfterActionSelect_AndWait(LocalRenderingData data1, LocalRenderingData data2, int whoselect)
+    {
+        yield return Rendering_AfterActionSelect_Coroutine(data1, data2, whoselect);
+    }
+
+    // 3) 실제 로직은 코루틴에 둔다 (여기서만 연출 완료까지 대기)
+    private IEnumerator Rendering_AfterActionSelect_Coroutine(LocalRenderingData data1, LocalRenderingData data2, int whoselect)
+    {
+        List<RenderDiff> diffs = CopyandDifferences(data1, data2);
+        ApplyDiffsToLocalRenderingData(diffs);
+
+        // “뚜왕” 연출: 끝날 때까지 대기
+        if(whoselect != PhotonNetwork.LocalPlayer.ActorNumber)
+            paching_Op.SetActive(true);
+        yield return BounceRemainingCost(data1, data2, whoselect);
+
+        // 연출이 끝난 뒤에만 UI 적용
+        ApplyImmediateUI(data1);
+        ApplyImmediateUI(data2);
+
+        //추가 해야하는 거 카드 코드 전달 섹스 보지 
+        
+        Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
+        _runningRAAS = null;
+    }
+
+    private IEnumerator BounceRemainingCost(LocalRenderingData data1, LocalRenderingData data2, int whoselect)
+    {
+        if (mycostRemainTxt == null && opponencostRemainTxt == null)
+            yield break;
+
+        int myActor = PhotonNetwork.LocalPlayer.ActorNumber;
+
+        bool d1IsMine = data1 != null && data1.actorNum == myActor;
+        bool d2IsMine = data2 != null && data2.actorNum == myActor;
+
+        int myRemain = d1IsMine ? data1.remainingCost : (d2IsMine ? data2.remainingCost : 0);
+        int opRemain = d1IsMine ? (data2 != null ? data2.remainingCost : 0)
+                                : (data1 != null ? data1.remainingCost : 0);
+
+        int oppActor = d1IsMine ? (data2 != null ? data2.actorNum : -1)
+                                : (data1 != null ? data1.actorNum : -1);
+
+        bool playMy = (whoselect == 0) || (whoselect == myActor);
+        bool playOp = (whoselect == 0) || ((oppActor != -1) && (whoselect == oppActor));
+
+        // 텍스트 갱신
+        if (mycostRemainTxt != null) mycostRemainTxt.text = myRemain.ToString();
+        if (opponencostRemainTxt != null) opponencostRemainTxt.text = opRemain.ToString();
+
+        // 시퀀스 구성 + “붙인 개수”로 판단
+        int joinCount = 0;
+        var master = DOTween.Sequence();
+
+        if (playMy && mycostRemainTxt != null)
+        {
+            master.Join(BuildBounceSeq(mycostRemainTxt.rectTransform));
+            joinCount++;
+        }
+        if (playOp && opponencostRemainTxt != null)
+        {
+            master.Join(BuildBounceSeq(opponencostRemainTxt.rectTransform));
+            joinCount++;
+        }
+
+        if (joinCount == 0)
+            yield break; // 붙인 트윈이 없으면 바로 종료
+
+        yield return master.WaitForCompletion();
+    }
+
+    private static Sequence BuildBounceSeq(RectTransform rt, float upScale = 1.5f, float durUp = 0.4f, float durDown = 0.6f)
+    {
+        // 중복 트윈으로 스케일 꼬임 방지하고 싶다면 아래 한 줄 활성화:
+        // rt.DOKill(true);
+
+        Vector3 baseScale = rt.localScale;
+        return DOTween.Sequence()
+            .Append(rt.DOScale(baseScale * upScale, durUp).SetEase(Ease.OutBack))
+            .Append(rt.DOScale(baseScale, durDown).SetEase(Ease.InOutQuad));
+    }
+    public void ApplyImmediateUI(LocalRenderingData data)
     {
         bool isMine = data.actorNum == PhotonNetwork.LocalPlayer.ActorNumber;
 

@@ -188,6 +188,7 @@ public class CardDragHandler : MonoBehaviour,
                         Debug.Log("support added");
                     }
                 }
+                CardModeState.Instance.ActionPacketUpgrade(apData);
 
                 btmPacketAdd(thisCardData.code);
                 Destroy(gameObject);

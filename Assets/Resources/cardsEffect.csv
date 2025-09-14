@@ -30,6 +30,7 @@ c12,Activate,Damage,0,0
 c13 ,Counter,whenAttackedFlagOn,1,0
 c13 ,Counter,GetDefense,-20,1
 c13 ,Counter,Flag_Off,1,1
+c13 ,Activate,NotRumbleFlagOn,30,1
 c14,Activate,Damage,0,0
 c14,Priority,PrevCycleClockFlagOn,15,0
 c14,Priority,MakeItTrue,0,22
@@ -38,7 +39,7 @@ c15,Guard,ExtraSelect_Kawari,0,1
 c15,Guard,Move,0,1
 c15,Guard,GA_On,0,1
 c15,Guard,Flag_Off,1,1
-c16,Activate,NotRumbleFlagOn,30,0
+c16,Activate,NextTurn_AddDamage,20,0
 c17,BeforeRumble,Invincible_forOneAction,0,0
 c17,Activate,Damage,0,0
 c18,Activate,Damage,0,0
@@ -90,8 +91,10 @@ c28,Activate,Remove_Element,3,1
 c28,Activate,Flag_Off,1,1
 c29,Activate,Damage,0,0
 c29,Activate,Element_Check_FlagOn,33201,0
-c29,Activate,ReplaceNextOpsMovetoStun,7,1
-c29,Activate,Remove_Element,332,1
+c29,Activate,intheRange_FlagOn,2,1
+c29,Activate,ReplaceNextOpsMovetoStun,7,2
+c29,Activate,Remove_Element,332,2
+c29,Activate,Flag_Off,2,2
 c29,Activate,Flag_Off,1,1
 c30,Activate,Damage,0,0
 c30,Activate,Element_Check_FlagOn,33201,0
@@ -100,11 +103,17 @@ c30,Activate,Remove_Element,332,1
 c30,Activate,Flag_Off,1,1
 c31,Activate,DamageMeBangMoo,20,0
 c31,Activate,StartDot_Heal,31010,0
-c32,Counter,whenDamaged_FlagOn,2001,0
-c32,Counter,ReduceMyNextTurnActionClock,-5,1
-c32,Counter,AddDamage,10,1
-c32,Counter,GetDefense,10,1
-c32,Counter,Flag_Off,1,1
+c33,Counter,whenDamaged_FlagOn,2001,0
+c33,Counter,ReduceMyNextTurnActionClock,-5,1
+c33,Counter,AddDamage,10,1
+c33,Counter,GetDefense,10,1
+c33,Counter,Flag_Off,1,1
+c35,Counter,whenDamaged_FlagOn,1,0
+c35,Activate,withOutFlag_FlagOn,102,0
+c35,Activate,Get_Element,1,2
+c35,Activate,Get_Element,2,2
+c35,Activate,Get_Element,3,2
+c35,Activate,Get_Element,4,2
 c38,Activate,Damage,0,0
 c38,Activate,intheRange_FlagOn,1,0
 c38,Activate,Blind_Op,4,1

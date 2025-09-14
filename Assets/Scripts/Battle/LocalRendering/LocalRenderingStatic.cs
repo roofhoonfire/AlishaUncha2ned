@@ -46,7 +46,12 @@ public static class RenderingConverter
             isStealthed = player.isStealthed,
             elements = new List<apProp>(player.forActionPacket_elem_List),
             rightOrLeft = player.rightOrLeft,
-        };
+            //카드 선택 때 만 보여주면 될 거 같음 일단
+            whosCycle = Overmind.Instance.cycleState,
+            myCard = found.action.cardcode
+           
+        //이 셋다 말이지
+            };
     }
 }
 public class LocalRenderingData
@@ -64,6 +69,9 @@ public class LocalRenderingData
     public bool isBlinded;
     public List<apProp> elements;
     public string rightOrLeft;
+    public string myCard;
+    public int whosCycle;
+
     //여기 애니메이션도 들어가야함
     
 }
