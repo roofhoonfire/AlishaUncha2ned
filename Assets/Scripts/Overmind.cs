@@ -573,7 +573,7 @@ public class Overmind : MonoBehaviourPunCallbacks
         yield return new WaitUntil(() => pendingSelections.Count == players.Count);
 
         // Register initial queue
-        actionQueue.Clear();
+      //  actionQueue.Clear();
         foreach (var sel in pendingSelections)
         {
             // 새로 들어오는 액션은, 아직 다른 액션이 실행된 적 없으므로 false로
@@ -1678,7 +1678,7 @@ public class Overmind : MonoBehaviourPunCallbacks
         //한번의 해프터 후커당 하나의 애니메이션이 출력된다고 생각해라 게이야 
         string actionJson = JsonConvert.SerializeObject(Nowhooker.action);
         string actionJson2 = JsonConvert.SerializeObject(opAction);
-        Debug.Log($"{Nowhooker.action.nthaction}의 렌더링하라고 마스터 클라이언트 요청 :: 렐렐");
+        Debug.Log($"{Nowhooker.action.cardname}의 렌더링하라고 마스터 클라이언트 요청 :: 렐렐");
         photonView.RPC(nameof(RPC_Norm_Play_Action_M2C), RpcTarget.All, Nowhooker.actorNum, actionJson, var1json, var2json, h, actionJson2, isGA);
         
          yield return new WaitUntil(() => syncCount == 2); //나중에 수정하든가 
@@ -1716,7 +1716,7 @@ public class Overmind : MonoBehaviourPunCallbacks
         //한번의 해프터 후커당 하나의 애니메이션이 출력된다고 생각해라 게이야 
         string actionJson = JsonConvert.SerializeObject(Nowhooker.action);
         string actionJson2 = JsonConvert.SerializeObject(opAction);
-        Debug.Log($"{Nowhooker.action.nthaction}의 렌더링하라고 마스터 클라이언트 요청 :: 렐렐");
+        Debug.Log($"{Nowhooker.action.cardname}의 렌더링하라고 마스터 클라이언트 요청 :: 렐렐");
         photonView.RPC(nameof(RPC_Rumble_Play_Single_Action_M2C), RpcTarget.All, Nowhooker.actorNum, actionJson, var1json, var2json, h, actionJson2);
 
         yield return new WaitUntil(() => syncCount == 2); //나중에 수정하든가 
@@ -1749,6 +1749,7 @@ public class Overmind : MonoBehaviourPunCallbacks
         //lr 패킷
 
 
+        Debug.Log($"{Nowhooker.action.cardname}의 렌더링하라고 마스터 클라이언트 요청 :: 렐렐");
 
 
         //여기서 출력되어야하는 애니메이션을 한번에 보여주면 됨 그냥(순차적으로)
@@ -2050,7 +2051,7 @@ public class Overmind : MonoBehaviourPunCallbacks
             }
         }
 
-
+        Debug.Log("자여기까지 몇마릴까");
         actionQueue.RemoveRange(0, 2);
 
 

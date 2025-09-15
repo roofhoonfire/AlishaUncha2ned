@@ -27,11 +27,12 @@ public static class RenderingConverter
         int actorNum = player.ActorNumber;
 
         var found = Overmind.Instance.actionQueue
-            .LastOrDefault(tuple => tuple.actorNumber == actorNum);
+      .LastOrDefault(t => t.actorNumber == actorNum);
 
-        int remaining = found.remainingCost;
-        int def = found.Item2 != null ? found.Item2.defense :
-                  fallbackAction != null ? fallbackAction.defense : 0;
+        var chosenAction = found.action ?? fallbackAction;   // ← 안전한 선택
+        int remaining = found.remainingCost;              // 못 찾으면 0
+        int def = chosenAction?.defense ?? 0;
+        string myCard = chosenAction?.cardcode;           // ← 핵심
 
         return new LocalRenderingData
         {
@@ -39,19 +40,17 @@ public static class RenderingConverter
             curpos = player.curpos,
             hp = player.HP,
             defense = def,
-            bounds = new List<string>(player.Bounds),
+            bounds = player.Bounds != null ? new List<string>(player.Bounds) : new List<string>(),
             remainingCost = remaining,
             boundIndex = player.boundIndex,
-            hands = new List<string>(player.hands),
+            hands = player.hands != null ? new List<string>(player.hands) : new List<string>(),
             isStealthed = player.isStealthed,
-            elements = new List<apProp>(player.forActionPacket_elem_List),
+            elements = player.forActionPacket_elem_List != null ? new List<apProp>(player.forActionPacket_elem_List) : new List<apProp>(),
             rightOrLeft = player.rightOrLeft,
-            //카드 선택 때 만 보여주면 될 거 같음 일단
             whosCycle = Overmind.Instance.cycleState,
-            myCard = found.action.cardcode
-           
-        //이 셋다 말이지
-            };
+            myCard = myCard
+        };
+
     }
 }
 public class LocalRenderingData

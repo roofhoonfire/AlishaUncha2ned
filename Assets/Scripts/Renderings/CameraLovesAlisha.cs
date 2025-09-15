@@ -20,8 +20,6 @@ public class CameraLovesAlisha : MonoBehaviour
     [Tooltip("Wait! 기본 페이드 인/홀드/아웃 (초)")]
     public float waitFadeIn = 0.08f, waitHold = 0.25f, waitFadeOut = 0.12f;
 
-
-
     private readonly List<CineHideDuringPoint1> _autoHidden = new();
     [Header("Point1 Backdrop & Isolation")]
     [Tooltip("오버레이 카메라(URP, Render Type=Overlay, CullingMask=Cine_Attacker)")]
@@ -47,7 +45,6 @@ public class CameraLovesAlisha : MonoBehaviour
     // 미세조정(월드 유닛). 필요 없으면 (0,0)
     public Vector2 point1WorldNudge = Vector2.zero;
 
-
     [Header("CutLine FX (Point1 전용)")]
     public GameObject cutLineGO;
     public Animator cutLineAnimator;
@@ -58,14 +55,12 @@ public class CameraLovesAlisha : MonoBehaviour
     public float cutLineZRotWhenFacingLeft = 5f;
     public float cutLineZRotWhenFacingRight = -5f;
 
-
     [Tooltip("flipX=true(왼쪽), false(오른쪽)일 때 CutLine의 Y 회전각(도)")]
     public float cutLineYRotWhenFacingLeft = 60f;
     public float cutLineYRotWhenFacingRight = -60f;
 
     [Tooltip("현재 로컬 회전에 위 값을 덧셈(오프셋)할지 여부. 끄면 절대값으로 세팅")]
     public bool cutLineAngleAsOffset = false;
-
 
     [Tooltip("Animator Trigger 이름 (Idle→Play)")]
     public string cutLineTrigger = "Trig_Play";
@@ -118,35 +113,20 @@ public class CameraLovesAlisha : MonoBehaviour
     public float hardPunchDelta = +1.8f;
     public float hardPunchDuration = 0.12f;
 
-
-
-
-
-
-
-    // CameraLovesAlisha.cs 상단 필드들 근처에 추가
+    // [MOD] Guard Prelude - Wait Pause & Shake
     [Header("[MOD] Guard Prelude - Wait Pause & Shake")]
     [Tooltip("Wait!가 뜬 뒤 카메라가 정지할 시간(초)")]
     public float guardWaitPauseSec = 0.6f;
-
     [Tooltip("정지 동안 Wait 이미지를 흔들 것인지")]
     public bool guardWaitShake = true;
-
     [Tooltip("스케일 펌핑 강도(0~0.25 권장)")]
     [Range(0f, 0.25f)] public float guardWaitShakeScale = 0.06f;
-
     [Tooltip("Z축 회전 펀치 각도(도)")]
     [Range(0f, 25f)] public float guardWaitShakeRot = 8f;
-
     [Tooltip("펀치/쉐이크 진동 횟수")]
     public int guardWaitShakeVibrato = 8;
-
     [Tooltip("펀치 탄성(0~1)")]
     [Range(0f, 1f)] public float guardWaitShakeElasticity = 0.75f;
-
-
-
-
 
     private Camera _cam;
     private bool _cinematicLock = false;
@@ -156,6 +136,7 @@ public class CameraLovesAlisha : MonoBehaviour
     private readonly List<(Transform t, int layer)> _layerBackup = new();
     private bool _isIsolationActive = false;
     private int _isolateLayer = -1;
+
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -169,7 +150,6 @@ public class CameraLovesAlisha : MonoBehaviour
         // 레이어 캐시
         _isolateLayer = LayerMask.NameToLayer(isolateLayerName);
         if (_isolateLayer < 0)
-  
             Debug.LogWarning($"[CameraLovesAlisha] 레이어 '{isolateLayerName}' 가 존재하지 않습니다. (Project Settings → Tags and Layers)");
 
         if (cutLineImage != null)
@@ -177,15 +157,31 @@ public class CameraLovesAlisha : MonoBehaviour
             var c0 = cutLineImage.color; c0.a = 0f; cutLineImage.color = c0;
         }
     }
+
+    // --- 신규: 카메라-공간 깊이(Forward Dot) 계산 ---
+    private float DepthAlongCamera(Vector3 worldPoint)
+    {
+        if (_cam == null) return 10f;
+        Vector3 camToPoint = worldPoint - _cam.transform.position;
+        float depth = Vector3.Dot(camToPoint, _cam.transform.forward);
+        return Mathf.Max(0.01f, depth);
+    }
+
     void LateUpdate()
     {
         if (_cinematicLock) return; // 시네매틱 중엔 자리 고정(트윈이 움직임 제어)
         if (target == null) return;
 
-        Vector3 desiredPosition = target.position + offset;
-        desiredPosition.z = transform.position.z;
-        Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
+        // 월드 z를 강제로 고정하지 말고, 카메라 forward 기준 거리 유지
+        Vector3 desiredTarget = target.position + offset;
+        float depth = DepthAlongCamera(desiredTarget);
+        Vector3 desiredCamPos = desiredTarget - (_cam.transform.forward * depth);
+
+        Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredCamPos, smoothSpeed);
         transform.position = smoothedPosition;
+
+        // 필요시 화면 기울어짐 방지(Z만 0)
+        ResetTiltZ();
     }
 
     // ---------- Public API ----------
@@ -214,6 +210,7 @@ public class CameraLovesAlisha : MonoBehaviour
             Focus(attacker, fovPoint1, durationToPrepEnd);
         }
     }
+
     /// <summary> Attack 시작~N프레임 히트스톱 시작까지 피격자에게 이동(FOV=40) </summary>
     public void MoveToPoint2_Victim(Transform victim, float durationToN, float fovPoint2 = 40f)
         => Focus(victim, fovPoint2, durationToN);
@@ -242,8 +239,10 @@ public class CameraLovesAlisha : MonoBehaviour
         _moveTW?.Kill();
         _fovTW?.Kill();
 
-        Vector3 dest = (t ? t.position : transform.position) + offset;
-        dest.z = transform.position.z;
+        // 대상 지점 + offset을 바라보되, 카메라 forward 기준 거리 유지
+        Vector3 targetPoint = (t ? t.position : transform.position) + offset;
+        float depth = DepthAlongCamera(targetPoint);
+        Vector3 dest = targetPoint - (_cam.transform.forward * depth);
 
         _moveTW = transform.DOMove(dest, Mathf.Max(0f, duration))
                            .SetEase(Ease.InOutSine)
@@ -328,6 +327,7 @@ public class CameraLovesAlisha : MonoBehaviour
             }
         }
     }
+
     // ========== Point1: 공격자만 보이게 + 백드롭 ==========
     public void BeginPoint1Backdrop(GameObject attackerRoot, Sprite bg, float fadeIn = 0.15f, float holdWindowSec = -1f)
     {
@@ -361,29 +361,26 @@ public class CameraLovesAlisha : MonoBehaviour
         // 4) CutLine 트리거
         TriggerCutLine(holdWindowSec, attackerRoot != null ? attackerRoot.transform : null);
 
-        // 5) 마커 붙은 자식 자동 숨김
-        /*  if (autoHideMarkedChildren && attackerRoot != null)
-          {
-              _autoHidden.Clear();
-              attackerRoot.GetComponentsInChildren(true, _autoHidden);
-              foreach (var h in _autoHidden) h.Hide();
-          }
-        */
-        _isIsolationActive = true;
-
-
-    }
-    public void HideEmAll(GameObject attackerRoot)
-    {
-
+        // 5) 마커 붙은 자식 자동 숨김 (원한다면 주석 해제)
+        /*
         if (autoHideMarkedChildren && attackerRoot != null)
         {
             _autoHidden.Clear();
             attackerRoot.GetComponentsInChildren(true, _autoHidden);
             foreach (var h in _autoHidden) h.Hide();
         }
+        */
+        _isIsolationActive = true;
+    }
 
-
+    public void HideEmAll(GameObject attackerRoot)
+    {
+        if (autoHideMarkedChildren && attackerRoot != null)
+        {
+            _autoHidden.Clear();
+            attackerRoot.GetComponentsInChildren(true, _autoHidden);
+            foreach (var h in _autoHidden) h.Hide();
+        }
     }
 
     // CameraLovesAlisha.cs 내부 메서드 아무 곳에 추가
@@ -397,7 +394,7 @@ public class CameraLovesAlisha : MonoBehaviour
         // 2) 기존 ShowWaitSign 재활용: hold = pause 로 설정 (타임스케일 무시)
         ShowWaitSign(pause);
 
-        // 3) "두두두둥" 쉐이크 (스케일 + 회전 펀치) — DOTween 두 개를 병렬로
+        // 3) "두두두둥" 쉐이크 (스케일 + 회전 펀치)
         if (guardWaitShake && pause > 0f)
         {
             var rt = waitImage.rectTransform;
@@ -450,7 +447,6 @@ public class CameraLovesAlisha : MonoBehaviour
             if (sr != null) flipX = sr.flipX;
         }
 
-
         // --- 1) CutLine 회전 세팅 ---
         var rt = cutLineGO.transform as RectTransform; // UI라면 RectTransform일 것
         if (rt != null)
@@ -471,6 +467,7 @@ public class CameraLovesAlisha : MonoBehaviour
                 rt.localRotation = Quaternion.Euler(e.x, targetY, targetZ);
             }
         }
+
         // 2) 보이게 준비
         cutLineGO.SetActive(true);
         if (cutLineImage != null)
@@ -479,7 +476,7 @@ public class CameraLovesAlisha : MonoBehaviour
             cutLineImage.DOFade(1f, cutLineFadeIn).SetUpdate(backdropUseRealtime);
         }
 
-        //3 애니 길이 업뎃 ㅎ
+        // 3) 애니 길이 매칭/재생
         if (cutLineAnimator != null)
         {
             if (cutLineUseUnscaled) cutLineAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;
@@ -490,7 +487,6 @@ public class CameraLovesAlisha : MonoBehaviour
             // Prep 정지 구간(holdWindowSec)에 길이 맞추기 (옵션)
             if (cutLineMatchHold && windowSec > 0.01f && clipLen > 0.01f)
             {
-                // 애니 종료 시간 = clipLen / speed → windowSec에 맞추려면 speed = clipLen / windowSec
                 cutLineAnimator.speed = Mathf.Max(0.01f, clipLen / windowSec);
             }
             else
@@ -504,6 +500,7 @@ public class CameraLovesAlisha : MonoBehaviour
                 cutLineAnimator.Play(cutLineStateName, 0, 0f);
         }
     }
+
     public void EndPoint1Backdrop(float fadeOut = 0.12f)
     {
         // === 0) CutLine 관련 정리: 항상 수행 ===
@@ -522,9 +519,9 @@ public class CameraLovesAlisha : MonoBehaviour
         for (int i = 0; i < _autoHidden.Count; i++)
             if (_autoHidden[i] != null) _autoHidden[i].Show();
         _autoHidden.Clear();
+
         //  셀렉션바는 화면에서 보이지 않게 ‘대기 상태’로
         SelectionBarManager.Instance?.PrepareHiddenStandby();
-
 
         // === 1) 백드롭/오버레이/레이어 복구: 실제로 켠 경우에만 수행 ===
         if (_isIsolationActive && overlayCamera != null && backdropCanvas != null && backdropImage != null)
@@ -566,6 +563,7 @@ public class CameraLovesAlisha : MonoBehaviour
             if (t != null) t.gameObject.layer = l;
         }
     }
+
     public void UnhideAutoHiddenNow()
     {
         // 마커로 숨겨둔 애들은 백드롭 사용 여부와 무관하게 무조건 복구
@@ -581,6 +579,7 @@ public class CameraLovesAlisha : MonoBehaviour
         e.z = 0f;
         transform.eulerAngles = e;
     }
+
     /// <summary>
     /// 대상이 주어진 뷰포트 좌표(anchor.x, anchor.y)에 보이도록
     /// 카메라 중심을 계산해서 트윈. (0~1: 좌->우, 하->상)
@@ -598,17 +597,14 @@ public class CameraLovesAlisha : MonoBehaviour
         Vector3 desiredTarget = (t ? t.position : transform.position) + offset;
         desiredTarget += new Vector3(worldNudge.x, worldNudge.y, 0f);
 
-        // 현재 카메라 기준으로 앵커 좌표가 가리키는 월드 위치
-        float depth = Mathf.Abs((_cam != null ? _cam.transform.position.z : transform.position.z) - desiredTarget.z);
-        if (depth < 0.0001f) depth = 10f; // 안전빵(2D)
-
+        // 카메라-공간 깊이를 사용해 앵커의 월드 좌표 구하기
+        float depth = DepthAlongCamera(desiredTarget);
         Vector3 worldAtAnchor = (_cam != null)
             ? _cam.ViewportToWorldPoint(new Vector3(anchor.x, anchor.y, depth))
             : desiredTarget; // 카메라 없으면 그냥 중앙
 
         // 카메라를 얼마나 움직이면 대상이 앵커에 맞을지 = (대상 - 현재 앵커월드)
-        Vector3 dest = transform.position + (desiredTarget - worldAtAnchor);
-        dest.z = transform.position.z; // Z는 고정
+        Vector3 dest = transform.position + (desiredTarget - worldAtAnchor); // ★ z 고정 금지
 
         _moveTW = transform.DOMove(dest, Mathf.Max(0f, duration))
                            .SetEase(Ease.InOutSine)
@@ -642,7 +638,6 @@ public class CameraLovesAlisha : MonoBehaviour
         }
     }
 
-    // 클래스 내부 메서드 영역 아무 곳에 추가
     /// <summary>
     /// [MOD] Guard 프롤로그에서 쓰는 'Wait!' 표식 연출. 
     /// overrideHoldSec가 있으면 홀드시간을 그 값으로 사용.
@@ -663,8 +658,6 @@ public class CameraLovesAlisha : MonoBehaviour
         seq.Append(img.DOFade(0f, Mathf.Max(0f, waitFadeOut)));
         seq.OnComplete(() => { if (img != null) img.gameObject.SetActive(false); });
     }
-
-    // CameraLovesAlisha.cs
 
     // 1) 내부용: 로컬 플레이어 트랜스폼 찾아오기
     private Transform ResolveLocalPlayerTransform()
@@ -687,5 +680,4 @@ public class CameraLovesAlisha : MonoBehaviour
         var t = ResolveLocalPlayerTransform() ?? _defaultTargetCache ?? target;
         ReturnToDefault(durationOverride, t);
     }
-
 }
