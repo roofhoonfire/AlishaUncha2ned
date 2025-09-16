@@ -1517,7 +1517,7 @@ public class Overmind : MonoBehaviourPunCallbacks
         //var data2 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson2);
         //LocalRenderingManager.Instance.Rendering_Before_Tile_Choose(actornum, data1, data2, action);
         //
-        LocalRenderingManager.Instance.Rendering_Tile_Choose(actornum, action);
+      //  LocalRenderingManager.Instance.Rendering_Tile_Choose(actornum, action);
         if (actornum != PhotonNetwork.LocalPlayer.ActorNumber)
         {
             //상대 생각중!

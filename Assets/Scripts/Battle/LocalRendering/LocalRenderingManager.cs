@@ -29,6 +29,8 @@ public class LocalRenderingManager : MonoBehaviour
 
     private Coroutine _runningRAAS; // 애프터 액션 추즈를 위한 (코스트 등좡  똭을 위한 코루튄)
 
+    public CardHoverPreview_CastingUI myCardCode;
+    public CardHoverPreview_CastingUI opCardCode;
 
     public class RenderDiff
     {
@@ -110,6 +112,16 @@ public class LocalRenderingManager : MonoBehaviour
     }*/
     public void Rendering_AfterActionSelect(LocalRenderingData data1, LocalRenderingData data2, int whoselect)
     {
+        int myActor = PhotonNetwork.LocalPlayer.ActorNumber;
+
+
+        List<RenderDiff> diffs = CopyandDifferences(data1, data2);
+        ApplyDiffsToLocalRenderingData(diffs);
+
+        myCardCode.myCardCode = LocalRenderingStatic.localRenderingDatas[myActor].myCard;
+        opCardCode.opCardCode = LocalRenderingStatic.localRenderingDatas[Overmind.Instance.GetOtherPlayerNumber(myActor)].myCard;
+
+
         // 진행 중이면 정리하고 새로 시작 (원하면 Kill 생략 가능)
         if (_runningRAAS != null) StopCoroutine(_runningRAAS);
         _runningRAAS = StartCoroutine(Rendering_AfterActionSelect_Coroutine(data1, data2, whoselect));
@@ -122,11 +134,19 @@ public class LocalRenderingManager : MonoBehaviour
     // 3) 실제 로직은 코루틴에 둔다 (여기서만 연출 완료까지 대기)
     private IEnumerator Rendering_AfterActionSelect_Coroutine(LocalRenderingData data1, LocalRenderingData data2, int whoselect)
     {
-        List<RenderDiff> diffs = CopyandDifferences(data1, data2);
-        ApplyDiffsToLocalRenderingData(diffs);
+        int myActor = PhotonNetwork.LocalPlayer.ActorNumber;
+
+        
+//        List<RenderDiff> diffs = CopyandDifferences(data1, data2);
+  //      ApplyDiffsToLocalRenderingData(diffs);
+
+    //    myCardCode.myCardCode = LocalRenderingStatic.localRenderingDatas[myActor].myCard;
+        //opCardCode.opCardCode = LocalRenderingStatic.localRenderingDatas[Overmind.Instance.GetOtherPlayerNumber(myActor)].myCard;
+        
+
 
         // “뚜왕” 연출: 끝날 때까지 대기
-        if(whoselect != PhotonNetwork.LocalPlayer.ActorNumber)
+        if (whoselect != PhotonNetwork.LocalPlayer.ActorNumber)
             paching_Op.SetActive(true);
         yield return BounceRemainingCost(data1, data2, whoselect);
 
@@ -134,7 +154,7 @@ public class LocalRenderingManager : MonoBehaviour
         ApplyImmediateUI(data1);
         ApplyImmediateUI(data2);
 
-        //추가 해야하는 거 카드 코드 전달 섹스 보지 
+        //추가 해야하는 거 카드 코드 전달 
         
         Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
         _runningRAAS = null;
@@ -447,11 +467,17 @@ public class LocalRenderingManager : MonoBehaviour
 
         ApplyDiffsToLocalRenderingData(diffs);
 
+        if (actorNum == PhotonNetwork.LocalPlayer.ActorNumber && h == HookType.Activate)
+            myCardCode.myCardCode = null;
+        
+        else if(actorNum != PhotonNetwork.LocalPlayer.ActorNumber && h == HookType.Activate)
+            opCardCode.opCardCode = null;
+
 
         StealthPlayer(diffs);
         ElementRenderer.Instance.RenderElementsFromDiffs(diffs);
         Debug.Log("자자 노멀 액션 렌더링 다 끝, 이제 렌더링 섭밑만 하면됨");
-
+   
         // [MOD] 혹시 백드롭을 안 썼거나 중간 스킵 경로였을 때를 대비한 안전 복구
         CameraLovesAlisha.Instance?.UnhideAutoHiddenNow();
 
@@ -460,7 +486,7 @@ public class LocalRenderingManager : MonoBehaviour
 
     public IEnumerator Rendering_After_Anim_Pack(LocalRenderingData data1, LocalRenderingData data2)
     {
-
+        
         var diffs = CopyandDifferences(data1, data2);
         yield return StartCoroutine(AnimateStatChange("defense", diffs));
 
@@ -480,6 +506,10 @@ public class LocalRenderingManager : MonoBehaviour
         ApplyDiffsToLocalRenderingData(diffs);
         StealthPlayer(diffs);
         ElementRenderer.Instance.RenderElementsFromDiffs(diffs);
+
+        myCardCode.myCardCode = null;
+        opCardCode.opCardCode = null;
+
         Debug.Log("자자 노멀 액션 렌더링 다 끝, 이제 렌더링 섭밑만 하면됨");
 
         // [MOD] 혹시 백드롭을 안 썼거나 중간 스킵 경로였을 때를 대비한 안전 복구
@@ -593,7 +623,10 @@ public class LocalRenderingManager : MonoBehaviour
 
         List<RenderDiff> diffs = CopyandDifferences(data1, data2);
         StartCoroutine(AnimateStatChange("remainingCost", diffs));
+
         ApplyDiffsToLocalRenderingData(diffs);
+        //myCardCode.myCardCode = LocalRenderingStatic.localRenderingDatas[PhotonNetwork.LocalPlayer.ActorNumber].myCard;
+        //opCardCode.opCardCode = LocalRenderingStatic.localRenderingDatas[Overmind.Instance.GetOtherPlayerNumber(PhotonNetwork.LocalPlayer.ActorNumber)].myCard;
 
         return myAction;
     }
@@ -605,6 +638,8 @@ public class LocalRenderingManager : MonoBehaviour
         List<RenderDiff> diffs = CopyandDifferences(data1, data2);
         StartCoroutine(AnimateStatChange("remainingCost", diffs));
         ApplyDiffsToLocalRenderingData(diffs);
+        //myCardCode.myCardCode = LocalRenderingStatic.localRenderingDatas[PhotonNetwork.LocalPlayer.ActorNumber].myCard;
+        //opCardCode.opCardCode = LocalRenderingStatic.localRenderingDatas[Overmind.Instance.GetOtherPlayerNumber(PhotonNetwork.LocalPlayer.ActorNumber)].myCard;
 
         Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
 
@@ -711,9 +746,15 @@ public class LocalRenderingManager : MonoBehaviour
             Compare("defense", localData.defense, incomingData.defense);
             Compare("remainingCost", localData.remainingCost, incomingData.remainingCost);
             Compare("boundIndex", localData.boundIndex, incomingData.boundIndex);
-            Compare("isStealthed", localData.isStealthed, incomingData.isStealthed); // 추가
+            Compare("isStealthed", localData.isStealthed, incomingData.isStealthed);
 
-               bool ListDiff<T>(List<T> a, List<T> b)
+            // ★ 추가: 네가 요청한 4개
+            Compare("isBlinded", localData.isBlinded, incomingData.isBlinded);
+            Compare("rightOrLeft", localData.rightOrLeft, incomingData.rightOrLeft);
+            Compare("myCard", localData.myCard, incomingData.myCard);
+            Compare("whosCycle", localData.whosCycle, incomingData.whosCycle);
+
+            bool ListDiff<T>(List<T> a, List<T> b)
                 => !(a?.SequenceEqual(b) ?? b == null);
 
             if (ListDiff(localData.hands, incomingData.hands))
@@ -721,13 +762,9 @@ public class LocalRenderingManager : MonoBehaviour
 
             if (ListDiff(localData.bounds, incomingData.bounds))
                 diff.changedFields["bounds"] = (localData.bounds, incomingData.bounds);
+
             if (ListDiff(localData.elements, incomingData.elements))
                 diff.changedFields["elements"] = (localData.elements, incomingData.elements);
-
-
-            //스테이터스는 보류
-            //  if (ListDiff(localData.statuses, incomingData.statuses))
-            //    diff.changedFields["statuses"] = (localData.statuses, incomingData.statuses);
 
             if (diff.changedFields.Count > 0)
                 results.Add(diff);
@@ -735,7 +772,6 @@ public class LocalRenderingManager : MonoBehaviour
 
         CompareWithLocal(data1);
         CompareWithLocal(data2);
-
         return results;
     }
 
@@ -754,38 +790,26 @@ public class LocalRenderingManager : MonoBehaviour
 
                 switch (fieldName)
                 {
-                    case "curpos":
-                        targetData.curpos = (int)newVal;
-                        break;
-                    case "hp":
-                        targetData.hp = (int)newVal;
-                        break;
-                    case "defense":
-                        targetData.defense = (int)newVal;
-                        break;
-                    case "remainingCost":
-                        targetData.remainingCost = (int)newVal;
-                        break;
-                    case "boundIndex":
-                        targetData.boundIndex = (int)newVal;
-                        break;
-                    case "hands":
-                        targetData.hands = new List<string>((List<string>)newVal);
-                        break;
-                    case "bounds":
-                        targetData.bounds = new List<string>((List<string>)newVal);
-                        break;
-                    case "isStealthed":
-                        targetData.isStealthed = (bool)newVal;
-                        break;
-                    case "elements":
-                        targetData.elements = new List<apProp>((List<apProp>)newVal);
-                        break;    // case "statuses": // 향후 구현
-                        //     break;
+                    case "curpos": targetData.curpos = (int)newVal; break;
+                    case "hp": targetData.hp = (int)newVal; break;
+                    case "defense": targetData.defense = (int)newVal; break;
+                    case "remainingCost": targetData.remainingCost = (int)newVal; break;
+                    case "boundIndex": targetData.boundIndex = (int)newVal; break;
+                    case "hands": targetData.hands = new List<string>((List<string>)newVal); break;
+                    case "bounds": targetData.bounds = new List<string>((List<string>)newVal); break;
+                    case "isStealthed": targetData.isStealthed = (bool)newVal; break;
+                    case "elements": targetData.elements = new List<apProp>((List<apProp>)newVal); break;
+
+                    // ★ 추가: 네가 요청한 4개
+                    case "isBlinded": targetData.isBlinded = (bool)newVal; break;
+                    case "rightOrLeft": targetData.rightOrLeft = (string)newVal; break;
+                    case "myCard": targetData.myCard = (string)newVal; break;
+                    case "whosCycle": targetData.whosCycle = (int)newVal; break;
                 }
             }
         }
     }
+
     private void ApplyFacingFromRightOrLeft(int actorNum, LocalRenderingData d)
     {
         if (d == null) return;

@@ -158,7 +158,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   previewTag: cardPreview
   cacheAcrossInstances: 1
-  hoverDelay: 1.5
+  hoverDelay: 0.5
   fadeDuration: 0.18
   liveSyncDuringHover: 0
   timeClockName: TimeClock

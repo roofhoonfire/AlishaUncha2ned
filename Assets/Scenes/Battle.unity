@@ -8999,6 +8999,7 @@ GameObject:
   - component: {fileID: 1296300289}
   - component: {fileID: 1296300288}
   - component: {fileID: 1296300287}
+  - component: {fileID: 1296300290}
   m_Layer: 5
   m_Name: "\uD234\uD301\uD2B8\uB9AC\uAC70"
   m_TagString: Untagged
@@ -9037,8 +9038,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0271abc8bb2504f4caab78f0593df5af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  description: "\uC0C1\uB300\uC758 \uB2E4\uC74C \uBA54\uC778 \uC561\uC158 \uAE4C\uC9C0
-    \uB0A8\uC740 \uC2DC\uAC04"
+  description: "\uC0C1\uB300 \uBA54\uC778 \uC561\uC158 \uCE90\uC2A4\uD305\uAE4C\uC9C0
+    \uB0A8\uC740 \uC2DC\uAC04\n"
   showDelay: 0
 --- !u!114 &1296300288
 MonoBehaviour:
@@ -9078,6 +9079,34 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1296300285}
   m_CullTransparentMesh: 1
+--- !u!114 &1296300290
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1296300285}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c348deac8352704b87ab6ab6ef47731, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myCardCode: 
+  opCardCode: 
+  isOp: 1
+  previewRoot: {fileID: 481727518}
+  hoverDelay: 0.5
+  useUnscaledTime: 1
+  fadeInDuration: 0.15
+  fadeOutDuration: 0.12
+  fadeInEase: 6
+  fadeOutEase: 5
+  timeClockText: {fileID: 527470018}
+  defenseText: {fileID: 1433090539}
+  rumbleText: {fileID: 432960378}
+  nameText: {fileID: 1459267569}
+  ptText: {fileID: 535476077}
+  tooltiptriggerDis: {fileID: 1296300287}
 --- !u!1 &1334487628
 GameObject:
   m_ObjectHideFlags: 0
@@ -9298,6 +9327,8 @@ MonoBehaviour:
   paching_Op: {fileID: 381446457}
   myBoundConductor: {fileID: 1985711532}
   opBoundConductor: {fileID: 274414056}
+  myCardCode: {fileID: 1623806801}
+  opCardCode: {fileID: 1296300290}
 --- !u!114 &1334487640
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11713,6 +11744,7 @@ GameObject:
   - component: {fileID: 1623806800}
   - component: {fileID: 1623806799}
   - component: {fileID: 1623806798}
+  - component: {fileID: 1623806801}
   m_Layer: 5
   m_Name: "\uD234\uD301\uD2B8\uB9AC\uAC70"
   m_TagString: Untagged
@@ -11751,8 +11783,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0271abc8bb2504f4caab78f0593df5af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  description: "\uB0B4 \uB2E4\uC74C \uBA54\uC778 \uC561\uC158 \uBC1C\uB3D9\uAE4C\uC9C0
-    \uB0A8\uC740 \uC2DC"
+  description: "\uB0B4 \uBA54\uC778 \uC561\uC158 \uCE90\uC2A4\uD305\uAE4C\uC9C0 \uB0A8\uC740
+    \uC2DC\uAC04\n"
   showDelay: 0
 --- !u!114 &1623806799
 MonoBehaviour:
@@ -11792,6 +11824,34 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1623806796}
   m_CullTransparentMesh: 1
+--- !u!114 &1623806801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1623806796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c348deac8352704b87ab6ab6ef47731, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myCardCode: 
+  opCardCode: 
+  isOp: 0
+  previewRoot: {fileID: 481727518}
+  hoverDelay: 0.5
+  useUnscaledTime: 0
+  fadeInDuration: 0.15
+  fadeOutDuration: 0.12
+  fadeInEase: 6
+  fadeOutEase: 5
+  timeClockText: {fileID: 527470018}
+  defenseText: {fileID: 1433090539}
+  rumbleText: {fileID: 432960378}
+  nameText: {fileID: 1459267569}
+  ptText: {fileID: 535476077}
+  tooltiptriggerDis: {fileID: 1623806798}
 --- !u!1 &1642931530
 GameObject:
   m_ObjectHideFlags: 0
