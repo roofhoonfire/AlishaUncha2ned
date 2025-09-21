@@ -8,7 +8,7 @@ using UnityEngine.Playables; // 타임라인 제어
 
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
-    private string gameVersion = "Test"; // 같은 버전끼리만 매칭
+    private string gameVersion = "dodo"; // 같은 버전끼리만 매칭
 
     [Header("UI")]
     public Text connectionInfoText;
@@ -46,6 +46,10 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             _titleTimelinePlaying = true;
             titleDirector.Play();
         }
+
+        PhotonNetwork.AutomaticallySyncScene = true;
+        PhotonNetwork.GameVersion = gameVersion; // 또는 Application.version
+                                                 // (여기서 아직 ConnectUsingSettings() 호출하지 마)
     }
 
     private void OnDestroy()
@@ -86,8 +90,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     // ------------------- 기존 로비 로직 -------------------
     void Start()
     {
-        PhotonNetwork.AutomaticallySyncScene = true;
-        PhotonNetwork.GameVersion = gameVersion;
+       // PhotonNetwork.AutomaticallySyncScene = true;
+       // PhotonNetwork.GameVersion = gameVersion;
         PhotonNetwork.ConnectUsingSettings();
 
         if (joinButton) joinButton.interactable = false;

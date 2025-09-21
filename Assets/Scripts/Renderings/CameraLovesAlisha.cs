@@ -10,6 +10,25 @@ using System.Collections.Generic;
 public class CameraLovesAlisha : MonoBehaviour
 {
     public static CameraLovesAlisha Instance;
+
+
+
+
+
+    [Header("Follow Depth Lock")]
+    [Tooltip("타깃-카메라 간 'forward 방향 거리'를 고정할지 여부")]
+    public bool lockFollowDepth = true;
+
+    [Tooltip("고정할 깊이 값(카메라 forward 방향). 씬 시작 시 한 번 보정 가능")]
+    public float followDepth = 10f;
+
+    [Tooltip("Awake에서 현재 타깃 기준으로 자동 보정할지")]
+    public bool autoCalibrateFollowDepth = true;
+
+
+
+
+
     [Header("Point1: Auto-hide marked children")]
     public bool autoHideMarkedChildren = true;
 
@@ -128,6 +147,11 @@ public class CameraLovesAlisha : MonoBehaviour
     [Tooltip("펀치 탄성(0~1)")]
     [Range(0f, 1f)] public float guardWaitShakeElasticity = 0.75f;
 
+
+
+
+
+
     private Camera _cam;
     private bool _cinematicLock = false;
     private Tweener _moveTW, _fovTW, _shakeTW, _bdFadeTW;
@@ -156,6 +180,13 @@ public class CameraLovesAlisha : MonoBehaviour
         {
             var c0 = cutLineImage.color; c0.a = 0f; cutLineImage.color = c0;
         }
+
+        // ★★★★★ 이 보정은 cutLineImage 유무와 무관해야 함
+        if (autoCalibrateFollowDepth && target != null && _cam != null)
+        {
+            var tp = target.position + offset;
+            followDepth = Mathf.Max(0.01f, DepthAlongCamera(tp));
+        }
     }
 
     // --- 신규: 카메라-공간 깊이(Forward Dot) 계산 ---
@@ -169,19 +200,17 @@ public class CameraLovesAlisha : MonoBehaviour
 
     void LateUpdate()
     {
-        if (_cinematicLock) return; // 시네매틱 중엔 자리 고정(트윈이 움직임 제어)
+        if (_cinematicLock) return;
         if (target == null) return;
 
-        // 월드 z를 강제로 고정하지 말고, 카메라 forward 기준 거리 유지
-        Vector3 desiredTarget = target.position + offset;
-        float depth = DepthAlongCamera(desiredTarget);
-        Vector3 desiredCamPos = desiredTarget - (_cam.transform.forward * depth);
+        Vector3 targetPoint = target.position + offset;
+        float depth = lockFollowDepth ? followDepth : DepthAlongCamera(targetPoint);
+        Vector3 desiredCamPos = targetPoint - (_cam.transform.forward * depth);
 
-        Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredCamPos, smoothSpeed);
-        transform.position = smoothedPosition;
+        Vector3 smoothed = Vector3.Lerp(transform.position, desiredCamPos, smoothSpeed);
+        transform.position = smoothed;
 
-        // 필요시 화면 기울어짐 방지(Z만 0)
-        ResetTiltZ();
+        ResetTiltZ(); // 롤 고정 유지(원하면 주석 처리)
     }
 
     // ---------- Public API ----------
@@ -235,18 +264,15 @@ public class CameraLovesAlisha : MonoBehaviour
     private void Focus(Transform t, float fov, float duration, Action onComplete = null)
     {
         _cinematicLock = true;
+        _moveTW?.Kill(); _fovTW?.Kill();
 
-        _moveTW?.Kill();
-        _fovTW?.Kill();
-
-        // 대상 지점 + offset을 바라보되, 카메라 forward 기준 거리 유지
         Vector3 targetPoint = (t ? t.position : transform.position) + offset;
-        float depth = DepthAlongCamera(targetPoint);
+        float depth = lockFollowDepth ? followDepth : DepthAlongCamera(targetPoint);
         Vector3 dest = targetPoint - (_cam.transform.forward * depth);
 
         _moveTW = transform.DOMove(dest, Mathf.Max(0f, duration))
                            .SetEase(Ease.InOutSine)
-                           .SetUpdate(true); // 실시간
+                           .SetUpdate(true);
 
         if (_cam != null)
         {
@@ -589,22 +615,19 @@ public class CameraLovesAlisha : MonoBehaviour
         float fov, float duration, Action onComplete = null)
     {
         _cinematicLock = true;
+        _moveTW?.Kill(); _fovTW?.Kill();
 
-        _moveTW?.Kill();
-        _fovTW?.Kill();
+        Vector3 desiredTarget = (t ? t.position : transform.position) + offset
+                                + new Vector3(worldNudge.x, worldNudge.y, 0f);
 
-        // “대상 자체 위치 + 기본 offset + 월드 미세조정”이 앵커 위치에 오게끔
-        Vector3 desiredTarget = (t ? t.position : transform.position) + offset;
-        desiredTarget += new Vector3(worldNudge.x, worldNudge.y, 0f);
+        float depth = lockFollowDepth ? followDepth : DepthAlongCamera(desiredTarget);
 
-        // 카메라-공간 깊이를 사용해 앵커의 월드 좌표 구하기
-        float depth = DepthAlongCamera(desiredTarget);
-        Vector3 worldAtAnchor = (_cam != null)
+        // 카메라 기준 anchor 지점의 월드 좌표(깊이는 고정/또는 자동)
+        Vector3 worldAtAnchor = _cam != null
             ? _cam.ViewportToWorldPoint(new Vector3(anchor.x, anchor.y, depth))
-            : desiredTarget; // 카메라 없으면 그냥 중앙
+            : desiredTarget;
 
-        // 카메라를 얼마나 움직이면 대상이 앵커에 맞을지 = (대상 - 현재 앵커월드)
-        Vector3 dest = transform.position + (desiredTarget - worldAtAnchor); // ★ z 고정 금지
+        Vector3 dest = transform.position + (desiredTarget - worldAtAnchor);
 
         _moveTW = transform.DOMove(dest, Mathf.Max(0f, duration))
                            .SetEase(Ease.InOutSine)
