@@ -45,6 +45,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: 20998472bea5dbb40955aab21fe74453,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c2
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -77,6 +85,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: 20998472bea5dbb40955aab21fe74453,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c3
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -109,6 +125,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: 20998472bea5dbb40955aab21fe74453,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c3
     hook: 4
     victimDefendTrigger: 
@@ -141,6 +165,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: dec5e864ea597044b830f702a0bf802c,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c4
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -173,6 +205,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: a551ca6005ed2e645ab4d09bec1e0c15,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c5
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -205,6 +245,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: a551ca6005ed2e645ab4d09bec1e0c15,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c6
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -237,6 +285,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: a551ca6005ed2e645ab4d09bec1e0c15,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c9
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -269,6 +325,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: 20998472bea5dbb40955aab21fe74453,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c11
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -301,6 +365,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: db41b1d1d89e8924aabdf2cbf0bc2602,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c12
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -333,6 +405,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: db41b1d1d89e8924aabdf2cbf0bc2602,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c13
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -365,6 +445,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: dec5e864ea597044b830f702a0bf802c,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c14
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -397,6 +485,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: a551ca6005ed2e645ab4d09bec1e0c15,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c16
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -429,6 +525,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: dec5e864ea597044b830f702a0bf802c,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c17
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -461,6 +565,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: a551ca6005ed2e645ab4d09bec1e0c15,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c18
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -493,6 +605,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: a551ca6005ed2e645ab4d09bec1e0c15,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c20
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -525,6 +645,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: f66f0371fd2c39949a6a323b49b10f99,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c21
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -557,6 +685,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: f66f0371fd2c39949a6a323b49b10f99,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c22
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -589,6 +725,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: f66f0371fd2c39949a6a323b49b10f99,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c23
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -621,6 +765,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: f66f0371fd2c39949a6a323b49b10f99,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c24
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -653,6 +805,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: f66f0371fd2c39949a6a323b49b10f99,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c25
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -685,6 +845,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: dec5e864ea597044b830f702a0bf802c,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c26
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -717,6 +885,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: f66f0371fd2c39949a6a323b49b10f99,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c27
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -749,6 +925,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: db41b1d1d89e8924aabdf2cbf0bc2602,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c28
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -781,6 +965,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: f66f0371fd2c39949a6a323b49b10f99,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c29
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -813,6 +1005,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: f66f0371fd2c39949a6a323b49b10f99,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c30
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -845,6 +1045,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: f66f0371fd2c39949a6a323b49b10f99,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c31
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -877,6 +1085,13 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 0
+    prepOverlaySprite: {fileID: 0}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c35
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -909,6 +1124,14 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: dec5e864ea597044b830f702a0bf802c,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}
   - cardCode: c38
     hook: 0
     victimDefendTrigger: Trig_Defend
@@ -941,3 +1164,11 @@ MonoBehaviour:
       pauseVictim: 1
       pauseEffects: 1
       pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: a551ca6005ed2e645ab4d09bec1e0c15,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}

@@ -89,6 +89,28 @@ public class CardAnimationDB : ScriptableObject
 
         [Header("히트스탑 설정(※ Attack 클립 기준 프레임!)")]
         public List<HitStopSpec> hitStops = new List<HitStopSpec>();
+
+
+
+        [Header("Cinematic Overlay (Point1: 추가 연출 이미지)")]
+        [Tooltip("Prep 정지 구간에 백드롭 외에 추가 스프라이트를 함께 띄울지")]
+        public bool usePrepOverlay = false;
+
+        [Tooltip("같은 캔버스(백드롭과 동일) 위에 겹쳐서 뜰 스프라이트")]
+        public Sprite prepOverlaySprite;
+
+        [Tooltip("오버레이 페이드 인/아웃(초)")]
+        public float prepOverlayFadeIn = 0.12f;
+        public float prepOverlayFadeOut = 0.10f;
+
+        [Tooltip("오버레이 알파 최대치(0~1)")]
+        [Range(0f, 1f)] public float prepOverlayMaxAlpha = 1f;
+
+        [Tooltip("오버레이 RectTransform.anchoredPosition (캔버스 좌표)")]
+        public Vector2 prepOverlayAnchoredPos = Vector2.zero;
+
+        [Tooltip("오버레이 RectTransform.localScale")]
+        public Vector3 prepOverlayScale = Vector3.one;
     }
 
     public List<CardAnimEntry> entries = new List<CardAnimEntry>();

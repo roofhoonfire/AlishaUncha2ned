@@ -149,7 +149,12 @@ public class CameraLovesAlisha : MonoBehaviour
 
 
 
+    [Header("Point1 Overlay (추가 연출)")]
+    [Tooltip("Point1용 오버레이 이미지(UI) - 백드롭과 동일 Canvas 하위에 배치")]
+    public Image point1OverlayImage;       // <- 에디터에 같은 캔버스의 Image 할당
+    public CanvasGroup point1OverlayGroup; // <- 같은 오브젝트나 상위에 CanvasGroup 할당 권장
 
+    private Tweener _ovTween;
 
 
     private Camera _cam;
@@ -398,7 +403,62 @@ public class CameraLovesAlisha : MonoBehaviour
         */
         _isIsolationActive = true;
     }
+    public void BeginPoint1Overlay(
+      Sprite sprite,
+      float fadeInSec,
+      float holdSec,
+      float maxAlpha,
+      Vector2 anchoredPos,
+      Vector3 localScale
+  )
+    {
+        if (point1OverlayImage == null) return;
 
+        // 스프라이트/트랜스폼 세팅
+        point1OverlayImage.sprite = sprite;
+        var rt = point1OverlayImage.rectTransform;
+        rt.anchoredPosition = anchoredPos;
+        rt.localScale = localScale;
+
+        // 알파 제어 대상
+        if (point1OverlayGroup == null)
+        {
+            // fallback: Image color 알파로 제어
+            var c = point1OverlayImage.color;
+            c.a = 0f; point1OverlayImage.color = c;
+
+            // 트윈
+            _ovTween?.Kill();
+            _ovTween = point1OverlayImage.DOFade(maxAlpha, Mathf.Max(0f, fadeInSec));
+        }
+        else
+        {
+            point1OverlayGroup.alpha = 0f;
+            _ovTween?.Kill();
+            _ovTween = point1OverlayGroup.DOFade(maxAlpha, Mathf.Max(0f, fadeInSec));
+        }
+
+        point1OverlayImage.gameObject.SetActive(true);
+    }
+
+    // === 오버레이 종료 ===
+    public void EndPoint1Overlay(float fadeOutSec)
+    {
+        if (point1OverlayImage == null) return;
+
+        if (point1OverlayGroup == null)
+        {
+            _ovTween?.Kill();
+            _ovTween = point1OverlayImage.DOFade(0f, Mathf.Max(0f, fadeOutSec))
+                .OnComplete(() => point1OverlayImage.gameObject.SetActive(false));
+        }
+        else
+        {
+            _ovTween?.Kill();
+            _ovTween = point1OverlayGroup.DOFade(0f, Mathf.Max(0f, fadeOutSec))
+                .OnComplete(() => point1OverlayImage.gameObject.SetActive(false));
+        }
+    }
     public void HideEmAll(GameObject attackerRoot)
     {
         if (autoHideMarkedChildren && attackerRoot != null)

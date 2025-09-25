@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Photon.Pun;
 
 public class CardAnimationRouter : MonoBehaviour
 {
@@ -77,6 +78,11 @@ public class CardAnimationRouter : MonoBehaviour
     [Tooltip("프롤로그 백드롭 기본 페이드(공격자 쪽)")]
     public float guardPreludeFadeIn = 0.12f;
     public float guardPreludeFadeOut = 0.10f;
+
+    // 상단 필드들 아래 어울리는 곳에
+    [Header("Overlay Facing")]
+    [Tooltip("로컬 플레이어의 스프라이트 flipX에 오버레이 좌우도 맞춘다")]
+    public bool overlayFollowLocalFacing = true;
 
     void Awake()
     {
@@ -236,7 +242,17 @@ public class CardAnimationRouter : MonoBehaviour
                         entry.prepPoseHoldSec
                     );
                 }
-
+                if (enableCameraCinematic && entry.usePrepOverlay && entry.prepOverlaySprite != null && CameraLovesAlisha.Instance != null)
+                {
+                    CameraLovesAlisha.Instance.BeginPoint1Overlay(
+                        entry.prepOverlaySprite,
+                        entry.prepOverlayFadeIn,
+                        entry.prepPoseHoldSec,
+                        entry.prepOverlayMaxAlpha,
+                        entry.prepOverlayAnchoredPos,
+                        ApplyFacingToOverlayScale(entry.prepOverlayScale)
+                    );
+                }
                 yield return new WaitForSecondsRealtime(entry.prepPoseHoldSec);
 
                 FreezeOnLastFrame(attackerAnim, entry.prepStateName, false);
@@ -244,6 +260,10 @@ public class CardAnimationRouter : MonoBehaviour
                 if (enableCameraCinematic && entry.usePrepBackdrop && entry.prepBackdropSprite != null && CameraLovesAlisha.Instance != null)
                 {
                     CameraLovesAlisha.Instance.EndPoint1Backdrop(entry.prepBackdropFadeOut);
+                }
+                if (enableCameraCinematic && entry.usePrepOverlay && entry.prepOverlaySprite != null && CameraLovesAlisha.Instance != null)
+                {
+                    CameraLovesAlisha.Instance.EndPoint1Overlay(entry.prepOverlayFadeOut);
                 }
             }
         }
@@ -705,6 +725,19 @@ public class CardAnimationRouter : MonoBehaviour
             float holdSec = guardPreludeHoldDefault;
             Sprite preBG = null;
             float preFadeIn = guardPreludeFadeIn, preFadeOut = guardPreludeFadeOut;
+            // actEntry에서 오버레이 메타 뽑기 (있으면 사용)
+            Sprite preOverlay = null; float preOvFadeIn = 0.12f, preOvFadeOut = 0.10f;
+            float preOvMaxA = 1f; Vector2 preOvPos = Vector2.zero; Vector3 preOvScale = Vector3.one;
+
+            if (actEntry != null && actEntry.usePrepOverlay && actEntry.prepOverlaySprite != null)
+            {
+                preOverlay = actEntry.prepOverlaySprite;
+                preOvFadeIn = actEntry.prepOverlayFadeIn;
+                preOvFadeOut = actEntry.prepOverlayFadeOut;
+                preOvMaxA = actEntry.prepOverlayMaxAlpha;
+                preOvPos = actEntry.prepOverlayAnchoredPos;
+                preOvScale = actEntry.prepOverlayScale;
+            }
 
             if (actEntry != null)
             {
@@ -743,6 +776,9 @@ public class CardAnimationRouter : MonoBehaviour
                 if (enableCameraCinematic && preBG != null)
                     CameraLovesAlisha.Instance.BeginPoint1Backdrop(origAttackerT.gameObject, preBG, preFadeIn, holdSec);
 
+                if (enableCameraCinematic && preOverlay != null)
+                    CameraLovesAlisha.Instance.BeginPoint1Overlay(
+                        preOverlay, preOvFadeIn, holdSec, preOvMaxA, preOvPos, ApplyFacingToOverlayScale(preOvScale));
                 // [중요] 컷라인 재생 시간 == holdSec 이므로, 그 시간이 끝난 뒤에 Wait!를 띄움
                 yield return new WaitForSecondsRealtime(holdSec);
 
@@ -755,6 +791,9 @@ public class CardAnimationRouter : MonoBehaviour
                 // 백드롭 종료 및 정지 해제
                 if (enableCameraCinematic && preBG != null)
                     CameraLovesAlisha.Instance.EndPoint1Backdrop(preFadeOut);
+                // ★추가: 오버레이 종료
+                if (enableCameraCinematic && preOverlay != null)
+                    CameraLovesAlisha.Instance.EndPoint1Overlay(preOvFadeOut);
 
                 FreezeOnLastFrame(origAttackerAnim, actEntry.prepStateName, false);
                 
@@ -831,4 +870,29 @@ public class CardAnimationRouter : MonoBehaviour
         //리턴 된 놈은 Transform으로 받고 .transform.position으로 써야 작동
 
     }
+
+    // 클래스 하단 임의 위치
+
+    // 로컬 플레이어의 SpriteRenderer.flipX 읽기
+    private bool GetLocalFlipX()
+    {
+        var ls = LocalState.Instance;
+        if (ls != null && ls.PlayerObDic != null &&
+            ls.PlayerObDic.TryGetValue(PhotonNetwork.LocalPlayer.ActorNumber, out var go) && go != null)
+        {
+            var sr = go.GetComponentInChildren<SpriteRenderer>();
+            if (sr != null) return sr.flipX;
+        }
+        return false;
+    }
+
+    // 오버레이 스케일에 좌우 방향 적용(X만 ±로 맞춤)
+    private Vector3 ApplyFacingToOverlayScale(Vector3 baseScale)
+    {
+        if (!overlayFollowLocalFacing) return baseScale;
+        bool flip = GetLocalFlipX();
+        float sx = Mathf.Abs(baseScale.x) * (flip ? -1f : 1f);
+        return new Vector3(sx, baseScale.y, baseScale.z);
+    }
+
 }
