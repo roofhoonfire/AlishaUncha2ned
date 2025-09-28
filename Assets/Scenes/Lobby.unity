@@ -2319,7 +2319,7 @@ MonoBehaviour:
   cellSize: {x: 300, y: 400}
   spacing: {x: 40, y: 40}
   columns: 3
-  dev: 0
+  dev: 1
 --- !u!114 &1149971053
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2354,7 +2354,7 @@ MonoBehaviour:
   joinButton: {fileID: 1328035729}
   MP: 2
   ovm: {fileID: 365383671}
-  isDeveloper: 0
+  isDeveloper: 1
   titleDirector: {fileID: 1096278706}
   activateOnEnd:
   - {fileID: 715977503}

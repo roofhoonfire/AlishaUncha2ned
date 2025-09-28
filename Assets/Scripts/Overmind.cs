@@ -2355,8 +2355,9 @@ public class Overmind : MonoBehaviourPunCallbacks
         else
         {
             //여기서 상대 제약이 뭐였는지 판단하는 함수 호출 
-            LocalState.Instance.GuessJuju(index);
+            // LocalState.Instance.GuessJuju(index);
 
+            Submit_Juju(actorNum, null);
         }
     }
 

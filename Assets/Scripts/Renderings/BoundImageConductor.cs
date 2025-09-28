@@ -1,16 +1,28 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class BoundImageConductor : MonoBehaviour
 {
+
+
+    // --- í´ë˜ìŠ¤ ë‚´ë¶€ ---
+    [Header("Guess Editor (op only, LOCAL UI)")]
+    [SerializeField] private GameObject guessEditorRoot;   // íŒ¨ë„ ë£¨íŠ¸ (SetActive on/off)
+    [SerializeField] private TMP_InputField guessInput;    // ì…ë ¥ í•„ë“œ
+    [SerializeField] private Button guessSubmitButton;     // ì œì¶œ ë²„íŠ¼ (Enter ì œì¶œ ê¸ˆì§€: ë²„íŠ¼ë§Œ)
+
+    private int _editIndex = -1; // 
+
+
     [Header("DB & Targets")]
     [SerializeField] private BoundSpriteDB database;
-    [SerializeField] private Image targetImage; // ºñ¿ì¸é GetComponent<Image>() »ç¿ë
+    [SerializeField] private Image targetImage; // ë¹„ìš°ë©´ GetComponent<Image>() ì‚¬ìš©
 
-    [Header("Animation Watch (¼±ÅÃ)")]
+    [Header("Animation Watch (ì„ íƒ)")]
     [SerializeField] private Animator animTarget;
     [SerializeField] private string triggerName = "Trig_BoundSwap";
     [SerializeField] private string watchStateTag = "BoundSwap";
@@ -24,34 +36,37 @@ public class BoundImageConductor : MonoBehaviour
     [SerializeField] private float fadeInDuration = 0.15f;
     [SerializeField] private bool useUnscaledTime = true;
 
-    [Header("»ó´ë ¹Ù¿îµå¸é ¹°À½Ç¥ Ç¥½Ã")]
+    [Header("ìƒëŒ€ ë°”ìš´ë“œë©´ ë¬¼ìŒí‘œ í‘œì‹œ")]
     [SerializeField] private bool isOp = false;
 
-    [Header("Tooltip ¿¬µ¿ (¼±ÅÃ)")]
-    [SerializeField] private TooltipTriggerUI tooltipTrigger; // ¡Ú ¸ŞÀÎ Å« ÀÌ¹ÌÁö¿ë
+    [Header("Tooltip ì—°ë™ (ì„ íƒ)")]
+    [SerializeField] private TooltipTriggerUI tooltipTrigger; // â˜… ë©”ì¸ í° ì´ë¯¸ì§€ìš©
 
-    [Header("¹Ù¿îµå¿¹Â÷Å©")]
-    [SerializeField] public List<string> boundGuesses; // ¡Ú isOp==trueÀÏ ¶§ »ç¿ë
+    [Header("ë°”ìš´ë“œì˜ˆì°¨í¬")]
+    [SerializeField] public List<string> boundGuesses; // â˜… isOp==trueì¼ ë•Œ ì‚¬ìš©
 
-    // ¡Ú¡Ú¡Ú Ãß°¡: ±×¸®µå ¹× ÇÁ¸®ÆÕ
-    [Header("ÇÁ¸®ºä ±×¸®µå & ÇÁ¸®ÆÕ")]
-    [Tooltip("³» ¹Ù¿îµå ÇÁ¸®ºä°¡ µé¾î°¥ GridLayoutGroupÀÇ RectTransform")]
+    // â˜…â˜…â˜… ì¶”ê°€: ê·¸ë¦¬ë“œ ë° í”„ë¦¬íŒ¹
+    [Header("í”„ë¦¬ë·° ê·¸ë¦¬ë“œ & í”„ë¦¬íŒ¹")]
+    [Tooltip("ë‚´ ë°”ìš´ë“œ í”„ë¦¬ë·°ê°€ ë“¤ì–´ê°ˆ GridLayoutGroupì˜ RectTransform")]
     [SerializeField] private RectTransform myGridRoot;
-    [Tooltip("»ó´ë ¹Ù¿îµå ÇÁ¸®ºä°¡ µé¾î°¥ GridLayoutGroupÀÇ RectTransform")]
+    [Tooltip("ìƒëŒ€ ë°”ìš´ë“œ í”„ë¦¬ë·°ê°€ ë“¤ì–´ê°ˆ GridLayoutGroupì˜ RectTransform")]
     [SerializeField] private RectTransform opGridRoot;
-    [Tooltip("°¢ Ä­¿¡ ±ò¸± 100x100 ÇÁ¸®ÆÕ (Image + TooltipTriggerUI Æ÷ÇÔ)")]
+    [Tooltip("ê° ì¹¸ì— ê¹”ë¦´ 100x100 í”„ë¦¬íŒ¹ (Image + TooltipTriggerUI í¬í•¨)")]
     [SerializeField] private BoundIconItem iconPrefab;
+    [SerializeField] private BoundIconItem Bound_In_Grid_Op;
+
+
     public GameObject myGridArea;
     public GameObject opGridArea;
 
 
-    // ³»ºÎ »óÅÂ
+    // ë‚´ë¶€ ìƒíƒœ
     private readonly List<string> _bounds = new();
     private int _index = -1;
     private bool _initialized = false;
     private Coroutine _running;
 
-    // ¡Ú »ı¼ºÇÑ ÇÁ¸®ºä ¾ÆÀÌÄÜµé º¸°ü(¼³¸í ¾÷µ¥ÀÌÆ® ¿ë)
+    // â˜… ìƒì„±í•œ í”„ë¦¬ë·° ì•„ì´ì½˜ë“¤ ë³´ê´€(ì„¤ëª… ì—…ë°ì´íŠ¸ ìš©)
     private readonly List<BoundIconItem> _myIcons = new();
     private readonly List<BoundIconItem> _opIcons = new();
 
@@ -64,41 +79,97 @@ public class BoundImageConductor : MonoBehaviour
             targetImage.color = new Color(c.r, c.g, c.b, targetImage.color.a);
         }
     }
+    void OnEnable()
+    {
+        if (guessEditorRoot != null) guessEditorRoot.SetActive(false);
+
+        if (guessSubmitButton != null)
+        {
+            guessSubmitButton.onClick.RemoveAllListeners();
+            guessSubmitButton.onClick.AddListener(SubmitGuessFromEditor);
+        }
+    }
+
+    // ì•„ì´ì½˜ í´ë¦­ ì‹œ í˜¸ì¶œë¨ â€” ë„¤íŠ¸ì›Œí¬ ë¬´ê´€ (ë¡œì»¬ UI)
+    public void BeginEditOpGuess(int index)
+    {
+        if (!isOp) return; // ë‚´ ë°”ìš´ë“œì—ì„œëŠ” ì•ˆ ì”€
+        if (boundGuesses == null || index < 0 || index >= boundGuesses.Count) return;
+
+        _editIndex = index;
+
+        if (guessEditorRoot != null) guessEditorRoot.SetActive(true);
+
+        if (guessInput != null)
+        {
+            // Enterë¡œ ì œì¶œë˜ì§€ ì•Šê²Œ í•˜ë ¤ë©´ ì¸ìŠ¤í™í„°ì—ì„œ Line Typeì„ Multi Line Newlineìœ¼ë¡œ ì„¤ì •
+            guessInput.text = boundGuesses[index] ?? string.Empty;
+            guessInput.caretPosition = guessInput.text.Length;
+            guessInput.ActivateInputField();
+            guessInput.Select();
+        }
+    }
+
+    // ë²„íŠ¼ìœ¼ë¡œë§Œ ì œì¶œ â€” ë„¤íŠ¸ì›Œí¬ ë¬´ê´€ (ë¡œì»¬ UI)
+    private void SubmitGuessFromEditor()
+    {
+        if (!isOp) return;
+        int idx = _editIndex;
+        if (idx < 0 || boundGuesses == null || idx >= boundGuesses.Count) return;
+
+        string newText = guessInput != null ? (guessInput.text ?? string.Empty).Trim() : string.Empty;
+
+        // 1) ë¡œì»¬ ë°ì´í„° ê°±ì‹ 
+        boundGuesses[idx] = newText;
+
+        // 2) í•´ë‹¹ ì•„ì´ì½˜ íˆ´íŒ ì¦‰ì‹œ ë°˜ì˜ (ë¡œì»¬)
+        if (idx >= 0 && idx < _opIcons.Count && _opIcons[idx] != null && _opIcons[idx].tooltip != null)
+            _opIcons[idx].tooltip.description = newText;
+
+        // 3) í˜„ì¬ ë©”ì¸ ì¸ë±ìŠ¤(_index)ì™€ ê°™ë‹¤ë©´ ë©”ì¸ íˆ´íŒë„ ì¦‰ì‹œ ë°˜ì˜ (ë¡œì»¬)
+        if (idx == _index && tooltipTrigger != null)
+            tooltipTrigger.description = newText;
+
+        // 4) ì—ë””í„° íŒ¨ë„ ë‹«ê¸°
+        if (guessEditorRoot != null) guessEditorRoot.SetActive(false);
+        _editIndex = -1;
+    }
+
 
     public string InitBounds(IList<string> boundsFromData)
     {
-        // ÃÊ±âÈ­
+        // ì´ˆê¸°í™”
         _bounds.Clear();
         if (boundsFromData != null) _bounds.AddRange(boundsFromData);
         _initialized = true;
         _index = 0;
 
-        // ±×¸®µå/¾ÆÀÌÄÜ ÃÊ±âÈ­
+        // ê·¸ë¦¬ë“œ/ì•„ì´ì½˜ ì´ˆê¸°í™”
         ClearGrid(myGridRoot, _myIcons);
         ClearGrid(opGridRoot, _opIcons);
 
-        // isOp ¿©ºÎ¿¡ µû¶ó ÇÁ¸®ºä »ı¼º
+        // isOp ì—¬ë¶€ì— ë”°ë¼ í”„ë¦¬ë·° ìƒì„±
         if (!isOp)
         {
-            // ³» ¹Ù¿îµå: ½ÇÁ¦ Å°·Î ÇÁ¸®ºä °íÁ¤ »ı¼º
+            // ë‚´ ë°”ìš´ë“œ: ì‹¤ì œ í‚¤ë¡œ í”„ë¦¬ë·° ê³ ì • ìƒì„±
             BuildMyGridPreview(_bounds);
         }
         else
         {
-            // »ó´ë ¹Ù¿îµå: b0 ÀÌ¹ÌÁö + ÃÊ±â guess·Î »ı¼º
+            // ìƒëŒ€ ë°”ìš´ë“œ: b0 ì´ë¯¸ì§€ + ì´ˆê¸° guessë¡œ ìƒì„±
             if (boundGuesses == null) boundGuesses = new List<string>();
             boundGuesses.Clear();
             for (int i = 0; i < _bounds.Count; i++)
-                boundGuesses.Add("»ó´ëÀÇ Çàµ¿¿¡ ÁıÁßÇØ¼­ ¹Ù¿îµå¸¦ ¿¹ÃøÇÏÀÚ");
+                boundGuesses.Add($"ìƒëŒ€ì˜ {i+1}ë²ˆì§¸ ë°”ìš´ë“œ\n ìƒëŒ€ì˜ í–‰ë™ì— ì§‘ì¤‘í•´ì„œ ë°”ìš´ë“œë¥¼ ì˜ˆì¸¡í•˜ì");
 
             BuildOpGridPreview(_bounds.Count, boundGuesses);
         }
 
-        // ¸ŞÀÎ Å« ÀÌ¹ÌÁö Àû¿ëÅ° °áÁ¤
+        // ë©”ì¸ í° ì´ë¯¸ì§€ ì ìš©í‚¤ ê²°ì •
         string key = (_bounds.Count > 0) ? _bounds[0] : null;
-        if (isOp) key = "b0";   // »ó´ë´Â °¡¸²
+        if (isOp) key = "b0";   // ìƒëŒ€ëŠ” ê°€ë¦¼
 
-        // ¡Ú ÇÙ½É: ¸ÕÀú ÇÁ¸®ºäµéÀ» ¸¸µé°í, ±× ´ÙÀ½ ¸ŞÀÎ ÀÌ¹ÌÁö/ÅøÆÁÀ» Àû¿ë
+        // â˜… í•µì‹¬: ë¨¼ì € í”„ë¦¬ë·°ë“¤ì„ ë§Œë“¤ê³ , ê·¸ ë‹¤ìŒ ë©”ì¸ ì´ë¯¸ì§€/íˆ´íŒì„ ì ìš©
         ApplyByKeyImmediate(key, 0);
         SetAlphaImmediate(1f);
         return key;
@@ -111,14 +182,14 @@ public class BoundImageConductor : MonoBehaviour
         if (newIndex == _index) return;
 
         string key = _bounds[newIndex];
-        if (isOp) key = "b0"; // »ó´ë´Â °¡¸²
+        if (isOp) key = "b0"; // ìƒëŒ€ëŠ” ê°€ë¦¼
 
         ApplyByKeyImmediate(key, newIndex);
         SetAlphaImmediate(1f);
         _index = newIndex;
     }
 
-    // ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡ ³»ºÎ À¯Æ¿ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€ ë‚´ë¶€ ìœ í‹¸ â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     void ApplyByKeyImmediate(string key, int index)
     {
@@ -147,12 +218,12 @@ public class BoundImageConductor : MonoBehaviour
         if (targetImage == null) return;
         targetImage.overrideSprite = sp;
         targetImage.SetVerticesDirty();
-        // ¼³¸íÀº Å°°¡ ¾øÀ¸¸é °»½Å ºÒ°¡
+        // ì„¤ëª…ì€ í‚¤ê°€ ì—†ìœ¼ë©´ ê°±ì‹  ë¶ˆê°€
     }
 
     void UpdateTooltipDesc(string desc, int index)
     {
-        // ¸ŞÀÎ(Å«) ÀÌ¹ÌÁöÀÇ ÅøÆÁ
+        // ë©”ì¸(í°) ì´ë¯¸ì§€ì˜ íˆ´íŒ
         if (isOp)
         {
             if (tooltipTrigger != null && boundGuesses != null && index >= 0 && index < boundGuesses.Count)
@@ -164,13 +235,13 @@ public class BoundImageConductor : MonoBehaviour
                 tooltipTrigger.description = desc ?? string.Empty;
         }
 
-        // ¡Ú Ãß°¡: ÇÁ¸®ºä ±×¸®µå ¾ÆÀÌÄÜÀÇ ÇØ´ç ÀÎµ¦½º ÅøÆÁµµ µ¿±âÈ­
+        // â˜… ì¶”ê°€: í”„ë¦¬ë·° ê·¸ë¦¬ë“œ ì•„ì´ì½˜ì˜ í•´ë‹¹ ì¸ë±ìŠ¤ íˆ´íŒë„ ë™ê¸°í™”
         if (isOp)
         {
             int indexBefore = (index + 5) % 6;
 
             if (index >= 0 && index < _opIcons.Count && _opIcons[index] != null && _opIcons[index].tooltip != null)
-                Debug.Log("»ó¼öÁ¤ÀÌµÇ");
+                Debug.Log("ìƒìˆ˜ì •ì´ë˜");
                 _opIcons[indexBefore].tooltip.description = boundGuesses[indexBefore];
         }
       /*  else
@@ -204,16 +275,16 @@ public class BoundImageConductor : MonoBehaviour
         return false;
     }
 
-    // ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡ ÇÁ¸®ºä ºôµå À¯Æ¿ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€ í”„ë¦¬ë·° ë¹Œë“œ ìœ í‹¸ â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     void BuildMyGridPreview(IList<string> keys)
     {
         if (myGridRoot == null || iconPrefab == null) return;
-        Debug.Log("¿©±ä¾Æ´Ô1");
+        Debug.Log("ì—¬ê¸´ì•„ë‹˜1");
         ConfigureGrid(myGridRoot, keys?.Count ?? 0);
 
         if (keys == null) return;
-        Debug.Log("¿©±ä¾Æ´Ô3");
+        Debug.Log("ì—¬ê¸´ì•„ë‹˜3");
 
         foreach (var key in keys)
         {
@@ -227,10 +298,9 @@ public class BoundImageConductor : MonoBehaviour
             _myIcons.Add(item);
         }
     }
-
     void BuildOpGridPreview(int count, IList<string> guesses)
     {
-        if (opGridRoot == null || iconPrefab == null) return;
+        if (opGridRoot == null || Bound_In_Grid_Op == null) return;
 
         ConfigureGrid(opGridRoot, count);
 
@@ -240,17 +310,23 @@ public class BoundImageConductor : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            var item = Instantiate(iconPrefab, opGridRoot, false);
+            var item = Instantiate(Bound_In_Grid_Op, opGridRoot, false);
             var desc = (guesses != null && i < guesses.Count) ? guesses[i] : string.Empty;
-            item.Set(spB0, desc); // ÀüºÎ b0 ÀÌ¹ÌÁö
+            item.Set(spB0, desc); // ëª¨ë‘ b0 + ì´ˆê¸° guess
             _opIcons.Add(item);
+
+            // ì—¬ê¸°ì„œ "ë¡œì»¬ í´ë¦­"ë§Œ ì—°ê²°
+            var clickable = item.GetComponent<BoundOpIconClickable>();
+            if (clickable == null) clickable = item.gameObject.AddComponent<BoundOpIconClickable>();
+            clickable.Init(this, i);
         }
     }
+
 
     void ConfigureGrid(RectTransform grid, int count)
     {
         if (grid == null) return;
-        Debug.Log("¿©±ä¾Æ´Ô2");
+        Debug.Log("ì—¬ê¸´ì•„ë‹˜2");
 
         var glg = grid.GetComponent<GridLayoutGroup>();
         if (glg == null) glg = grid.gameObject.AddComponent<GridLayoutGroup>();
@@ -264,7 +340,7 @@ public class BoundImageConductor : MonoBehaviour
         glg.startAxis = GridLayoutGroup.Axis.Horizontal;
         glg.childAlignment = TextAnchor.UpperLeft;
 
-        // ºÎ¸ğ ¹Ú½º Å©±â(ÃÖ´ë 6°³, 3¿­ ¡æ ÃÖ´ë 2Çà ±âÁØ)
+        // ë¶€ëª¨ ë°•ìŠ¤ í¬ê¸°(ìµœëŒ€ 6ê°œ, 3ì—´ â†’ ìµœëŒ€ 2í–‰ ê¸°ì¤€)
         int columns = 3;
         int rows = Mathf.Max(1, Mathf.CeilToInt(Mathf.Min(count, 6) / (float)columns));
 
@@ -276,7 +352,7 @@ public class BoundImageConductor : MonoBehaviour
                      + glg.cellSize.y * rows
                      + glg.spacing.y * (rows - 1);
 
-        // °íÁ¤ »çÀÌÁî·Î µü ¸Â°Ô
+        // ê³ ì • ì‚¬ì´ì¦ˆë¡œ ë”± ë§ê²Œ
         var rt = grid;
         rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
         rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);

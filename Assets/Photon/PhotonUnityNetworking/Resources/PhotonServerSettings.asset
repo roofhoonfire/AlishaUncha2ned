@@ -17,7 +17,7 @@ MonoBehaviour:
     AppIdFusion: 
     AppIdChat: 
     AppIdVoice: 
-    AppVersion: hoyoon
+    AppVersion: 12355
     UseNameServer: 1
     FixedRegion: jp
     Server: 
