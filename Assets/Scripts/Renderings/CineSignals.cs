@@ -52,6 +52,53 @@ public class CineSignals : MonoBehaviour
         }
 
     }
+
+
+
+    public void Alisha_Anim_Opening_Start()
+    {
+        Debug.Log("응 오프닝 시작 시그널 왓어");
+
+
+        var dic = LocalState.Instance.PlayerObDic;
+
+        foreach (var chargo in dic.Values)
+        {
+
+            var animatortt = chargo.GetComponentInChildren<Animator>();
+            if (animatortt == null)
+            {
+                Debug.LogError("오프닝,  Animator 없음");
+
+                return;
+            }
+            animatortt.SetTrigger("Trig_Opening_Start");
+
+        }
+
+    }
+    public void Alisha_Anim_Opening_End()
+    {
+        Debug.Log("응 오프닝 끝 시그널 왓어");
+
+
+        var dic = LocalState.Instance.PlayerObDic;
+
+        foreach (var chargo in dic.Values)
+        {
+
+            var animatortt = chargo.GetComponentInChildren<Animator>();
+            if (animatortt == null)
+            {
+                Debug.LogError("오프닝,  Animator 없음");
+
+                return;
+            }
+            animatortt.SetTrigger("Trig_Opening_End");
+
+        }
+
+    }
     private Transform tileIndextoPosition(int tileindex)
     {
 
