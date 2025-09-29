@@ -101,7 +101,7 @@ public class CardChooseTile : MonoBehaviour
         _ragingNow.Clear();
         GridManagement.Instance.ClearAllRageTriggers();
 
-        AlertDialogue.Instance.StartDialogue(action, actor, HookType.Activate, 0,DialogueType.TileChoose);
+      //  AlertDialogue.Instance.StartDialogue(action, actor, HookType.Activate, 0,DialogueType.TileChoose);
         
         //타일추스 애니메
         var tile_chooser_anim = myChara.GetComponentInChildren<Animator>();

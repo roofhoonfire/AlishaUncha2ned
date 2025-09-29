@@ -1,4 +1,5 @@
 using DG.Tweening;
+using JetBrains.Annotations;
 using Microlight.MicroBar;
 using Photon.Pun;
 using System.Collections;
@@ -32,6 +33,8 @@ public class LocalRenderingManager : MonoBehaviour
     public CardHoverPreview_CastingUI myCardCode;
     public CardHoverPreview_CastingUI opCardCode;
 
+
+    
     public class RenderDiff
     {
         public int actorNum;
@@ -278,7 +281,7 @@ public class LocalRenderingManager : MonoBehaviour
     public void Rendering_FaceOff_Start(int nthFaceOff)
     {
 
-        AlertDialogue.Instance.StartDialogue(null, 0, 0, nthFaceOff, DialogueType.FaceOff);
+       // AlertDialogue.Instance.StartDialogue(null, 0, 0, nthFaceOff, DialogueType.FaceOff);
 
     }
     public void Rendering_Rumble_Single_Action(int winner, LocalRenderingData data1, LocalRenderingData data2)
@@ -522,7 +525,7 @@ public class LocalRenderingManager : MonoBehaviour
     public void Rendering_Dot_Action(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h)
     {
 
-        AlertDialogue.Instance.StartDialogue(action, actorNum, h, 0, DialogueType.Activate);
+       // AlertDialogue.Instance.StartDialogue(action, actorNum, h, 0, DialogueType.Activate);
 
 
         //훅 타입에 맞는 애니메이션 재생해주고 
@@ -652,12 +655,12 @@ public class LocalRenderingManager : MonoBehaviour
 
         if (actorNum != PhotonNetwork.LocalPlayer.ActorNumber)
         {
-            AlertDialogue.Instance.StartDialogue(action, 0, 0, 0, DialogueType.TileChoose);
+        //    AlertDialogue.Instance.StartDialogue(action, 0, 0, 0, DialogueType.TileChoose);
 
         }
         else
         {
-            AlertDialogue.Instance.StartDialogue(null, 0, 0, 0, DialogueType.Wait);
+      //      AlertDialogue.Instance.StartDialogue(null, 0, 0, 0, DialogueType.Wait);
 
         }
 

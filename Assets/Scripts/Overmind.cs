@@ -1830,6 +1830,12 @@ public class Overmind : MonoBehaviourPunCallbacks
     /// </summary>
     private IEnumerator ShowDown()
     {
+
+        photonView.RPC(nameof(RPC_CycleSync_M2C), RpcTarget.All, -1, faceOffCount);
+        yield return new WaitUntil(() => syncCount == 2);
+        syncCount = 0;
+
+
         int showdownCircFlag = 0;
 
         // 1, 2 승자 존재: 승자 번호 3: 동시발동 4: 00후 처맞기 5: 처맞고 00하기하기
@@ -2070,6 +2076,13 @@ public class Overmind : MonoBehaviourPunCallbacks
         if (cycleState == -1)
         {
             cycleState = newState;
+
+
+            photonView.RPC(nameof(RPC_CycleSync_M2C), RpcTarget.All, newState, faceOffCount);
+            yield return new WaitUntil(() => syncCount == 2);
+            syncCount = 0;
+
+
             yield break;
         }
 
@@ -2135,7 +2148,11 @@ public class Overmind : MonoBehaviourPunCallbacks
                             syncCount = 0;
             }
 
-         //  BoundChecker.BoundParamReset();
+            //  BoundChecker.BoundParamReset();
+            photonView.RPC(nameof(RPC_CycleSync_M2C), RpcTarget.All, newState, faceOffCount);
+            yield return new WaitUntil(() => syncCount == 2);
+            syncCount = 0;
+
 
         }
         else
@@ -2146,9 +2163,38 @@ public class Overmind : MonoBehaviourPunCallbacks
                 players[1].canMove = true;
                 players[2].energy++;
                 players[2].canMove = true;
+
+
+                photonView.RPC(nameof(RPC_CycleSync_M2C), RpcTarget.All, newState, faceOffCount);
+                yield return new WaitUntil(() => syncCount == 2);
+                syncCount = 0;
+
             }
+
+
         }
-            cycleState = newState;
+
+
+
+
+
+
+
+
+
+        cycleState = newState;
+
+
+
+
+
+
+        
+
+
+
+
+
     }
 
 
@@ -2317,6 +2363,15 @@ public class Overmind : MonoBehaviourPunCallbacks
             
     }
 
+    [PunRPC]
+    void RPC_CycleSync_M2C(int newcycle, int faceoffCount)
+    {
+        LocalCycleManager.Instance.PlayCycleBanner(newcycle, faceoffCount);
+
+
+        //LocalRenderingManager.Instance.Rendering_JujuSync(packet1, packet2);
+
+    }
 
     [PunRPC]
    public void RPC_After_Action_Selection_Sync_M2C(string json1, string json2, int who_Select)
