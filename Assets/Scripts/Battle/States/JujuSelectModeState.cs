@@ -46,6 +46,8 @@ public class JujuSelectModeState : MonoBehaviour
 
         if (jujuCode!= null)
         {
+
+            Debug.Log($"{jujuCode}¾¾¹ß º¸³½´Ù ");
             Overmind.Instance.Submit_Juju(actorNum, jujuCode);
 
 

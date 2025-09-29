@@ -667,7 +667,7 @@ public class CardAnimationRouter : MonoBehaviour
         bool skipPoint1DueToGuard = false,          // Activate를 Point2부터(Prep 카메라 연출 스킵)
         string opponentActivateCardCode = null,     // Guard 프롤로그에서 참조할 공격자 카드
         int? opponentActorNum = null               // Guard 프롤로그에서 초점 맞출 공격자 actor
-        
+
         )
     {
         if (LocalState.Instance == null || LocalState.Instance.PlayerObDic == null) yield break;
@@ -796,7 +796,7 @@ public class CardAnimationRouter : MonoBehaviour
                     CameraLovesAlisha.Instance.EndPoint1Overlay(preOvFadeOut);
 
                 FreezeOnLastFrame(origAttackerAnim, actEntry.prepStateName, false);
-                
+
                 if (!string.IsNullOrEmpty(actEntry.prepTrigger))
                     origAttackerAnim.ResetTrigger(actEntry.prepTrigger);  // 같은 이름 우선
                 ResetAllTriggers(origAttackerAnim);                       // 안전빵: 모든 트리거 정리
@@ -845,11 +845,11 @@ public class CardAnimationRouter : MonoBehaviour
     }
 
     //여기도 수정함
-   /* public void Play(string cardCode, int attackerActorNum, HookType hook, int? victimActorNum = null)
-    {
-        StartCoroutine(PlayCo(cardCode, attackerActorNum, hook, victimActorNum));
-    }
-   */
+    /* public void Play(string cardCode, int attackerActorNum, HookType hook, int? victimActorNum = null)
+     {
+         StartCoroutine(PlayCo(cardCode, attackerActorNum, hook, victimActorNum));
+     }
+    */
     private bool HasLeftState(Animator anim, string stateName, int layer)
     {
         var cur = anim.GetCurrentAnimatorStateInfo(layer);

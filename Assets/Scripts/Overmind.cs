@@ -2104,6 +2104,7 @@ public class Overmind : MonoBehaviourPunCallbacks
 
                 CallRPCJuju(cycleState, BC_ret.ret_bound, BC_ret.ret_check);
                 yield return new WaitUntil(() => syncCount == 2);
+                Debug.Log("여기 못온거잖아 그치?");
                 syncCount = 0;
                 BoundChecker.After_CallRPCJuju(cycleState);
                 //여기서 불러야함 콜주주랑
@@ -2366,8 +2367,7 @@ public class Overmind : MonoBehaviourPunCallbacks
     void RPC_ReceiveJuju_C2M(string jujuCode, int actorNum)
     {
 
-
-        if (jujuCode != null)
+         if (jujuCode != null)
         {
 
 
@@ -2377,6 +2377,7 @@ public class Overmind : MonoBehaviourPunCallbacks
 
         }
         syncCount++;
+        Debug.Log($"{actorNum}한테 일단 하나 받음 현재 싱크 카운트 : {syncCount}");
 
 
     }
