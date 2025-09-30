@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7232488348456789605}
   - component: {fileID: 8509763197749144008}
+  - component: {fileID: 7439760799307531908}
   m_Layer: 0
   m_Name: JuJutsuMode
   m_TagString: Untagged
@@ -84,6 +85,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &7439760799307531908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 144955895100488355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e21010a966eadf24e9a0744aa59c7d89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockedValue: 0
+  allowChange: 0
 --- !u!1 &822202761492472780
 GameObject:
   m_ObjectHideFlags: 0
@@ -314,6 +329,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1786445751745410466}
   - component: {fileID: 974738854046858636}
+  - component: {fileID: 2914537128904217652}
   m_Layer: 0
   m_Name: MoveMode
   m_TagString: Untagged
@@ -388,6 +404,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2914537128904217652
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1731018219644291853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e21010a966eadf24e9a0744aa59c7d89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockedValue: 0
+  allowChange: 0
 --- !u!1 &1812709106590986504
 GameObject:
   m_ObjectHideFlags: 0
@@ -619,6 +649,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4741783545357060679}
   - component: {fileID: 4145026937228260811}
+  - component: {fileID: 8396907583582080883}
   m_Layer: 0
   m_Name: CardMode
   m_TagString: Untagged
@@ -693,6 +724,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &8396907583582080883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2940844258042613404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e21010a966eadf24e9a0744aa59c7d89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockedValue: 0
+  allowChange: 0
 --- !u!1 &3711788267315054533
 GameObject:
   m_ObjectHideFlags: 0

@@ -29,9 +29,9 @@ MonoBehaviour:
     stateName: Base Layer.Alisha_Slash
     clip: {fileID: 7400000, guid: c052ebee4afb8ff4aac20e219294e11a, type: 2}
     totalFramesOverride: 0
-    victimAnimatorTrigger: Trig_Damaged
-    victimStateName: Base Layer.Alisha_Damaged
-    victimClip: {fileID: 7400000, guid: 7fd8eff2fb1d3c04288c0e7d00ae7d49, type: 2}
+    victimAnimatorTrigger: Trig_Damaged_Scratch
+    victimStateName: Base Layer.Alisha_Damaged_Scratch
+    victimClip: {fileID: 7400000, guid: a33829a0184656b488537d448de4a88c, type: 2}
     victimStartFrames: 02000000
     usePrepBackdrop: 1
     prepBackdropSprite: {fileID: 21300000, guid: 2f0421c3c8964b0419d48f65575ebaa0,
@@ -40,7 +40,7 @@ MonoBehaviour:
     prepBackdropFadeOut: 0.12
     hitStops:
     - frame: 3
-      duration: 0.7
+      duration: 0.5
       pauseAttacker: 1
       pauseVictim: 1
       pauseEffects: 1
@@ -109,9 +109,9 @@ MonoBehaviour:
     stateName: Base Layer.Alisha_Slash
     clip: {fileID: 7400000, guid: c052ebee4afb8ff4aac20e219294e11a, type: 2}
     totalFramesOverride: 0
-    victimAnimatorTrigger: Trig_Damaged
-    victimStateName: Base Layer.Alisha_Damaged
-    victimClip: {fileID: 7400000, guid: 7fd8eff2fb1d3c04288c0e7d00ae7d49, type: 2}
+    victimAnimatorTrigger: Trig_Damaged_Slash
+    victimStateName: Base Layer.Alisha_Damaged_Slash
+    victimClip: {fileID: 7400000, guid: d84da1024389adc439c867e5b3f62f29, type: 2}
     victimStartFrames: 02000000
     usePrepBackdrop: 1
     prepBackdropSprite: {fileID: 21300000, guid: 2f0421c3c8964b0419d48f65575ebaa0,
@@ -189,9 +189,9 @@ MonoBehaviour:
     stateName: Base Layer.Alisha_Pierce
     clip: {fileID: 7400000, guid: 491a1a6fe8ea7244a9a975ccc9132b13, type: 2}
     totalFramesOverride: 0
-    victimAnimatorTrigger: Trig_Damaged
-    victimStateName: Base Layer.Alisha_Damaged
-    victimClip: {fileID: 7400000, guid: 7fd8eff2fb1d3c04288c0e7d00ae7d49, type: 2}
+    victimAnimatorTrigger: Trig_Damaged_Punch
+    victimStateName: Base Layer.Alisha_Damaged_Punch
+    victimClip: {fileID: 7400000, guid: 12725cf408cf9ee41a5ef173391b9073, type: 2}
     victimStartFrames: 01000000
     usePrepBackdrop: 1
     prepBackdropSprite: {fileID: 21300000, guid: 2f0421c3c8964b0419d48f65575ebaa0,
