@@ -76,7 +76,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 100
-  m_Sprite: {fileID: 21300000, guid: 34ba8c01ac70d1c418c6a92d71972fc9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3758bf46f0fd2c049ac8d863b4b87b4f, type: 3}
   m_Color: {r: 0.30980393, g: 0.29803923, b: 0.29803923, a: 0.5019608}
   m_FlipX: 0
   m_FlipY: 0
@@ -177,7 +177,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 101
-  m_Sprite: {fileID: 21300000, guid: c5c71ce0da0fdfe47b0fb9d64f31c43e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 01ee26c273b950243ac8862b2a96dfed, type: 3}
   m_Color: {r: 1, g: 0.2, b: 0.20784314, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -269,7 +269,7 @@ MonoBehaviour:
     _uiPrimaryBar: {fileID: 0}
     _uiGhostBar: {fileID: 0}
     _adaptiveColor: 0
-    _barPrimaryColor: {r: 1, g: 0.8727772, b: 0.36320752, a: 1}
+    _barPrimaryColor: {r: 1, g: 1, b: 1, a: 1}
     _barAdaptiveColor: {r: 0, g: 1, b: 0.043819427, a: 1}
     _useGhostBar: 1
     _dualGhostBars: 1
@@ -409,7 +409,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 102
-  m_Sprite: {fileID: 21300000, guid: c5c71ce0da0fdfe47b0fb9d64f31c43e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 01ee26c273b950243ac8862b2a96dfed, type: 3}
   m_Color: {r: 1, g: 0.2, b: 0.20784314, a: 1}
   m_FlipX: 0
   m_FlipY: 0
