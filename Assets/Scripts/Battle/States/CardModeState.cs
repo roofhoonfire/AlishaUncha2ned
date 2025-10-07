@@ -212,7 +212,25 @@ public class CardModeState : MonoBehaviour
             if (info == null) { Debug.LogWarning("EachCardInfo 없음"); continue; }
 
             info.cardData = CardCSVLoader.Instance.GetCardByCode(code);
-            info.ApplyCardData();
+
+            //여기가 바뀟다
+            var anim = cardGO.GetComponentInChildren<Animator>();
+            if (anim != null)
+            {
+                var deferrer = cardGO.GetComponent<CardApplyDeferrer>();
+                if (deferrer == null) deferrer = cardGO.AddComponent<CardApplyDeferrer>();
+                deferrer.Bind(
+                    info, anim,
+                    idleStateName: "Card_Actioin_Idle",
+                    layerIndex: 0,
+                    requireInitStateName: "Card_Actioin_Init" // ★ Init을 실제로 본 뒤에만 적용
+                );
+            }
+            else
+            {
+                info.ApplyCardData();
+            }
+            //음 여기가 말이지
         }
 
         Debug.Log("손패 생성완료");

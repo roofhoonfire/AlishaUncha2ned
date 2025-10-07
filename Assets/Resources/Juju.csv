@@ -1,9 +1,11 @@
 #code,type,name,sprite,animation,addingCard,boundPoint,onlyOnce,require,isUsed,cardText
-j1,handAdd,마무리 일격,,,c7,1,0,none,,메인 액션에 피해를 10추가하는 “마무리 일격”을 손 패에 추가합니다
-j2,handAdd,속임수 주사위,,,c8,2,0,none,,캐스팅을 +-3 조절할 수 있는 “속임수 주사위”를 손 패에 추가합니다
-j3,handAdd,가속,,,c10,2,0,none,,선공 시 유리해지는 멋진 카드를 손 패에 추가합니다 
-j4,Reinforce,전광석화,,,,2,1,none,,이제 부터 이동하는데 더 이상 캐스팅이 소요되지 않습니다
-j5,handAdd,술법 두루마리,,,c15,2,0,none,,바꿔치기 술법의 두루마리를 손 패에 추가합니다
-j6,handAdd,조금 빠르게,,,c32,2,0,none,,일단 서두르는 카드를 손 패에 추가합니다
-j7,handAdd,유비무환,,,c33,2,0,none,,약점 보험 카드를 손 패에 추가합니다
-j8,handAdd,철벽,,,c34,1,0,none,,단단해지는 카드를 손패에 추가합니다
+j1,handAdd,마무리 일격,Juju/Juju_finalblow,,c7,1,0,none,,메인 액션에 피해를 10추가하는 “마무리 일격”을 손 패에 추가합니다
+j2,handAdd,속임수 주사위,Juju/Juju_dice,,c8,2,0,none,,캐스팅을 +-3 조절할 수 있는 “속임수 주사위”를 손 패에 추가합니다
+j3,handAdd,가속,Juju/Juju_rush,,c10,2,0,none,,선공 시 유리해지는 멋진 카드를 손 패에 추가합니다 
+j4,Reinforce,전광석화,Juju/Juju_Pikachu,,,2,1,none,,이제 부터 이동하는데 더 이상 캐스팅이 소요되지 않습니다
+j5,handAdd,술법 두루마리,Juju/Juju_Jutsu,,c15,2,0,none,,바꿔치기 술법의 두루마리를 손 패에 추가합니다
+j6,handAdd,나비효과,Juju/Juju_Beffect ,,c32,2,0,none,,이번 싸이클에 입힌 피해를 “저장”합니다
+j7,handAdd,유비무환,Juju/Juju_insurance,,c33,2,0,none,,“약점 보험” 카드를 손 패에 추가합니다
+j8,handAdd,철벽,Juju/Juju_defense,,c34,1,0,none,,“철벽” 카드를 손 패에 추가합니다
+j9,handAdd,싸구려 물약,Juju/Juju_Potion,,c10,1,0,none,,체력을 10 회복합니다
+j10,handAdd,제물 서약,Juju/Juju_drop,,c10,1,0,none,,체력을 10 잃는 대신 상대의 다음 메인 액션의 피해량을 10 줄입니다

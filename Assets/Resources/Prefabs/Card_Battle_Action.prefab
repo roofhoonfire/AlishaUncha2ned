@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 212569989432367612}
   - component: {fileID: 7809848807526159109}
   - component: {fileID: 6377785650717913791}
+  - component: {fileID: 7826911874412313332}
   m_Layer: 5
   m_Name: Card_Battle_Action
   m_TagString: Untagged
@@ -188,6 +189,18 @@ MonoBehaviour:
   tempSortingOrder: 2000
   scaleTarget: {fileID: 3823623756298093756}
   respectInputGate: 1
+--- !u!114 &7826911874412313332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 686844825720063196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7988f9d9415adad4fb65444ef54e5132, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &959778176797282629
 GameObject:
   m_ObjectHideFlags: 0
@@ -613,7 +626,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Card Name
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: eaf776cc513ff71479945ff66262c284, type: 2}
   m_sharedMaterial: {fileID: -2122021243548641323, guid: eaf776cc513ff71479945ff66262c284,
@@ -1343,7 +1356,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Card Name
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: eaf776cc513ff71479945ff66262c284, type: 2}
   m_sharedMaterial: {fileID: -2122021243548641323, guid: eaf776cc513ff71479945ff66262c284,
