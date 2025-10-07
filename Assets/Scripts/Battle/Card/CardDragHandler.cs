@@ -19,6 +19,10 @@ public class CardDragHandler : MonoBehaviour,
     [SerializeField] private string trigInZone = "Trig_InZone";
     [SerializeField] private string trigOffZone = "Trig_OffZone";
 
+    [Header("FX")]
+    [Tooltip("드롭 존 위에 있을 때 켜질 이펙트(예: 불꽃, 하이라이트)")]
+    [SerializeField] private GameObject inZoneFlame; // ★ 인스펙터에서 드래그&드롭
+
     private RectTransform rectTransform;
     private CanvasGroup canvasGroup;
     private Canvas canvas;
@@ -69,6 +73,15 @@ public class CardDragHandler : MonoBehaviour,
 
         // Animator 자동 참조(없으면 null 허용)
         if (!animator) animator = GetComponent<Animator>();
+
+        // 시작 시 꺼 둔다
+        if (inZoneFlame) inZoneFlame.SetActive(false);
+    }
+
+    private void OnDisable()
+    {
+        // 비활성화 시 흔적 정리
+        if (inZoneFlame) inZoneFlame.SetActive(false);
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -94,6 +107,9 @@ public class CardDragHandler : MonoBehaviour,
             animator.ResetTrigger(trigInZone);
             animator.ResetTrigger(trigOffZone);
         }
+
+        // 드래그 시작 시 꺼 둔다 (안전장치)
+        if (inZoneFlame) inZoneFlame.SetActive(false);
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -126,6 +142,9 @@ public class CardDragHandler : MonoBehaviour,
                 animator.ResetTrigger(trigInZone);
                 animator.SetTrigger(trigOffZone);
             }
+
+            // 이펙트도 확실히 끄기
+            if (inZoneFlame) inZoneFlame.SetActive(false);
 
             // Blinded: 피 다시 덮기
             if (CardModeState.Instance.apDataRef.isBlinded)
@@ -169,8 +188,9 @@ public class CardDragHandler : MonoBehaviour,
                 btmPacketAdd(thisCardData.code);
                 Destroy(gameObject);
 
-                LocalState.Instance.PlayerObDic[PhotonNetwork.LocalPlayer.ActorNumber].GetComponentInChildren<Animator>().SetTrigger("Trig_Support_Buff");
-
+                LocalState.Instance.PlayerObDic[PhotonNetwork.LocalPlayer.ActorNumber]
+                    .GetComponentInChildren<Animator>()
+                    .SetTrigger("Trig_Support_Buff");
             }
             else if (thisCardData.cardType == 2)
             {
@@ -203,7 +223,7 @@ public class CardDragHandler : MonoBehaviour,
 
     private void HandleZoneAnimation(bool inside)
     {
-        // 상태 변화시에만 트리거 발동
+        // 상태 변화시에만 트리거/이펙트 발동
         if (inside != wasInside)
         {
             if (animator)
@@ -216,11 +236,14 @@ public class CardDragHandler : MonoBehaviour,
                 }
                 else
                 {
-                    AnimTriggerManager.Instance.FireByLabel("myCasting", "Trig_Close"); 
+                    AnimTriggerManager.Instance.FireByLabel("myCasting", "Trig_Close");
                     animator.ResetTrigger(trigInZone);
                     animator.SetTrigger(trigOffZone);
                 }
             }
+
+            // 인존 이펙트 온/오프
+            if (inZoneFlame) inZoneFlame.SetActive(inside);
 
             // Blinded일 때 피 오버레이 토글(존 안에선 걷고, 밖에선 덮기)
             if (CardModeState.Instance.apDataRef.isBlinded)
