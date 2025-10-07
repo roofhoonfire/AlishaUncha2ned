@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 using TMPro;
+using UnityEngine.UI; // ★ Image 사용
 using System.Collections;
 using System.Collections.Generic;
 
@@ -26,6 +27,12 @@ public class CardHoverPreview : MonoBehaviour,
     public string nameName = "name";
     public string ptName = "pt";
 
+    [Header("Artwork Sync")]
+    [Tooltip("여기 붙은 Image의 sprite를 프리뷰 카드의 ActualImage에 복사")]
+    [SerializeField] private GameObject sourceImage; // ★ 소스 이미지 오브젝트( Image 컴포넌트 필요 )
+    [Tooltip("프리뷰 카드 하위에서 스프라이트를 표시할 타겟 오브젝트 이름")]
+    [SerializeField] private string previewImageName = "ActualImage";
+
     // 내부// 추가
     [Header("Behavior")]
     public bool keepPreviewActive = true;
@@ -39,6 +46,10 @@ public class CardHoverPreview : MonoBehaviour,
     private Dictionary<string, TextMeshProUGUI> _src = new();
     private Dictionary<string, TextMeshProUGUI> _dst = new();
 
+    // ★ 이미지 캐시
+    private Image _srcImg;
+    private Image _dstImg;
+
     private Coroutine _hoverCo;
     private Coroutine _syncCo;
     private Tween _fadeTween;
@@ -48,6 +59,9 @@ public class CardHoverPreview : MonoBehaviour,
     {
         CacheTexts(transform, _src);
         EnsurePreview();
+
+        // 소스 이미지 캐시
+        _srcImg = GetImageFromGO(sourceImage);
 
         if (previewCard)
         {
@@ -62,9 +76,11 @@ public class CardHoverPreview : MonoBehaviour,
 
             if (_dst.Count == 0)
                 CacheTexts(previewCard.transform, _dst, allowInactive: true);
+
+            // 프리뷰 쪽 타깃 이미지 캐시
+            _dstImg = FindImageByName(previewCard.transform, previewImageName, includeInactive: true);
         }
     }
-
 
     void OnDisable()
     {
@@ -75,7 +91,6 @@ public class CardHoverPreview : MonoBehaviour,
     // ===== Pointer Events =====
     public void OnPointerEnter(PointerEventData eventData)
     {
-        Debug.Log("아이엠레뒤");
         if (_hoverCo != null) StopCoroutine(_hoverCo);
         _hoverCo = StartCoroutine(HoverCountdown());
     }
@@ -106,7 +121,9 @@ public class CardHoverPreview : MonoBehaviour,
         if (_src.Count == 0) CacheTexts(transform, _src);
         if (_dst.Count == 0) CacheTexts(previewCard.transform, _dst, allowInactive: true);
 
+        // 텍스트 & 이미지 1회 복사
         CopyTextsOnce();
+        CopyImageOnce();
 
         if (_isShowing) return;
         _isShowing = true;
@@ -125,7 +142,6 @@ public class CardHoverPreview : MonoBehaviour,
         if (liveSyncDuringHover)
             _syncCo = StartCoroutine(LiveSyncLoop());
     }
-
 
     private void Hide()
     {
@@ -161,7 +177,6 @@ public class CardHoverPreview : MonoBehaviour,
 
         if (_syncCo != null) { StopCoroutine(_syncCo); _syncCo = null; }
     }
-
 
     private void KillHoverOnly()
     {
@@ -217,6 +232,11 @@ public class CardHoverPreview : MonoBehaviour,
                 _cachedCG = _previewCG;
             }
         }
+
+        // 프리뷰 찾았으면 타깃 이미지도 캐시 시도
+        if (_dstImg == null && previewCard != null)
+            _dstImg = FindImageByName(previewCard.transform, previewImageName, includeInactive: true);
+
         return true;
     }
 
@@ -230,12 +250,29 @@ public class CardHoverPreview : MonoBehaviour,
         CopyIfExists(ptName);
     }
 
+    private void CopyImageOnce()
+    {
+        // 소스/타깃 캐시가 없다면 다시 시도
+        if (_srcImg == null) _srcImg = GetImageFromGO(sourceImage);
+        if (_dstImg == null && previewCard != null)
+            _dstImg = FindImageByName(previewCard.transform, previewImageName, includeInactive: true);
+
+        if (_srcImg != null && _dstImg != null)
+        {
+            _dstImg.sprite = _srcImg.sprite;
+            _dstImg.enabled = (_dstImg.sprite != null);
+            // 필요시 이미지 크기 보정이 있으면 여기서 SetNativeSize() 등 사용 가능
+            // _dstImg.SetNativeSize();
+        }
+    }
+
     private IEnumerator LiveSyncLoop()
     {
         var wait = new WaitForEndOfFrame();
         while (_isShowing)
         {
             CopyTextsOnce();
+            CopyImageOnce(); // ★ 라이브 동기화 옵션일 때 이미지도 계속 동기화
             yield return wait;
         }
     }
@@ -264,7 +301,7 @@ public class CardHoverPreview : MonoBehaviour,
 
             if (tmp == null)
             {
-                var tmps = root.GetComponentsInChildren<TextMeshProUGUI>(true);
+                var tmps = root.GetComponentsInChildren<TextMeshProUGUI>(allowInactive);
                 foreach (var x in tmps)
                     if (x.name == key) { tmp = x; break; }
             }
@@ -272,10 +309,40 @@ public class CardHoverPreview : MonoBehaviour,
             if (tmp != null) map[key] = tmp;
         }
     }
+
+    private static Image GetImageFromGO(GameObject go)
+    {
+        if (!go) return null;
+        // 자기 자신 우선
+        var img = go.GetComponent<Image>();
+        if (img) return img;
+        // 자식 중 첫 Image
+        return go.GetComponentInChildren<Image>(true);
+    }
+
+    private static Image FindImageByName(Transform root, string name, bool includeInactive)
+    {
+        if (!root || string.IsNullOrEmpty(name)) return null;
+
+        // 1차: 직계 이름으로
+        var t = root.Find(name);
+        if (t)
+        {
+            var img = t.GetComponent<Image>();
+            if (img) return img;
+        }
+
+        // 2차: 전체 하위 탐색
+        var imgs = root.GetComponentsInChildren<Image>(includeInactive);
+        foreach (var x in imgs)
+            if (x.name == name) return x;
+
+        return null;
+    }
 }
 
 // 선택형: 프리뷰 카드에 달아두면 자동 탐색에 사용됨(태그 대신/보조)
 public class CardPreviewAnchor : MonoBehaviour
 {
-    void Reset() { gameObject.tag = "CardPreview"; } // 에디터에서 자동 태깅 보조
+    void Reset() { gameObject.tag = "CardPreview"; }
 }

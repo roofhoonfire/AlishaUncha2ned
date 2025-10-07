@@ -23,6 +23,8 @@ public class LocalRenderingManager : MonoBehaviour
     public TextMeshProUGUI OpBound;
 
     public GameObject paching_Op;
+    public GameObject paching_Me;
+
 
     public static LocalRenderingManager Instance;
     [SerializeField] BoundImageConductor myBoundConductor;
@@ -139,18 +141,27 @@ public class LocalRenderingManager : MonoBehaviour
     {
         int myActor = PhotonNetwork.LocalPlayer.ActorNumber;
 
-        
-//        List<RenderDiff> diffs = CopyandDifferences(data1, data2);
-  //      ApplyDiffsToLocalRenderingData(diffs);
 
-    //    myCardCode.myCardCode = LocalRenderingStatic.localRenderingDatas[myActor].myCard;
+        //        List<RenderDiff> diffs = CopyandDifferences(data1, data2);
+        //      ApplyDiffsToLocalRenderingData(diffs);
+
+        //    myCardCode.myCardCode = LocalRenderingStatic.localRenderingDatas[myActor].myCard;
         //opCardCode.opCardCode = LocalRenderingStatic.localRenderingDatas[Overmind.Instance.GetOtherPlayerNumber(myActor)].myCard;
-        
+
 
 
         // “뚜왕” 연출: 끝날 때까지 대기
         if (whoselect != PhotonNetwork.LocalPlayer.ActorNumber)
+        { 
             paching_Op.SetActive(true);
+        
+            if(whoselect <= 0)
+                paching_Me.SetActive(true);
+
+        }
+        else {
+            paching_Me.SetActive(true);
+                }
         yield return BounceRemainingCost(data1, data2, whoselect);
 
         // 연출이 끝난 뒤에만 UI 적용
@@ -601,6 +612,10 @@ public class LocalRenderingManager : MonoBehaviour
 
     public ActionData Rendering_Before_Tile_Choose_ShowDown(List<(int actorNum, ActionData action)> actionList, LocalRenderingData data1, LocalRenderingData data2)
     {
+        
+            paching_Op.SetActive(true);
+            paching_Me.SetActive(true);
+        
         int myActorNum = PhotonNetwork.LocalPlayer.ActorNumber;
 
         var myActionTuple = actionList.FirstOrDefault(pair => pair.actorNum == myActorNum);
@@ -634,11 +649,17 @@ public class LocalRenderingManager : MonoBehaviour
         return myAction;
     }
 
-    public void Rendering_Before_Tile_Choose(LocalRenderingData data1, LocalRenderingData data2)
+    public void Rendering_Before_Tile_Choose(LocalRenderingData data1, LocalRenderingData data2, int whoSelect)
     {
+        
+            if (whoSelect != PhotonNetwork.LocalPlayer.ActorNumber)
+                paching_Op.SetActive(true);
+            else
+            {
+                paching_Me.SetActive(true);
+            }
 
-
-        List<RenderDiff> diffs = CopyandDifferences(data1, data2);
+            List<RenderDiff> diffs = CopyandDifferences(data1, data2);
         StartCoroutine(AnimateStatChange("remainingCost", diffs));
         ApplyDiffsToLocalRenderingData(diffs);
         //myCardCode.myCardCode = LocalRenderingStatic.localRenderingDatas[PhotonNetwork.LocalPlayer.ActorNumber].myCard;

@@ -248,10 +248,44 @@ public class CardModeState : MonoBehaviour
     {
         // 드래그핸들러에서 StopSelectCardLoop 호출하는 기존 구조 사용
     }
+    public void ActivatePachingOnCodeZero()
+    {
+        foreach (var card in spawnedCards)
+        {
+            if (card == null) continue;
+
+            var info = card.GetComponentInChildren<EachCardInfo>(true);
+            if (info == null || info.cardData == null) continue;
+
+            // code가 "0"인 카드만 대상
+            if (info.cardData.cardType == 0)
+            {
+                // 직계에서 먼저 찾고, 없으면 모든 하위에서 이름으로 탐색
+                Transform paching = card.transform.Find("Paching");
+                if (paching == null)
+                {
+                    foreach (var t in card.GetComponentsInChildren<Transform>(true))
+                    {
+                        if (t.name == "Paching") { paching = t; break; }
+                    }
+                }
+                
+                if (paching != null)
+                {
+                    Debug.Log("파칭 찾음");
+
+                    paching.gameObject.SetActive(true);
+                }
+                // else: 못 찾으면 아무 것도 안 함 (요청대로 다른 동작 불필요)
+            }
+        }
+    }
 
     public void ActionPacketUpgrade(ActionPacketData apData)
     {
+
         Debug.Log("손패 업글 눈에 보이지예?");
+
         int delta_cast = apData.permCast + apData.tempCast;
         int delta_def = apData.tempDef + apData.permDef;
 

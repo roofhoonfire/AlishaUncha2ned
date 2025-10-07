@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 using UnityEditor.Rendering;
+using UnityEngine.UI; // ★ Image 사용
 
 public class CardHoverPreview_CastingUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -33,15 +34,16 @@ public class CardHoverPreview_CastingUI : MonoBehaviour, IPointerEnterHandler, I
     [SerializeField] private TMP_Text nameText;      // "name"
     [SerializeField] private TMP_Text ptText;        // "pt"
 
-
     [Header("툴팁 디스크립션")]
-    [SerializeField] private TooltipTriggerUI tooltiptriggerDis; // "TimeClock"
+    [SerializeField] private TooltipTriggerUI tooltiptriggerDis;
+
+    [Header("Artwork (Drag & Drop)")]
+    [Tooltip("프리뷰 카드에 보여줄 일러스트 Image (인스펙터에서 드래그&드롭)")]
+    [SerializeField] private Image previewImage; // ★ 이름으로 찾지 않음: 무조건 드래그&드롭
 
     private Coroutine _showRoutine;
     private CanvasGroup _cg;
     private Tween _fadeTween;
-
-
 
     private void Awake()
     {
@@ -88,33 +90,39 @@ public class CardHoverPreview_CastingUI : MonoBehaviour, IPointerEnterHandler, I
 
         _fadeTween?.Kill();
 
-        // 활성/비활성 토글 없이, 텍스트 초기화 → 데이터 채움 → 알파 페이드 인
+        // 활성/비활성 토글 없이, 텍스트/이미지 초기화 → 데이터 채움 → 알파 페이드 인
         ClearFields();
 
         string code = isOp ? opCardCode : myCardCode;
-
-        if (string.IsNullOrEmpty(code)) {
-
-          //  tooltiptriggerDis.description = "캐스팅 중인 액션이 없습니다";
-                return;
-
+        if (string.IsNullOrEmpty(code))
+        {
+            // if (tooltiptriggerDis) tooltiptriggerDis.description = "캐스팅 중인 액션이 없습니다";
+            return;
         }
 
-        if (!string.IsNullOrEmpty(code) && CardCSVLoader.Instance != null)
+        if (CardCSVLoader.Instance != null)
         {
             var card = CardCSVLoader.Instance.GetCardByCode(code);
             if (card != null)
             {
+                // ===== 텍스트 채우기 =====
                 if (timeClockText) timeClockText.text = card.actionClock.ToString();
                 if (defenseText) defenseText.text = card.defense.ToString();
                 if (rumbleText) rumbleText.text = card.rumblePoint.ToString();
                 if (nameText) nameText.text = card.name ?? string.Empty;
-                var desc = card.cardText ?? string.Empty;
-                // CSV/외부 입력의 이스케이프를 실제 개행으로 정규화
-                desc = desc.Replace("\\r\\n", "\n").Replace("\\n", "\n").Replace("<br>", "\n").Replace("<br/>", "\n");
 
+                var desc = card.cardText ?? string.Empty;
+                desc = desc.Replace("\\r\\n", "\n").Replace("\\n", "\n").Replace("<br>", "\n").Replace("<br/>", "\n");
                 if (ptText) ptText.text = desc;
-             //   if (tooltiptriggerDis)  tooltiptriggerDis.description =  $"{card.name}의 캐스팅까지 남은시간";
+
+                // ===== 이미지 채우기 =====
+                if (previewImage != null)
+                {
+                    previewImage.sprite = card.sprite;         // ★ card.sprite 사용
+                    previewImage.enabled = (previewImage.sprite != null);
+                }
+
+                // if (tooltiptriggerDis) tooltiptriggerDis.description = $"{card.name}의 캐스팅까지 남은시간";
             }
         }
 
@@ -134,7 +142,7 @@ public class CardHoverPreview_CastingUI : MonoBehaviour, IPointerEnterHandler, I
 
         _fadeTween?.Kill();
 
-        // 알파만 1 → 0 (완료 후 텍스트 정리)
+        // 알파만 1 → 0 (완료 후 텍스트/이미지 정리)
         _fadeTween = _cg.DOFade(0f, fadeOutDuration)
                      .SetEase(fadeOutEase)
                      .SetUpdate(useUnscaledTime)
@@ -162,6 +170,7 @@ public class CardHoverPreview_CastingUI : MonoBehaviour, IPointerEnterHandler, I
         rumbleText ??= FindTMP("Rumble");
         nameText ??= FindTMP("name");
         ptText ??= FindTMP("pt");
+        // ★ 이미지 슬롯은 이름으로 찾지 않음(드래그&드롭 전용)
     }
 
     private TMP_Text FindTMP(string childName)
@@ -184,5 +193,12 @@ public class CardHoverPreview_CastingUI : MonoBehaviour, IPointerEnterHandler, I
         if (rumbleText) rumbleText.text = string.Empty;
         if (nameText) nameText.text = string.Empty;
         if (ptText) ptText.text = string.Empty;
+
+        // ★ 이미지도 함께 초기화
+        if (previewImage != null)
+        {
+            previewImage.sprite = null;
+            previewImage.enabled = false;
+        }
     }
 }

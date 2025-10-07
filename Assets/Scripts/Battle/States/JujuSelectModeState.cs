@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using DG.Tweening; // ← 파일 상단 using들 사이에 추가
+
 
 public class JujuSelectModeState : MonoBehaviour
 {
@@ -31,6 +33,19 @@ public class JujuSelectModeState : MonoBehaviour
         }
 
     }
+    private static void PlaySpawnPop(Transform visualRoot, float upScale = 1.1f, float durUp = 0.08f, float durDown = 0.12f)
+    {
+        if (visualRoot == null) return;
+
+        // 중복 트윈 방지
+        visualRoot.DOKill(true);
+
+        var baseScale = visualRoot.localScale;
+        DOTween.Sequence()
+            .Append(visualRoot.DOScale(baseScale * upScale, durUp).SetEase(Ease.OutBack))
+            .Append(visualRoot.DOScale(baseScale, durDown).SetEase(Ease.InOutQuad));
+    }
+
     public void StopSelectJujuLoop(string jujuCode)
     {
         if (_selectJujuCoroutine != null)
@@ -115,27 +130,28 @@ public class JujuSelectModeState : MonoBehaviour
 
     }
 
-    void PopulateJuju(List <string> jujucodes)
+    void PopulateJuju(List<string> jujucodes)
     {
         spawnedJuju.Clear();
 
-        
-
-        // 최대 3개만 선택
-        
         for (int i = 0; i < jujucodes.Count; i++)
         {
             string selectedCode = jujucodes[i];
 
-            //이건 어차피 렌더링 용이기 때문에 굳이 플레이어꺼를 갖다 쓸필요 없음
-            Juju jujuData = JujuLoader.jujuDataBase[selectedCode]; 
+            Juju jujuData = JujuLoader.jujuDataBase[selectedCode];
 
             GameObject jujuObj = Instantiate(jujuPrefab, jujuContentArea);
             spawnedJuju.Add(jujuObj);
-             EachJujuInfo info = jujuObj.GetComponent<EachJujuInfo>();
+
+            // ★ 비주얼 루트 찾아 팝 연출
+            Transform visualRoot = jujuObj.transform.Find("VisualRoot");
+            if (visualRoot == null) visualRoot = jujuObj.transform; // 안전빵 폴백
+            PlaySpawnPop(visualRoot, 1.1f, 0.08f, 0.12f);
+
+            EachJujuInfo info = jujuObj.GetComponent<EachJujuInfo>();
             if (info != null)
             {
-                info.ApplyJujuData(jujuData); //렌더링 코드임
+                info.ApplyJujuData(jujuData);
             }
             else
             {
@@ -143,7 +159,8 @@ public class JujuSelectModeState : MonoBehaviour
             }
         }
     }
-    
+
+
     public void ClearAllJuju()
     {
 

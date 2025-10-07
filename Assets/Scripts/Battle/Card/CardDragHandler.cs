@@ -183,6 +183,8 @@ public class CardDragHandler : MonoBehaviour,
                 apData.tempDam += thisCardData.damage;
                 apData.tempCast += thisCardData.actionClock;
 
+                CardModeState.Instance.ActivatePachingOnCodeZero();
+
                 CardModeState.Instance.ActionPacketUpgrade(apData);
 
                 btmPacketAdd(thisCardData.code);

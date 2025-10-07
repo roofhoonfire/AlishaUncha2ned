@@ -1274,7 +1274,7 @@ public class Overmind : MonoBehaviourPunCallbacks
 
 
 
-        photonView.RPC(nameof(RPC_Rendering_Before_ChooseTile_M2C), RpcTarget.All, var1json, var2json);
+        photonView.RPC(nameof(RPC_Rendering_Before_ChooseTile_M2C), RpcTarget.All, var1json, var2json, actornum);
         yield return new WaitUntil(() => syncCount == 2);
         syncCount = 0;
         
@@ -1470,14 +1470,14 @@ public class Overmind : MonoBehaviourPunCallbacks
 
     [PunRPC]
 
-    void RPC_Rendering_Before_ChooseTile_M2C(string lrjson1, string lrjson2)
+    void RPC_Rendering_Before_ChooseTile_M2C(string lrjson1, string lrjson2, int whoSelect)
     {
         //이동 때문에 이녀석이 불가피하게 되었다
 
         var data1 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson1);
 
         var data2 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson2);
-        LocalRenderingManager.Instance.Rendering_Before_Tile_Choose( data1, data2);
+        LocalRenderingManager.Instance.Rendering_Before_Tile_Choose( data1, data2, whoSelect);
 
     }
 
