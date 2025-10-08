@@ -8,6 +8,17 @@ public class CardAnimationRouter : MonoBehaviour
 {
     public static CardAnimationRouter Instance { get; private set; }
 
+    // CardAnimationRouter 상단 어울리는 섹션에 추가
+    [Header("볼륨 연출 체크")]
+    [SerializeField] private GameObject globalVolume;   // ← 드래그&드롭
+    [SerializeField] private bool globalvolumetest = false; // ← 체크되면 토글 동작
+    
+    
+    [Header("시네커터")]
+    [SerializeField] private GameObject UpperCut;   
+    [SerializeField] private GameObject UnderCut; 
+
+
     // -------- Camera cinematic (이동/줌 연출) --------
     [Header("Camera Cinematic (Movement)")]
     public bool enableCameraCinematic = true;      // 전체 카메라 시네마틱 on/off
@@ -89,6 +100,13 @@ public class CardAnimationRouter : MonoBehaviour
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         BuildMap();
+    }
+
+    private IEnumerator ToggleGlobalVolumeAfter(float delay, bool on)
+    {
+        if (!globalvolumetest || globalVolume == null) yield break;
+        if (delay > 0f) yield return new WaitForSecondsRealtime(delay);
+        globalVolume.SetActive(on);
     }
 
     private void BuildMap()
@@ -236,14 +254,24 @@ public class CardAnimationRouter : MonoBehaviour
 
                 if (enableCameraCinematic && entry.usePrepBackdrop && entry.prepBackdropSprite != null && CameraLovesAlisha.Instance != null)
                 {
+                    UpperCut.SetActive(true);
+                    UnderCut.SetActive(true);
+                    StartCoroutine(ToggleGlobalVolumeAfter(0f, false));
+
                     CameraLovesAlisha.Instance.BeginPoint1Backdrop(
                         attackerGO, entry.prepBackdropSprite,
                         entry.prepBackdropFadeIn,
                         entry.prepPoseHoldSec
                     );
+
+
                 }
                 if (enableCameraCinematic && entry.usePrepOverlay && entry.prepOverlaySprite != null && CameraLovesAlisha.Instance != null)
                 {
+                    UpperCut.SetActive(true);
+                    UnderCut.SetActive(true);
+                    StartCoroutine(ToggleGlobalVolumeAfter(0f, false));
+
                     CameraLovesAlisha.Instance.BeginPoint1Overlay(
                         entry.prepOverlaySprite,
                         entry.prepOverlayFadeIn,
@@ -252,6 +280,8 @@ public class CardAnimationRouter : MonoBehaviour
                         entry.prepOverlayAnchoredPos,
                         ApplyFacingToOverlayScale(entry.prepOverlayScale)
                     );
+
+
                 }
                 yield return new WaitForSecondsRealtime(entry.prepPoseHoldSec);
 
@@ -260,10 +290,15 @@ public class CardAnimationRouter : MonoBehaviour
                 if (enableCameraCinematic && entry.usePrepBackdrop && entry.prepBackdropSprite != null && CameraLovesAlisha.Instance != null)
                 {
                     CameraLovesAlisha.Instance.EndPoint1Backdrop(entry.prepBackdropFadeOut);
+                    StartCoroutine(ToggleGlobalVolumeAfter(entry.prepBackdropFadeOut, true));
+
                 }
                 if (enableCameraCinematic && entry.usePrepOverlay && entry.prepOverlaySprite != null && CameraLovesAlisha.Instance != null)
                 {
                     CameraLovesAlisha.Instance.EndPoint1Overlay(entry.prepOverlayFadeOut);
+                    StartCoroutine(ToggleGlobalVolumeAfter(entry.prepOverlayFadeOut, true));
+
+
                 }
             }
         }
@@ -774,12 +809,24 @@ public class CardAnimationRouter : MonoBehaviour
                 FreezeOnLastFrame(origAttackerAnim, actEntry.prepStateName, true);
 
                 if (enableCameraCinematic && preBG != null)
+                {
+                    UpperCut.SetActive(true);
+                    UnderCut.SetActive(true);
+                    StartCoroutine(ToggleGlobalVolumeAfter(0f, false));
+
                     CameraLovesAlisha.Instance.BeginPoint1Backdrop(origAttackerT.gameObject, preBG, preFadeIn, holdSec);
 
+                }
                 if (enableCameraCinematic && preOverlay != null)
+                {
+                    UpperCut.SetActive(true);
+                    UnderCut.SetActive(true);
+                    StartCoroutine(ToggleGlobalVolumeAfter(0f, false));
+
                     CameraLovesAlisha.Instance.BeginPoint1Overlay(
                         preOverlay, preOvFadeIn, holdSec, preOvMaxA, preOvPos, ApplyFacingToOverlayScale(preOvScale));
-                // [중요] 컷라인 재생 시간 == holdSec 이므로, 그 시간이 끝난 뒤에 Wait!를 띄움
+
+                }// [중요] 컷라인 재생 시간 == holdSec 이므로, 그 시간이 끝난 뒤에 Wait!를 띄움
                 yield return new WaitForSecondsRealtime(holdSec);
 
                 // 컷라인 끝난 뒤 "그때!" Wait!
@@ -790,11 +837,17 @@ public class CardAnimationRouter : MonoBehaviour
 
                 // 백드롭 종료 및 정지 해제
                 if (enableCameraCinematic && preBG != null)
+                {
                     CameraLovesAlisha.Instance.EndPoint1Backdrop(preFadeOut);
-                // ★추가: 오버레이 종료
-                if (enableCameraCinematic && preOverlay != null)
-                    CameraLovesAlisha.Instance.EndPoint1Overlay(preOvFadeOut);
+                    StartCoroutine(ToggleGlobalVolumeAfter(preFadeOut, true));
 
+                }// ★추가: 오버레이 종료
+                if (enableCameraCinematic && preOverlay != null)
+                {
+                    CameraLovesAlisha.Instance.EndPoint1Overlay(preOvFadeOut);
+                    StartCoroutine(ToggleGlobalVolumeAfter(preFadeOut, true));
+
+                }
                 FreezeOnLastFrame(origAttackerAnim, actEntry.prepStateName, false);
 
                 if (!string.IsNullOrEmpty(actEntry.prepTrigger))

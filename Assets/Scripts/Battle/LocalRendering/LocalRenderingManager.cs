@@ -35,7 +35,8 @@ public class LocalRenderingManager : MonoBehaviour
     public CardHoverPreview_CastingUI myCardCode;
     public CardHoverPreview_CastingUI opCardCode;
 
-
+    [SerializeField] private GameObject globalVolume;   // 드래그&드롭
+    [SerializeField] private bool globalvolumetest = false; 
     
     public class RenderDiff
     {
@@ -307,6 +308,10 @@ public class LocalRenderingManager : MonoBehaviour
 
     public void Rendering_Norm_Action(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h, ActionData OpAction, bool GA)
     {
+
+        if (globalvolumetest && globalVolume != null)
+            globalVolume.SetActive(false);
+
         StartCoroutine(Rendering_Norm_Action_Co(actorNum, data1, data2, action, h, OpAction, GA));
     }
     private IEnumerator Rendering_Norm_Action_Co(
@@ -460,7 +465,9 @@ public class LocalRenderingManager : MonoBehaviour
                 }
             }
         }
-
+        // ★ 추가: 연출 직후 글로벌 볼륨 다시 켜기
+        if (globalvolumetest && globalVolume != null)
+            globalVolume.SetActive(true);
         Debug.Log("자자 노멀 액션 시퀀스 잘봣니?");
 
         // ===== 여기부터는 공통 사후 처리(기존 유지) =====
