@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -12,11 +13,11 @@ public class CardAnimationRouter : MonoBehaviour
     [Header("볼륨 연출 체크")]
     [SerializeField] private GameObject globalVolume;   // ← 드래그&드롭
     [SerializeField] private bool globalvolumetest = false; // ← 체크되면 토글 동작
-    
-    
+
+
     [Header("시네커터")]
-    [SerializeField] private GameObject UpperCut;   
-    [SerializeField] private GameObject UnderCut; 
+    [SerializeField] private GameObject UpperCut;
+    [SerializeField] private GameObject UnderCut;
 
 
     // -------- Camera cinematic (이동/줌 연출) --------
@@ -949,3 +950,4 @@ public class CardAnimationRouter : MonoBehaviour
     }
 
 }
+

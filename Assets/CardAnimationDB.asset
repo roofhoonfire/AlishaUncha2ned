@@ -40,7 +40,7 @@ MonoBehaviour:
     prepBackdropFadeOut: 0.12
     hitStops:
     - frame: 3
-      duration: 0.5
+      duration: 0.7
       pauseAttacker: 1
       pauseVictim: 1
       pauseEffects: 1
@@ -399,8 +399,14 @@ MonoBehaviour:
     prepBackdropFadeIn: 0.15
     prepBackdropFadeOut: 0.12
     hitStops:
+    - frame: 2
+      duration: 0.15
+      pauseAttacker: 1
+      pauseVictim: 1
+      pauseEffects: 0
+      pauseScene: 0
     - frame: 3
-      duration: 0.4
+      duration: 0.55
       pauseAttacker: 1
       pauseVictim: 1
       pauseEffects: 1
@@ -749,9 +755,9 @@ MonoBehaviour:
     stateName: Base Layer.Alisha_SpellDam
     clip: {fileID: 7400000, guid: fdfca1722f13df34bb359b2494759738, type: 2}
     totalFramesOverride: 0
-    victimAnimatorTrigger: Trig_Damaged_ExSlash
-    victimStateName: Base Layer.Alisha_Damaged_ExSlash
-    victimClip: {fileID: 7400000, guid: 7fd8eff2fb1d3c04288c0e7d00ae7d49, type: 2}
+    victimAnimatorTrigger: Trig_Damaged_BTW
+    victimStateName: Base Layer.Alisha_Damaged_BTW
+    victimClip: {fileID: 7400000, guid: c223637d72f72814ea29ea4d3d6d383f, type: 2}
     victimStartFrames: 01000000
     usePrepBackdrop: 1
     prepBackdropSprite: {fileID: 21300000, guid: 2f0421c3c8964b0419d48f65575ebaa0,
@@ -760,7 +766,7 @@ MonoBehaviour:
     prepBackdropFadeOut: 0.12
     hitStops:
     - frame: 2
-      duration: 0.52
+      duration: 0.88
       pauseAttacker: 1
       pauseVictim: 1
       pauseEffects: 1
