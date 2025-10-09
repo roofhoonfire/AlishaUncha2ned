@@ -476,6 +476,9 @@ public class LocalRenderingManager : MonoBehaviour
 
         HPBarManager.Instance.DamageMe(GetMine(data1,data2).hp);
         HPBarManager.Instance.DamageOp(GetOp(data1, data2).hp);
+
+
+        Debug.Log($"{GetMine(data1, data2).hp}가 내 체력 {GetOp(data1, data2).hp}가 네 체력 ");
         yield return StartCoroutine(AnimateStatChange("hp", diffs));
         yield return StartCoroutine(AnimateStatChange("remainingCost", diffs));
 

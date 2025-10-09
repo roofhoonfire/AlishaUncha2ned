@@ -751,9 +751,9 @@ MonoBehaviour:
     prepClip: {fileID: 7400000, guid: 815045b1187f5954f821d1712fb2dbe7, type: 2}
     prepTotalFramesOverride: 0
     prepPoseHoldSec: 1
-    animatorTrigger: Trig_SpellDam
-    stateName: Base Layer.Alisha_SpellDam
-    clip: {fileID: 7400000, guid: fdfca1722f13df34bb359b2494759738, type: 2}
+    animatorTrigger: Trig_SpellDam_BTW
+    stateName: Base Layer.Alisha_SpellDam_BTW
+    clip: {fileID: 7400000, guid: 3c5991ec2aeb1934c90e97e37f0bf76b, type: 2}
     totalFramesOverride: 0
     victimAnimatorTrigger: Trig_Damaged_BTW
     victimStateName: Base Layer.Alisha_Damaged_BTW
@@ -767,6 +767,18 @@ MonoBehaviour:
     hitStops:
     - frame: 2
       duration: 0.88
+      pauseAttacker: 1
+      pauseVictim: 1
+      pauseEffects: 1
+      pauseScene: 0
+    - frame: 8
+      duration: 0.3
+      pauseAttacker: 1
+      pauseVictim: 1
+      pauseEffects: 1
+      pauseScene: 0
+    - frame: 15
+      duration: 0.3
       pauseAttacker: 1
       pauseVictim: 1
       pauseEffects: 1

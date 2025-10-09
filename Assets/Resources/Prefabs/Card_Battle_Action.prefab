@@ -173,6 +173,7 @@ MonoBehaviour:
   sourceImage: {fileID: 6431524271846788284}
   previewImageName: ActualImage
   keepPreviewActive: 1
+  hoverBlocker: {fileID: 1544318970601151284}
 --- !u!114 &6377785650717913791
 MonoBehaviour:
   m_ObjectHideFlags: 0

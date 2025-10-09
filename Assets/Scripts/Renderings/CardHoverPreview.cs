@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 using TMPro;
-using UnityEngine.UI; // ★ Image 사용
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -29,24 +29,27 @@ public class CardHoverPreview : MonoBehaviour,
 
     [Header("Artwork Sync")]
     [Tooltip("여기 붙은 Image의 sprite를 프리뷰 카드의 ActualImage에 복사")]
-    [SerializeField] private GameObject sourceImage; // ★ 소스 이미지 오브젝트( Image 컴포넌트 필요 )
+    [SerializeField] private GameObject sourceImage;
     [Tooltip("프리뷰 카드 하위에서 스프라이트를 표시할 타겟 오브젝트 이름")]
     [SerializeField] private string previewImageName = "ActualImage";
 
-    // 내부// 추가
     [Header("Behavior")]
     public bool keepPreviewActive = true;
+
+    // ★ 추가: 호버 차단용 오브젝트 (활성화되면 프리뷰 비활성화)
+    [Header("Hover Blocker")]
+    [Tooltip("이 오브젝트가 활성(activeInHierarchy)이면 호버 프리뷰를 막습니다.")]
+    [SerializeField] private GameObject hoverBlocker;  // ← 인스펙터 드래그
 
     private static GameObject _cachedPreviewCard;
     private static CanvasGroup _cachedCG;
 
-    private GameObject previewCard;   // ← 인스펙터 할당 불필요(런타임 자동 연결)
+    private GameObject previewCard;
     private CanvasGroup _previewCG;
 
     private Dictionary<string, TextMeshProUGUI> _src = new();
     private Dictionary<string, TextMeshProUGUI> _dst = new();
 
-    // ★ 이미지 캐시
     private Image _srcImg;
     private Image _dstImg;
 
@@ -60,26 +63,28 @@ public class CardHoverPreview : MonoBehaviour,
         CacheTexts(transform, _src);
         EnsurePreview();
 
-        // 소스 이미지 캐시
         _srcImg = GetImageFromGO(sourceImage);
 
         if (previewCard)
         {
-            if (keepPreviewActive)
-                previewCard.SetActive(true);     // 부모는 항상 활성
-            else
-                previewCard.SetActive(false);    // (옵션 B 사용시)
+            if (keepPreviewActive) previewCard.SetActive(true);
+            else previewCard.SetActive(false);
 
             _previewCG.alpha = 0f;
-            _previewCG.blocksRaycasts = false;   // 미리보기는 클릭 가로채지 않게
+            _previewCG.blocksRaycasts = false;
             _previewCG.interactable = false;
 
             if (_dst.Count == 0)
                 CacheTexts(previewCard.transform, _dst, allowInactive: true);
 
-            // 프리뷰 쪽 타깃 이미지 캐시
             _dstImg = FindImageByName(previewCard.transform, previewImageName, includeInactive: true);
         }
+    }
+
+    void OnEnable()
+    {
+        // ★ 차단 상태라면 즉시 숨김 유지
+        if (IsHoverBlocked()) HideImmediate();
     }
 
     void OnDisable()
@@ -91,6 +96,9 @@ public class CardHoverPreview : MonoBehaviour,
     // ===== Pointer Events =====
     public void OnPointerEnter(PointerEventData eventData)
     {
+        // ★ 차단 중이면 아무 것도 하지 않음
+        if (IsHoverBlocked()) return;
+
         if (_hoverCo != null) StopCoroutine(_hoverCo);
         _hoverCo = StartCoroutine(HoverCountdown());
     }
@@ -109,19 +117,27 @@ public class CardHoverPreview : MonoBehaviour,
 
     private IEnumerator HoverCountdown()
     {
-        yield return new WaitForSeconds(hoverDelay);
+        // ★ 대기 중에도 차단 상태를 계속 감시
+        float t = 0f;
+        while (t < hoverDelay)
+        {
+            if (IsHoverBlocked()) yield break;
+            t += Time.unscaledDeltaTime;
+            yield return null;
+        }
         Show();
     }
 
     // ===== Show/Hide =====
     private void Show()
     {
+        // ★ 마지막 방어선: Show 시점에도 차단 확인
+        if (IsHoverBlocked()) return;
         if (!EnsurePreview()) return;
 
         if (_src.Count == 0) CacheTexts(transform, _src);
         if (_dst.Count == 0) CacheTexts(previewCard.transform, _dst, allowInactive: true);
 
-        // 텍스트 & 이미지 1회 복사
         CopyTextsOnce();
         CopyImageOnce();
 
@@ -130,9 +146,8 @@ public class CardHoverPreview : MonoBehaviour,
 
         _fadeTween?.Kill();
 
-        if (!keepPreviewActive) previewCard.SetActive(true); // 항상활성 모드라면 토글 불필요
+        if (!keepPreviewActive) previewCard.SetActive(true);
 
-        // 레이캐스트는 계속 OFF (프리뷰가 입력 방해 X)
         _previewCG.blocksRaycasts = false;
         _previewCG.interactable = false;
 
@@ -158,7 +173,7 @@ public class CardHoverPreview : MonoBehaviour,
             .OnComplete(() =>
             {
                 if (!_isShowing && !keepPreviewActive)
-                    previewCard.SetActive(false); // 항상활성 모드면 비활성화 금지
+                    previewCard.SetActive(false);
             });
     }
 
@@ -173,7 +188,7 @@ public class CardHoverPreview : MonoBehaviour,
         _previewCG.interactable = false;
 
         if (!keepPreviewActive)
-            previewCard.SetActive(false); // 항상활성 모드면 비활성화 금지
+            previewCard.SetActive(false);
 
         if (_syncCo != null) { StopCoroutine(_syncCo); _syncCo = null; }
     }
@@ -205,7 +220,6 @@ public class CardHoverPreview : MonoBehaviour,
             var go = GameObject.FindWithTag(previewTag);
             if (!go)
             {
-                // 보조 루트: CardPreviewAnchor 마커를 붙였을 때 자동 탐색
                 var anchor = Object.FindObjectOfType<CardPreviewAnchor>(true);
                 if (anchor) go = anchor.gameObject;
             }
@@ -220,7 +234,6 @@ public class CardHoverPreview : MonoBehaviour,
             _previewCG = previewCard.GetComponent<CanvasGroup>();
             if (!_previewCG) _previewCG = previewCard.AddComponent<CanvasGroup>();
 
-            // 처음 한 번은 확실히 숨겨둔다
             previewCard.SetActive(false);
             _previewCG.alpha = 0f;
             _previewCG.blocksRaycasts = false;
@@ -233,7 +246,6 @@ public class CardHoverPreview : MonoBehaviour,
             }
         }
 
-        // 프리뷰 찾았으면 타깃 이미지도 캐시 시도
         if (_dstImg == null && previewCard != null)
             _dstImg = FindImageByName(previewCard.transform, previewImageName, includeInactive: true);
 
@@ -252,7 +264,6 @@ public class CardHoverPreview : MonoBehaviour,
 
     private void CopyImageOnce()
     {
-        // 소스/타깃 캐시가 없다면 다시 시도
         if (_srcImg == null) _srcImg = GetImageFromGO(sourceImage);
         if (_dstImg == null && previewCard != null)
             _dstImg = FindImageByName(previewCard.transform, previewImageName, includeInactive: true);
@@ -261,8 +272,7 @@ public class CardHoverPreview : MonoBehaviour,
         {
             _dstImg.sprite = _srcImg.sprite;
             _dstImg.enabled = (_dstImg.sprite != null);
-            // 필요시 이미지 크기 보정이 있으면 여기서 SetNativeSize() 등 사용 가능
-            // _dstImg.SetNativeSize();
+            // _dstImg.SetNativeSize(); // 필요 시
         }
     }
 
@@ -271,8 +281,14 @@ public class CardHoverPreview : MonoBehaviour,
         var wait = new WaitForEndOfFrame();
         while (_isShowing)
         {
+            // ★ 라이브 동기화 중에도 차단되면 즉시 숨김
+            if (IsHoverBlocked())
+            {
+                HideImmediate();
+                yield break;
+            }
             CopyTextsOnce();
-            CopyImageOnce(); // ★ 라이브 동기화 옵션일 때 이미지도 계속 동기화
+            CopyImageOnce();
             yield return wait;
         }
     }
@@ -313,10 +329,8 @@ public class CardHoverPreview : MonoBehaviour,
     private static Image GetImageFromGO(GameObject go)
     {
         if (!go) return null;
-        // 자기 자신 우선
         var img = go.GetComponent<Image>();
         if (img) return img;
-        // 자식 중 첫 Image
         return go.GetComponentInChildren<Image>(true);
     }
 
@@ -324,7 +338,6 @@ public class CardHoverPreview : MonoBehaviour,
     {
         if (!root || string.IsNullOrEmpty(name)) return null;
 
-        // 1차: 직계 이름으로
         var t = root.Find(name);
         if (t)
         {
@@ -332,12 +345,17 @@ public class CardHoverPreview : MonoBehaviour,
             if (img) return img;
         }
 
-        // 2차: 전체 하위 탐색
         var imgs = root.GetComponentsInChildren<Image>(includeInactive);
         foreach (var x in imgs)
             if (x.name == name) return x;
 
         return null;
+    }
+
+    // ★ 차단 상태 확인 헬퍼
+    private bool IsHoverBlocked()
+    {
+        return hoverBlocker != null && hoverBlocker.activeInHierarchy;
     }
 }
 

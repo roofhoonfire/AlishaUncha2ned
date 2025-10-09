@@ -176,23 +176,25 @@ public class CameraLovesAlisha : MonoBehaviour
         if (backdropCanvas != null) backdropCanvas.enabled = false;
         if (overlayCamera != null) overlayCamera.gameObject.SetActive(false);
 
-        // 레이어 캐시
         _isolateLayer = LayerMask.NameToLayer(isolateLayerName);
         if (_isolateLayer < 0)
-            Debug.LogWarning($"[CameraLovesAlisha] 레이어 '{isolateLayerName}' 가 존재하지 않습니다. (Project Settings → Tags and Layers)");
+            Debug.LogWarning($"[CameraLovesAlisha] 레이어 '{isolateLayerName}' 가 존재하지 않습니다.");
 
         if (cutLineImage != null)
         {
             var c0 = cutLineImage.color; c0.a = 0f; cutLineImage.color = c0;
         }
 
-        // ★★★★★ 이 보정은 cutLineImage 유무와 무관해야 함
+        // ★ Wait 이미지는 기본 비활성화(애니메이터가 알아서 켜짐/꺼짐 제어)
+        if (waitImage != null) waitImage.gameObject.SetActive(false);
+
         if (autoCalibrateFollowDepth && target != null && _cam != null)
         {
             var tp = target.position + offset;
             followDepth = Mathf.Max(0.01f, DepthAlongCamera(tp));
         }
     }
+
 
     // --- 신규: 카메라-공간 깊이(Forward Dot) 계산 ---
     private float DepthAlongCamera(Vector3 worldPoint)
@@ -722,25 +724,22 @@ public class CameraLovesAlisha : MonoBehaviour
     }
 
     /// <summary>
-    /// [MOD] Guard 프롤로그에서 쓰는 'Wait!' 표식 연출. 
-    /// overrideHoldSec가 있으면 홀드시간을 그 값으로 사용.
-    /// DOTween Sequence는 SetUpdate(true/Unscaled)로 타임스케일 무시.
+    /// [MOD] Guard 프롤로그 'Wait!' 연출: 페이드 제거, 즉시 활성화만.
+    /// hold 시간은 호출부(ShowGuardWait) 계산용으로 그대로 전달/사용.
     /// </summary>
     public void ShowWaitSign(float? overrideHoldSec = null)
     {
         if (waitImage == null) return;
 
-        float hold = overrideHoldSec.HasValue ? Mathf.Max(0f, overrideHoldSec.Value) : Mathf.Max(0f, waitHold);
-        var img = waitImage;
-        var c0 = img.color; c0.a = 0f; img.color = c0;
-        img.gameObject.SetActive(true);
+        // 애니메이터가 알아서 재생/비활성화하므로 즉시 켜주기만 함.
+        var go = waitImage.gameObject;
+        if (!go.activeSelf) go.SetActive(true);
 
-        var seq = DG.Tweening.DOTween.Sequence().SetUpdate(backdropUseRealtime);
-        seq.Append(img.DOFade(1f, Mathf.Max(0f, waitFadeIn)));
-        seq.AppendInterval(hold);
-        seq.Append(img.DOFade(0f, Mathf.Max(0f, waitFadeOut)));
-        seq.OnComplete(() => { if (img != null) img.gameObject.SetActive(false); });
+        // 필요 시, 애니메이터 트리거를 여기서 쏠 수도 있음 (선택)
+        // var anim = waitImage.GetComponent<Animator>();
+        // if (anim) anim.SetTrigger("Trig_Show"); 
     }
+
 
     // 1) 내부용: 로컬 플레이어 트랜스폼 찾아오기
     private Transform ResolveLocalPlayerTransform()

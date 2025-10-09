@@ -60,7 +60,7 @@ c22 ,Activate,Remove_Element,22,1
 c22,Activate,Flag_Off,1,1
 c22,Activate,Flag_Off,2,2
 c23,Activate,Element_Check_FlagOn,11101,0
-c23,Activate,AddDamage,15,1
+c23,Activate,AddDamage,10,1
 c23,Activate,intheRange_FlagOn,2,1
 c23,Activate,Burn_Op,3,2
 c23,Activate,Remove_Element,111,1
