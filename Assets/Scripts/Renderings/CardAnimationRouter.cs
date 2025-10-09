@@ -783,6 +783,16 @@ public class CardAnimationRouter : MonoBehaviour
                 if (actEntry.prepPoseHoldSec > 0f) holdSec = actEntry.prepPoseHoldSec;
             }
 
+            var cam = CameraLovesAlisha.Instance;
+
+            // … origAttackerT / actEntry 준비 끝난 직후
+            if (origAttackerT != null && cam != null)
+            {
+                cam.SnapLockTo(origAttackerT);    // ← 여기! 먼저 스냅 + 잠금
+                cam.SetDefault(origAttackerT);    // 이후 복귀 기준도 공격자로
+            }
+
+
             if (origAttackerT != null && origAttackerAnim != null && actEntry != null)
             {
                 // 공격자 Prep 진입
@@ -874,17 +884,7 @@ public class CardAnimationRouter : MonoBehaviour
                 if (cameraReturnDuration > 0f)
                     yield return new WaitForSecondsRealtime(cameraReturnDuration);
             }
-            try
-            {
-                // 수비 주체(가드 실행자)
-                if (attackerGO != null)
-                    RestoreRootSpriteAlphaIfZero(attackerGO);
 
-                // 공격자(가드 프롤로그에서 연출에 쓰인 상대)
-                if (origAttackerT != null)
-                    RestoreRootSpriteAlphaIfZero(origAttackerT.gameObject);
-            }
-            catch { /* 안전하게 무시 */ }
             yield break; // Guard 완료
         }
 
@@ -958,20 +958,5 @@ public class CardAnimationRouter : MonoBehaviour
         float sx = Mathf.Abs(baseScale.x) * (flip ? -1f : 1f);
         return new Vector3(sx, baseScale.y, baseScale.z);
     }
-    // 루트에 붙은 SpriteRenderer가 알파 0이면 1로 복구
-    private void RestoreRootSpriteAlphaIfZero(GameObject go)
-    {
-        if (go == null) return;
-        var sr = go.GetComponent<SpriteRenderer>(); // ★ 자식 X, 루트에 붙은 것만
-        if (sr != null)
-        {
-            var c = sr.color;
-            if (c.a <= 0f)
-            {
-                c.a = 1f;           // = 255/255
-                sr.color = c;
-            }
-        }
-    }
-}
 
+}

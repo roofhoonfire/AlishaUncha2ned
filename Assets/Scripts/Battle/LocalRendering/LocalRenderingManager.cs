@@ -1,4 +1,4 @@
-using DG.Tweening;
+ï»¿using DG.Tweening;
 using JetBrains.Annotations;
 using Microlight.MicroBar;
 using Photon.Pun;
@@ -30,12 +30,12 @@ public class LocalRenderingManager : MonoBehaviour
     [SerializeField] BoundImageConductor myBoundConductor;
     [SerializeField] BoundImageConductor opBoundConductor;
 
-    private Coroutine _runningRAAS; // ¾ÖÇÁÅÍ ¾×¼Ç ÃßÁî¸¦ À§ÇÑ (ÄÚ½ºÆ® µîÁÇ  ŒnÀ» À§ÇÑ ÄÚ·çÆ¤)
+    private Coroutine _runningRAAS; // ì• í”„í„° ì•¡ì…˜ ì¶”ì¦ˆë¥¼ ìœ„í•œ (ì½”ìŠ¤íŠ¸ ë“±ì¢¡  ë˜­ì„ ìœ„í•œ ì½”ë£¨íŠ„)
 
     public CardHoverPreview_CastingUI myCardCode;
     public CardHoverPreview_CastingUI opCardCode;
 
-    [SerializeField] private GameObject globalVolume;   // µå·¡±×&µå·Ó
+    [SerializeField] private GameObject globalVolume;   // ë“œë˜ê·¸&ë“œë¡­
     [SerializeField] private bool globalvolumetest = false; 
     
     public class RenderDiff
@@ -61,9 +61,9 @@ public class LocalRenderingManager : MonoBehaviour
 
     public void Rendering_On_Action_Select(LocalRenderingData data1, LocalRenderingData data2)
     {
-        //¿©±â¼­ ÇÒ²¨ ½ÎÀÌÅ¬ ¾÷µ«ÀÌ¶û
+        //ì—¬ê¸°ì„œ í• êº¼ ì‹¸ì´í´ ì—…ëƒì´ë‘
 
-        //¹æ¾îµµ ¾÷µ«
+        //ë°©ì–´ë„ ì—…ëƒ
 
 
     }
@@ -71,15 +71,15 @@ public class LocalRenderingManager : MonoBehaviour
 
     public  void Rendering_JujuSync(LocalRenderingData data1, LocalRenderingData data2)
     {
-        //¹Ù¿îµå ÀÎµ¦½º ³Ñ¾î°¡´Â °Å º¸¿©ÁÜ 
+        //ë°”ìš´ë“œ ì¸ë±ìŠ¤ ë„˜ì–´ê°€ëŠ” ê±° ë³´ì—¬ì¤Œ 
 
-        //ÁÖ¼ú ¼±ÅÃ ¾Ö´Ï¸ŞÀÌ¼Ç Ãâ·Â µî 
+        //ì£¼ìˆ  ì„ íƒ ì• ë‹ˆë©”ì´ì…˜ ì¶œë ¥ ë“± 
 
         myBoundConductor.UpdateByIndex(GetMine(data1, data2).boundIndex);
         opBoundConductor.UpdateByIndex(GetOp(data1, data2).boundIndex);
 
 
-        //data1°ú ±âÁ¸ÀÇ LocalRenderingData.localRenderingDatas ÀÇ °ª°ú ´Ù¸¥ °Íµé À» ¾Ö´Ï¸Ş·Î ÃÒÃÒÃÒ
+        //data1ê³¼ ê¸°ì¡´ì˜ LocalRenderingData.localRenderingDatas ì˜ ê°’ê³¼ ë‹¤ë¥¸ ê²ƒë“¤ ì„ ì• ë‹ˆë©”ë¡œ ì´¤ì´¤ì´¤
         ApplyImmediateUI(data1);
         ApplyImmediateUI(data2);
 
@@ -96,22 +96,22 @@ public class LocalRenderingManager : MonoBehaviour
         ApplyDiffsToLocalRenderingData(diffs);
 
 
-        //ÀÌ°Ç±ğÀÌ±âº¸´Ü ¶Ñ¿Õ ÇÏ°í ³ªÅ¸³ª´Â ´À³¦À¸·Î..´Ù°¡ . .
+        //ì´ê±´ê¹ì´ê¸°ë³´ë‹¨ ëšœì™• í•˜ê³  ë‚˜íƒ€ë‚˜ëŠ” ëŠë‚Œìœ¼ë¡œ..ë‹¤ê°€ . .
         //StartCoroutine(AnimateStatChange("defense", diffs));
         //StartCoroutine(AnimateStatChange("remainingCost", diffs));
         //ApplyDiffsToLocalRenderingData(diffs);
-        //Debug.Log("¹®Á¦¾ø´Ù");
+        //Debug.Log("ë¬¸ì œì—†ë‹¤");
 
 
 
 
 
 
-        //¶Ñ¿Õ ÇÏ´Â ´À³¦À¸·ç´Ù°¡!
+        //ëšœì™• í•˜ëŠ” ëŠë‚Œìœ¼ë£¨ë‹¤ê°€!
         ApplyImmediateUI(data1);
         ApplyImmediateUI(data2);
 
-        //ÀÌ°Å ÇÏ°í Àá±ñ ¸Ø­Ÿ´Ù ´Ù°¡ ¶Ñ°¡°¡°¡
+        //ì´ê±° í•˜ê³  ì ê¹ ë©ˆì·ƒë‹¤ ë‹¤ê°€ ëšœê°€ê°€ê°€
         Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
 
 
@@ -128,7 +128,7 @@ public class LocalRenderingManager : MonoBehaviour
         opCardCode.opCardCode = LocalRenderingStatic.localRenderingDatas[Overmind.Instance.GetOtherPlayerNumber(myActor)].myCard;
 
 
-        // ÁøÇà ÁßÀÌ¸é Á¤¸®ÇÏ°í »õ·Î ½ÃÀÛ (¿øÇÏ¸é Kill »ı·« °¡´É)
+        // ì§„í–‰ ì¤‘ì´ë©´ ì •ë¦¬í•˜ê³  ìƒˆë¡œ ì‹œì‘ (ì›í•˜ë©´ Kill ìƒëµ ê°€ëŠ¥)
         if (_runningRAAS != null) StopCoroutine(_runningRAAS);
         _runningRAAS = StartCoroutine(Rendering_AfterActionSelect_Coroutine(data1, data2, whoselect));
     }
@@ -137,7 +137,7 @@ public class LocalRenderingManager : MonoBehaviour
         yield return Rendering_AfterActionSelect_Coroutine(data1, data2, whoselect);
     }
 
-    // 3) ½ÇÁ¦ ·ÎÁ÷Àº ÄÚ·çÆ¾¿¡ µĞ´Ù (¿©±â¼­¸¸ ¿¬Ãâ ¿Ï·á±îÁö ´ë±â)
+    // 3) ì‹¤ì œ ë¡œì§ì€ ì½”ë£¨í‹´ì— ë‘”ë‹¤ (ì—¬ê¸°ì„œë§Œ ì—°ì¶œ ì™„ë£Œê¹Œì§€ ëŒ€ê¸°)
     private IEnumerator Rendering_AfterActionSelect_Coroutine(LocalRenderingData data1, LocalRenderingData data2, int whoselect)
     {
         int myActor = PhotonNetwork.LocalPlayer.ActorNumber;
@@ -151,7 +151,7 @@ public class LocalRenderingManager : MonoBehaviour
 
 
 
-        // ¡°¶Ñ¿Õ¡± ¿¬Ãâ: ³¡³¯ ¶§±îÁö ´ë±â
+        // â€œëšœì™•â€ ì—°ì¶œ: ëë‚  ë•Œê¹Œì§€ ëŒ€ê¸°
         if (whoselect != PhotonNetwork.LocalPlayer.ActorNumber)
         { 
             paching_Op.SetActive(true);
@@ -165,11 +165,11 @@ public class LocalRenderingManager : MonoBehaviour
                 }
         yield return BounceRemainingCost(data1, data2, whoselect);
 
-        // ¿¬ÃâÀÌ ³¡³­ µÚ¿¡¸¸ UI Àû¿ë
+        // ì—°ì¶œì´ ëë‚œ ë’¤ì—ë§Œ UI ì ìš©
         ApplyImmediateUI(data1);
         ApplyImmediateUI(data2);
 
-        //Ãß°¡ ÇØ¾ßÇÏ´Â °Å Ä«µå ÄÚµå Àü´Ş 
+        //ì¶”ê°€ í•´ì•¼í•˜ëŠ” ê±° ì¹´ë“œ ì½”ë“œ ì „ë‹¬ 
         
         Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
         _runningRAAS = null;
@@ -195,11 +195,11 @@ public class LocalRenderingManager : MonoBehaviour
         bool playMy = (whoselect == 0) || (whoselect == myActor);
         bool playOp = (whoselect == 0) || ((oppActor != -1) && (whoselect == oppActor));
 
-        // ÅØ½ºÆ® °»½Å
+        // í…ìŠ¤íŠ¸ ê°±ì‹ 
         if (mycostRemainTxt != null) mycostRemainTxt.text = myRemain.ToString();
         if (opponencostRemainTxt != null) opponencostRemainTxt.text = opRemain.ToString();
 
-        // ½ÃÄö½º ±¸¼º + ¡°ºÙÀÎ °³¼ö¡±·Î ÆÇ´Ü
+        // ì‹œí€€ìŠ¤ êµ¬ì„± + â€œë¶™ì¸ ê°œìˆ˜â€ë¡œ íŒë‹¨
         int joinCount = 0;
         var master = DOTween.Sequence();
 
@@ -215,14 +215,14 @@ public class LocalRenderingManager : MonoBehaviour
         }
 
         if (joinCount == 0)
-            yield break; // ºÙÀÎ Æ®À©ÀÌ ¾øÀ¸¸é ¹Ù·Î Á¾·á
+            yield break; // ë¶™ì¸ íŠ¸ìœˆì´ ì—†ìœ¼ë©´ ë°”ë¡œ ì¢…ë£Œ
 
         yield return master.WaitForCompletion();
     }
 
     private static Sequence BuildBounceSeq(RectTransform rt, float upScale = 1.5f, float durUp = 0.4f, float durDown = 0.6f)
     {
-        // Áßº¹ Æ®À©À¸·Î ½ºÄÉÀÏ ²¿ÀÓ ¹æÁöÇÏ°í ½Í´Ù¸é ¾Æ·¡ ÇÑ ÁÙ È°¼ºÈ­:
+        // ì¤‘ë³µ íŠ¸ìœˆìœ¼ë¡œ ìŠ¤ì¼€ì¼ ê¼¬ì„ ë°©ì§€í•˜ê³  ì‹¶ë‹¤ë©´ ì•„ë˜ í•œ ì¤„ í™œì„±í™”:
         // rt.DOKill(true);
 
         Vector3 baseScale = rt.localScale;
@@ -238,22 +238,22 @@ public class LocalRenderingManager : MonoBehaviour
         {
             myHP.text = data.hp.ToString();
             mydefense.text = data.defense.ToString();
-         //   myBound.text = data.bounds[data.boundIndex].ToString(); // ÇÊ¿äÇÏ¸é ´Ù¸¥ ¹æ½ÄÀ¸·Î Æ÷¸Ë
+         //   myBound.text = data.bounds[data.boundIndex].ToString(); // í•„ìš”í•˜ë©´ ë‹¤ë¥¸ ë°©ì‹ìœ¼ë¡œ í¬ë§·
         }
         else
         {
             opHP.text = data.hp.ToString();
             opdefense.text = data.defense.ToString();
-            //  OpBound.text = data.bounds[data.boundIndex].ToString(); // ¸¶Âù°¡Áö
+            //  OpBound.text = data.bounds[data.boundIndex].ToString(); // ë§ˆì°¬ê°€ì§€
         }
     }
-    // µü 2°³ ºñ±³ÇØ¼­ ·ÎÄÃ ÇÃ·¹ÀÌ¾î¿Í actorNumÀÌ °°Àº °´Ã¼¸¦ ¸®ÅÏ
+    // ë”± 2ê°œ ë¹„êµí•´ì„œ ë¡œì»¬ í”Œë ˆì´ì–´ì™€ actorNumì´ ê°™ì€ ê°ì²´ë¥¼ ë¦¬í„´
     public static LocalRenderingData GetMine(LocalRenderingData a, LocalRenderingData b)
     {
         var my = PhotonNetwork.LocalPlayer.ActorNumber;
         if (a != null && a.actorNum == my) return a;
         if (b != null && b.actorNum == my) return b;
-        return null; // ¸ø Ã£À¸¸é null
+        return null; // ëª» ì°¾ìœ¼ë©´ null
     }
 
     public static LocalRenderingData GetOp(LocalRenderingData a, LocalRenderingData b)
@@ -261,12 +261,12 @@ public class LocalRenderingManager : MonoBehaviour
         var my = PhotonNetwork.LocalPlayer.ActorNumber;
         if (a != null && a.actorNum == my) return b;
         if (b != null && b.actorNum == my) return a;
-        return null; // ¸ø Ã£À¸¸é null
+        return null; // ëª» ì°¾ìœ¼ë©´ null
     }
     public void Rendering_GameStart(LocalRenderingData data1, LocalRenderingData data2)
     {
 
-        //°ÔÀÓ½ÃÀÛ ·»´õ¸µ ¿¬Ãâ ³Ö°í ½ÍÀº°Å Áı¾î ¿¸¾î¶ó ½º¹ß¾Æ
+        //ê²Œì„ì‹œì‘ ë Œë”ë§ ì—°ì¶œ ë„£ê³  ì‹¶ì€ê±° ì§‘ì–´ ì˜‡ì–´ë¼ ìŠ¤ë°œì•„
 
 
 
@@ -284,7 +284,7 @@ public class LocalRenderingManager : MonoBehaviour
         opBoundConductor.InitBounds(GetOp(data1, data2).bounds);
 
 
-        //½ÌÅ©´Â ¾Æ·¡¼­ ³Ö¾îÁØ´Ù
+        //ì‹±í¬ëŠ” ì•„ë˜ì„œ ë„£ì–´ì¤€ë‹¤
         //
         //Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
 
@@ -320,8 +320,8 @@ public class LocalRenderingManager : MonoBehaviour
      LocalRenderingData data2,
      ActionData action,
      HookType h,
-     ActionData otherActionData,                 // [MOD] ·ÎÄÃ ±âÁØ »ó´ëÆí ActionData (¸¶½ºÅÍ¿¡¼­ Àü´Ş)
-     bool shouldGuardAnimationPlay               // [MOD] Guard ½Ã³×¸¶Æ½ Àç»ı ¿©ºÎ(Ãß°¡ ¾ÈÀüÀåÄ¡)
+     ActionData otherActionData,                 // [MOD] ë¡œì»¬ ê¸°ì¤€ ìƒëŒ€í¸ ActionData (ë§ˆìŠ¤í„°ì—ì„œ ì „ë‹¬)
+     bool shouldGuardAnimationPlay               // [MOD] Guard ì‹œë„¤ë§ˆí‹± ì¬ìƒ ì—¬ë¶€(ì¶”ê°€ ì•ˆì „ì¥ì¹˜)
  )
     {
         LocalRenderingData actorData = null;
@@ -329,24 +329,24 @@ public class LocalRenderingManager : MonoBehaviour
         else if (data2 != null && data2.actorNum == actorNum) actorData = data2;
 
         ApplyFacingFromRightOrLeft(actorNum, actorData);
-        Debug.Log($"{actorData.rightOrLeft}¸¦ ¹Ù¶ó º¼ °Ì´Ï´Ù ÀÌÁ¦");
+        Debug.Log($"{actorData.rightOrLeft}ë¥¼ ë°”ë¼ ë³¼ ê²ë‹ˆë‹¤ ì´ì œ");
 
         bool isMoveAction = (action != null && action.actionId == 0);
 
-        var router = CardAnimationRouter.Instance; // [MOD] ¶ó¿ìÅÍ Ä³½Ã(null °¡´É)
+        var router = CardAnimationRouter.Instance; // [MOD] ë¼ìš°í„° ìºì‹œ(null ê°€ëŠ¥)
 
-        // [MOD] ¾×ÅÍ GO Ä³½Ã (HideEmAll µî¿¡ »ç¿ë)
+        // [MOD] ì•¡í„° GO ìºì‹œ (HideEmAll ë“±ì— ì‚¬ìš©)
         GameObject actorGO = null;
         if (LocalState.Instance != null && LocalState.Instance.PlayerObDic != null)
             LocalState.Instance.PlayerObDic.TryGetValue(actorNum, out actorGO);
 
-        // [MOD] »ó´ë ¾×ÅÍ ³Ñ¹ö/Ä«µåÄÚµå ÇØ¼® (Guard ÇÁ·Ñ·Î±×¿ë)
+        // [MOD] ìƒëŒ€ ì•¡í„° ë„˜ë²„/ì¹´ë“œì½”ë“œ í•´ì„ (Guard í”„ë¡¤ë¡œê·¸ìš©)
         int ResolveOpponentActorNum(int self)
         {
-            // ActionData¿¡´Â actorNumÀÌ ¾ø´Ù°í ÇßÀ¸´Ï, OvermindÀÇ ÇïÆÛ·Î »ó´ë ¾×ÅÍ ³Ñ¹ö¸¦ ¾ò´Â´Ù.
+            // ActionDataì—ëŠ” actorNumì´ ì—†ë‹¤ê³  í–ˆìœ¼ë‹ˆ, Overmindì˜ í—¬í¼ë¡œ ìƒëŒ€ ì•¡í„° ë„˜ë²„ë¥¼ ì–»ëŠ”ë‹¤.
             if (Overmind.Instance != null) return Overmind.Instance.GetOtherPlayerNumber(self);
 
-            // ¾ÈÀü»§: Overmind°¡ ¾øÀ¸¸é ¾À¿¡ ÀÖ´Â "´Ù¸¥" ÇÃ·¹ÀÌ¾î¸¦ ÇÈ¾÷
+            // ì•ˆì „ë¹µ: Overmindê°€ ì—†ìœ¼ë©´ ì”¬ì— ìˆëŠ” "ë‹¤ë¥¸" í”Œë ˆì´ì–´ë¥¼ í”½ì—…
             if (LocalState.Instance != null && LocalState.Instance.PlayerObDic != null)
             {
                 foreach (var kv in LocalState.Instance.PlayerObDic)
@@ -358,14 +358,14 @@ public class LocalRenderingManager : MonoBehaviour
 
         if (isMoveAction)
         {
-            // ¡Ú ÀÌµ¿ ¾×¼Ç Àü¿ë ¾Ö´Ï¸ŞÀÌ¼Ç(´ë½Ã/Á¡ÇÁ + ÁöÁ¤ ÇÁ·¹ÀÓ ¿öÇÁ)
+            // â˜… ì´ë™ ì•¡ì…˜ ì „ìš© ì• ë‹ˆë©”ì´ì…˜(ëŒ€ì‹œ/ì í”„ + ì§€ì • í”„ë ˆì„ ì›Œí”„)
             yield return StartCoroutine(
                 MoveAnimationRouter.Instance.PlayMoveCo(actorNum, data1, data2, action)
             );
         }
         else
         {
-            // ============================ ¸ŞÀÎ ¾×¼Ç(ÀÌµ¿ ¾Æ´Ô) ============================
+            // ============================ ë©”ì¸ ì•¡ì…˜(ì´ë™ ì•„ë‹˜) ============================
 
             if (router == null || action == null)
             {
@@ -373,7 +373,7 @@ public class LocalRenderingManager : MonoBehaviour
             }
             else if (h == HookType.Guard)
             {
-                // ---------- Guard ·»´õ¸µ(ÇÇ°İÀÚ = actorNum) ----------
+                // ---------- Guard ë Œë”ë§(í”¼ê²©ì = actorNum) ----------
                 bool hasExactGuard = CardAnimationRouter.Instance != null &&
                                      CardAnimationRouter.Instance.HasExactEntry(action.cardcode, HookType.Guard);
 
@@ -382,19 +382,19 @@ public class LocalRenderingManager : MonoBehaviour
                     int activateActorNum = ResolveOpponentActorNum(actorNum);
                     string activateCardCode = ResolveOpponentCardCode();
 
-                    // [Áß¿ä] Guard¿¡¼­´Â ÇÇ°İÀÚ HideEmAll ÇÏÁö ¾ÊÀ½!
+                    // [ì¤‘ìš”] Guardì—ì„œëŠ” í”¼ê²©ì HideEmAll í•˜ì§€ ì•ŠìŒ!
                     yield return StartCoroutine(
                         CardAnimationRouter.Instance.PlayCo(
                              data1,
                             data2,
-                            action.cardcode,                 // Áö±İ(ÇÇ°İÀÚ) Ä«µå
-                            actorNum,                        // Áö±İ(ÇÇ°İÀÚ) actor
+                            action.cardcode,                 // ì§€ê¸ˆ(í”¼ê²©ì) ì¹´ë“œ
+                            actorNum,                        // ì§€ê¸ˆ(í”¼ê²©ì) actor
                             HookType.Guard,
-                            victimActorNum: activateActorNum,                // »ó´ë´Â °ø°İÀÚ
+                            victimActorNum: activateActorNum,                // ìƒëŒ€ëŠ” ê³µê²©ì
                             forcedOutcome: null,
-                            shouldGuardCinematic: true,                      // Guard ÇÁ·Ñ·Î±× ½ÇÇà(°ø°İÀÚ Prep Àç»ı + ÄÆ¶óÀÎ ³¡³­ µÚ Wait!)
+                            shouldGuardCinematic: true,                      // Guard í”„ë¡¤ë¡œê·¸ ì‹¤í–‰(ê³µê²©ì Prep ì¬ìƒ + ì»·ë¼ì¸ ëë‚œ ë’¤ Wait!)
                             skipPoint1DueToGuard: false,
-                            opponentActivateCardCode: activateCardCode,      // °ø°İÀÚ Activate Ä«µå·Î ÇÁ·Ñ·Î±× ²Ù¹Ò
+                            opponentActivateCardCode: activateCardCode,      // ê³µê²©ì Activate ì¹´ë“œë¡œ í”„ë¡¤ë¡œê·¸ ê¾¸ë°ˆ
                             opponentActorNum: activateActorNum
                         )
                     );
@@ -406,17 +406,17 @@ public class LocalRenderingManager : MonoBehaviour
             }
             else if (h == HookType.Activate)
             {
-                // ---------- Activate ·»´õ¸µ(°ø°İÀÚ) ----------
+                // ---------- Activate ë Œë”ë§(ê³µê²©ì) ----------
                 bool hasExactAct = CardAnimationRouter.Instance != null &&
                                    CardAnimationRouter.Instance.HasExactEntry(action.cardcode, HookType.Activate);
 
                 if (hasExactAct)
                 {
-                    // Activate ÂÊÀº ±âÁ¸Ã³·³ ¼û±è °¡´É(¼±ÅÃ): Point1 ½ºÅµÀÌ¸é ¼û±è È¿°úµµ °ÅÀÇ ¾È º¸ÀÓ
+                    // Activate ìª½ì€ ê¸°ì¡´ì²˜ëŸ¼ ìˆ¨ê¹€ ê°€ëŠ¥(ì„ íƒ): Point1 ìŠ¤í‚µì´ë©´ ìˆ¨ê¹€ íš¨ê³¼ë„ ê±°ì˜ ì•ˆ ë³´ì„
                     if (CameraLovesAlisha.Instance != null && actorGO != null)
                         CameraLovesAlisha.Instance.HideEmAll(actorGO);
 
-                    // ¸ŞÀÎ ¾×¼Ç(¾îÁ¦ ÀÛ¾÷ÇÑ ¶ó¿ìÅÍ ±×´ë·Î)
+                    // ë©”ì¸ ì•¡ì…˜(ì–´ì œ ì‘ì—…í•œ ë¼ìš°í„° ê·¸ëŒ€ë¡œ)
                     HitResolution? forcedOutcome = EvaluateHitOutcome(actorNum, data1, data2, action);
 
                     yield return StartCoroutine(
@@ -424,12 +424,12 @@ public class LocalRenderingManager : MonoBehaviour
                              data1,
                             data2,
                             action.cardcode,
-                            actorNum,            // °ø°İÀÚ
+                            actorNum,            // ê³µê²©ì
                             HookType.Activate,
                             victimActorNum: null,
                             forcedOutcome: forcedOutcome,
                             shouldGuardCinematic: false,
-                            skipPoint1DueToGuard: shouldGuardAnimationPlay,  // ¡Ú Á÷Àü¿¡ Guard¸¦ º¸¿©Áá´Ù¸é Point1 ½ºÅµ ¡æ Point2ºÎÅÍ
+                            skipPoint1DueToGuard: shouldGuardAnimationPlay,  // â˜… ì§ì „ì— Guardë¥¼ ë³´ì—¬ì¤¬ë‹¤ë©´ Point1 ìŠ¤í‚µ â†’ Point2ë¶€í„°
                             opponentActivateCardCode: null,
                             opponentActorNum: null
                         )
@@ -442,8 +442,8 @@ public class LocalRenderingManager : MonoBehaviour
             }
             else
             {
-                // ---------- Priority/Counter µî ±âÅ¸ ÈÅ ----------
-                bool hasExact = router.HasExactEntry(action.cardcode, h); // [MOD] ¾ö°İ °Ë»ç
+                // ---------- Priority/Counter ë“± ê¸°íƒ€ í›… ----------
+                bool hasExact = router.HasExactEntry(action.cardcode, h); // [MOD] ì—„ê²© ê²€ì‚¬
                 if (hasExact)
                 {
                     if (CameraLovesAlisha.Instance != null && actorGO != null)
@@ -465,12 +465,16 @@ public class LocalRenderingManager : MonoBehaviour
                 }
             }
         }
-        // ¡Ú Ãß°¡: ¿¬Ãâ Á÷ÈÄ ±Û·Î¹ú º¼·ı ´Ù½Ã ÄÑ±â
+        // â˜… ì¶”ê°€: ì—°ì¶œ ì§í›„ ê¸€ë¡œë²Œ ë³¼ë¥¨ ë‹¤ì‹œ ì¼œê¸°
         if (globalvolumetest && globalVolume != null)
             globalVolume.SetActive(true);
-        Debug.Log("ÀÚÀÚ ³ë¸Ö ¾×¼Ç ½ÃÄö½º Àß”f´Ï?");
+        Debug.Log("ìì ë…¸ë©€ ì•¡ì…˜ ì‹œí€€ìŠ¤ ì˜ë´£ë‹ˆ?");
 
-        // ===== ¿©±âºÎÅÍ´Â °øÅë »çÈÄ Ã³¸®(±âÁ¸ À¯Áö) =====
+
+
+     
+
+        // ===== ì—¬ê¸°ë¶€í„°ëŠ” ê³µí†µ ì‚¬í›„ ì²˜ë¦¬(ê¸°ì¡´ ìœ ì§€) =====
         var diffs = CopyandDifferences(data1, data2);
         yield return StartCoroutine(AnimateStatChange("defense", diffs));
 
@@ -478,14 +482,14 @@ public class LocalRenderingManager : MonoBehaviour
         HPBarManager.Instance.DamageOp(GetOp(data1, data2).hp);
 
 
-        Debug.Log($"{GetMine(data1, data2).hp}°¡ ³» Ã¼·Â {GetOp(data1, data2).hp}°¡ ³× Ã¼·Â ");
+        Debug.Log($"{GetMine(data1, data2).hp}ê°€ ë‚´ ì²´ë ¥ {GetOp(data1, data2).hp}ê°€ ë„¤ ì²´ë ¥ ");
         yield return StartCoroutine(AnimateStatChange("hp", diffs));
         yield return StartCoroutine(AnimateStatChange("remainingCost", diffs));
 
-        Debug.Log("ÀÚÀÚ UI ¹Ù²ï°Å Àß¹åÁö?");
+        Debug.Log("ìì UI ë°”ë€ê±° ì˜ë°§ì§€?");
 
-        // À§Ä¡ ÃÖÁ¾ ½º³À(ÀÌµ¿ ¶ó¿ìÅÍ¿¡¼­ ÀÌ¹Ì ¿öÇÁÇß´õ¶óµµ µ¿ÀÏ ÁÂÇ¥·Î ÇÑ¹ø ´õ Á¤·Ä ¡æ ¹®Á¦ ¾øÀ½)
-        //¿©±â¼­ ³Ë¹é·ù ¾Ö´Ï¸ŞÀÌ¼Ç ³ÖÀ¸¸é ÁÁÀ» µí ¤¾¤¾
+        // ìœ„ì¹˜ ìµœì¢… ìŠ¤ëƒ…(ì´ë™ ë¼ìš°í„°ì—ì„œ ì´ë¯¸ ì›Œí”„í–ˆë”ë¼ë„ ë™ì¼ ì¢Œí‘œë¡œ í•œë²ˆ ë” ì •ë ¬ â†’ ë¬¸ì œ ì—†ìŒ)
+        //ì—¬ê¸°ì„œ ë„‰ë°±ë¥˜ ì• ë‹ˆë©”ì´ì…˜ ë„£ìœ¼ë©´ ì¢‹ì„ ë“¯ ã…ã…
         //LocalState.Instance.PlayerObDic[data1.actorNum].transform.position = tileIndextoPosition(data1.curpos).position;
         //LocalState.Instance.PlayerObDic[data2.actorNum].transform.position = tileIndextoPosition(data2.curpos).position;
 
@@ -500,9 +504,9 @@ public class LocalRenderingManager : MonoBehaviour
 
         StealthPlayer(diffs);
         ElementRenderer.Instance.RenderElementsFromDiffs(diffs);
-        Debug.Log("ÀÚÀÚ ³ë¸Ö ¾×¼Ç ·»´õ¸µ ´Ù ³¡, ÀÌÁ¦ ·»´õ¸µ ¼·¹Ø¸¸ ÇÏ¸éµÊ");
+        Debug.Log("ìì ë…¸ë©€ ì•¡ì…˜ ë Œë”ë§ ë‹¤ ë, ì´ì œ ë Œë”ë§ ì„­ë°‘ë§Œ í•˜ë©´ë¨");
    
-        // [MOD] È¤½Ã ¹éµå·ÓÀ» ¾È ½è°Å³ª Áß°£ ½ºÅµ °æ·Î¿´À» ¶§¸¦ ´ëºñÇÑ ¾ÈÀü º¹±¸
+        // [MOD] í˜¹ì‹œ ë°±ë“œë¡­ì„ ì•ˆ ì¼ê±°ë‚˜ ì¤‘ê°„ ìŠ¤í‚µ ê²½ë¡œì˜€ì„ ë•Œë¥¼ ëŒ€ë¹„í•œ ì•ˆì „ ë³µêµ¬
         CameraLovesAlisha.Instance?.UnhideAutoHiddenNow();
 
         Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
@@ -520,10 +524,10 @@ public class LocalRenderingManager : MonoBehaviour
         yield return StartCoroutine(AnimateStatChange("hp", diffs));
         yield return StartCoroutine(AnimateStatChange("remainingCost", diffs));
 
-        Debug.Log("ÀÚÀÚ UI ¹Ù²ï°Å Àß¹åÁö?");
+        Debug.Log("ìì UI ë°”ë€ê±° ì˜ë°§ì§€?");
 
-        // À§Ä¡ ÃÖÁ¾ ½º³À(ÀÌµ¿ ¶ó¿ìÅÍ¿¡¼­ ÀÌ¹Ì ¿öÇÁÇß´õ¶óµµ µ¿ÀÏ ÁÂÇ¥·Î ÇÑ¹ø ´õ Á¤·Ä ¡æ ¹®Á¦ ¾øÀ½)
-        //¿©±â¼­ ³Ë¹é·ù ¾Ö´Ï¸ŞÀÌ¼Ç ³ÖÀ¸¸é ÁÁÀ» µí ¤¾¤¾
+        // ìœ„ì¹˜ ìµœì¢… ìŠ¤ëƒ…(ì´ë™ ë¼ìš°í„°ì—ì„œ ì´ë¯¸ ì›Œí”„í–ˆë”ë¼ë„ ë™ì¼ ì¢Œí‘œë¡œ í•œë²ˆ ë” ì •ë ¬ â†’ ë¬¸ì œ ì—†ìŒ)
+        //ì—¬ê¸°ì„œ ë„‰ë°±ë¥˜ ì• ë‹ˆë©”ì´ì…˜ ë„£ìœ¼ë©´ ì¢‹ì„ ë“¯ ã…ã…
         //LocalState.Instance.PlayerObDic[data1.actorNum].transform.position = tileIndextoPosition(data1.curpos).position;
         //LocalState.Instance.PlayerObDic[data2.actorNum].transform.position = tileIndextoPosition(data2.curpos).position;
 
@@ -534,9 +538,9 @@ public class LocalRenderingManager : MonoBehaviour
         myCardCode.myCardCode = null;
         opCardCode.opCardCode = null;
 
-        Debug.Log("ÀÚÀÚ ³ë¸Ö ¾×¼Ç ·»´õ¸µ ´Ù ³¡, ÀÌÁ¦ ·»´õ¸µ ¼·¹Ø¸¸ ÇÏ¸éµÊ");
+        Debug.Log("ìì ë…¸ë©€ ì•¡ì…˜ ë Œë”ë§ ë‹¤ ë, ì´ì œ ë Œë”ë§ ì„­ë°‘ë§Œ í•˜ë©´ë¨");
 
-        // [MOD] È¤½Ã ¹éµå·ÓÀ» ¾È ½è°Å³ª Áß°£ ½ºÅµ °æ·Î¿´À» ¶§¸¦ ´ëºñÇÑ ¾ÈÀü º¹±¸
+        // [MOD] í˜¹ì‹œ ë°±ë“œë¡­ì„ ì•ˆ ì¼ê±°ë‚˜ ì¤‘ê°„ ìŠ¤í‚µ ê²½ë¡œì˜€ì„ ë•Œë¥¼ ëŒ€ë¹„í•œ ì•ˆì „ ë³µêµ¬
         CameraLovesAlisha.Instance?.UnhideAutoHiddenNow();
 
         Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
@@ -549,7 +553,7 @@ public class LocalRenderingManager : MonoBehaviour
        // AlertDialogue.Instance.StartDialogue(action, actorNum, h, 0, DialogueType.Activate);
 
 
-        //ÈÅ Å¸ÀÔ¿¡ ¸Â´Â ¾Ö´Ï¸ŞÀÌ¼Ç Àç»ıÇØÁÖ°í 
+        //í›… íƒ€ì…ì— ë§ëŠ” ì• ë‹ˆë©”ì´ì…˜ ì¬ìƒí•´ì£¼ê³  
 
 
 
@@ -562,17 +566,17 @@ public class LocalRenderingManager : MonoBehaviour
         StartCoroutine(AnimateStatChange("remainingCost", diffs));
 
 
-        //Ä³¸¯ÅÍ À§Ä¡µµ ¹Ù²ãÁÒ¾ß ÇÔ 
-        //ÀÌ»Ú°ÔÇÏ´Â¹ıÀÌ³ª Á» Ã£¾Æ¶ó
-        //ÀÓ½ÃÀÌµ¿
-        //³ªÁß¿¡ ½ºÅ³ÀÌµ¿ÀÎÁö ±×³ÉÀÌµ¿ÀÎÁö ±¸ºĞÇÏ°í ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ¶û ¿¬µ¿ÇØ¼­ Àß µ¿ÀÛÇÏ°Ô²û ¹Ù²Ù 3
+        //ìºë¦­í„° ìœ„ì¹˜ë„ ë°”ê¿”ì£ ì•¼ í•¨ 
+        //ì´ì˜ê²Œí•˜ëŠ”ë²•ì´ë‚˜ ì¢€ ì°¾ì•„ë¼
+        //ì„ì‹œì´ë™
+        //ë‚˜ì¤‘ì— ìŠ¤í‚¬ì´ë™ì¸ì§€ ê·¸ëƒ¥ì´ë™ì¸ì§€ êµ¬ë¶„í•˜ê³  ì• ë‹ˆë©”ì´ì…˜ì´ë‘ ì—°ë™í•´ì„œ ì˜ ë™ì‘í•˜ê²Œë” ë°”ê¾¸ 3
         LocalState.Instance.PlayerObDic[data1.actorNum].transform.position = tileIndextoPosition(data1.curpos).position;
         LocalState.Instance.PlayerObDic[data2.actorNum].transform.position = tileIndextoPosition(data2.curpos).position;
 
 
         ApplyDiffsToLocalRenderingData(diffs);
-        //ÀÏÄÉÇÏ¸é ¶Ç ¤¡¤ºÀ»Áöµµ ¸ğ¸£°Ù±º 
-        StealthPlayer(diffs); //¾Æ¸¶ ½ºÅÚ½ºµµ Áö±İ data1, data2°¡ °¢°¢ ½Å ±¸·Î ÀÌÇØÇÏ°í ÀÕÀ» °¡´É¼ºÀÌ ÀÕÀ½ 
+        //ì¼ì¼€í•˜ë©´ ë˜ ã„±ã…Šì„ì§€ë„ ëª¨ë¥´ê²Ÿêµ° 
+        StealthPlayer(diffs); //ì•„ë§ˆ ìŠ¤í…”ìŠ¤ë„ ì§€ê¸ˆ data1, data2ê°€ ê°ê° ì‹  êµ¬ë¡œ ì´í•´í•˜ê³  ì‡ì„ ê°€ëŠ¥ì„±ì´ ì‡ìŒ 
         ElementRenderer.Instance.RenderElementsFromDiffs(diffs);
 
 
@@ -596,11 +600,11 @@ public class LocalRenderingManager : MonoBehaviour
                     {
                         var color = sr.color;
 
-                        if (newValue) // ½ºÅÚ½º On
+                        if (newValue) // ìŠ¤í…”ìŠ¤ On
                         {
                             color.a = (diff.actorNum == PhotonNetwork.LocalPlayer.ActorNumber) ? 0.4f : 0f;
                         }
-                        else // ½ºÅÚ½º Off
+                        else // ìŠ¤í…”ìŠ¤ Off
                         {
                             color.a = 1f;
                         }
@@ -614,9 +618,9 @@ public class LocalRenderingManager : MonoBehaviour
     private Transform tileIndextoPosition(int tileindex)
     {
 
-        //ÀÌ°Å ·ÎÄÃ¿¡¼­µµ ±×¸®µå ÃÊ±âÈ­ ÇØ¾ßÇÔ 
+        //ì´ê±° ë¡œì»¬ì—ì„œë„ ê·¸ë¦¬ë“œ ì´ˆê¸°í™” í•´ì•¼í•¨ 
         return GridManagement.Instance?.tileObjects[tileindex].transform.Find("charpoint");
-        //¸®ÅÏ µÈ ³ğÀº TransformÀ¸·Î ¹Ş°í .transform.positionÀ¸·Î ½á¾ß ÀÛµ¿
+        //ë¦¬í„´ ëœ ë†ˆì€ Transformìœ¼ë¡œ ë°›ê³  .transform.positionìœ¼ë¡œ ì¨ì•¼ ì‘ë™
 
     }
 
@@ -632,7 +636,7 @@ public class LocalRenderingManager : MonoBehaviour
 
         if (myActionTuple.action == null)
         {
-            Debug.LogError($"·ÎÄÃ ÇÃ·¹ÀÌ¾îÀÇ ¾×¼ÇÀ» Ã£À» ¼ö ¾ø½À´Ï´Ù. (ActorNumber: {myActorNum})");
+            Debug.LogError($"ë¡œì»¬ í”Œë ˆì´ì–´ì˜ ì•¡ì…˜ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. (ActorNumber: {myActorNum})");
             return null;
         }
 
@@ -710,7 +714,7 @@ public class LocalRenderingManager : MonoBehaviour
 
             bool isMyActor = diff.actorNum == PhotonNetwork.LocalPlayer.ActorNumber;
 
-            // Å¸°Ù ÅØ½ºÆ® ÇÒ´ç
+            // íƒ€ê²Ÿ í…ìŠ¤íŠ¸ í• ë‹¹
             TMP_Text target = null;
             switch (fieldName)
             {
@@ -730,7 +734,7 @@ public class LocalRenderingManager : MonoBehaviour
             float duration = 0.4f;
             float elapsed = 0f;
 
-            // ¼ıÀÚ ¾Ö´Ï¸ŞÀÌ¼Ç(¶ì¸®¸®¸µ)
+            // ìˆ«ì ì• ë‹ˆë©”ì´ì…˜(ë ë¦¬ë¦¬ë§)
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
@@ -740,19 +744,19 @@ public class LocalRenderingManager : MonoBehaviour
                 yield return null;
             }
 
-            // ¾Ö´Ï¸ŞÀÌ¼Ç Á¾·á ÈÄ º¸Á¤/ÈÄÃ³¸®
+            // ì• ë‹ˆë©”ì´ì…˜ ì¢…ë£Œ í›„ ë³´ì •/í›„ì²˜ë¦¬
             if (fieldName == "remainingCost" && isMyActor && newVal == 0)
             {
-                // ÃÖÁ¾ 0À» Àá±ñ ÂïÀº µÚ Áï½Ã Áö¿ò
+                // ìµœì¢… 0ì„ ì ê¹ ì°ì€ ë’¤ ì¦‰ì‹œ ì§€ì›€
                 target.text = "0";
                 target.text = string.Empty;
 
-                // Æ®¸®°Å ¹ß»ç (¶óº§ ±â¹İ)
+                // íŠ¸ë¦¬ê±° ë°œì‚¬ (ë¼ë²¨ ê¸°ë°˜)
                 AnimTriggerManager.Instance?.FireByLabel("myCasting", "Trig_End");
             }
             else
             {
-                target.text = newVal.ToString(); // ÀÏ¹İ º¸Á¤
+                target.text = newVal.ToString(); // ì¼ë°˜ ë³´ì •
             }
         }
     }
@@ -782,7 +786,7 @@ public class LocalRenderingManager : MonoBehaviour
             Compare("boundIndex", localData.boundIndex, incomingData.boundIndex);
             Compare("isStealthed", localData.isStealthed, incomingData.isStealthed);
 
-            // ¡Ú Ãß°¡: ³×°¡ ¿äÃ»ÇÑ 4°³
+            // â˜… ì¶”ê°€: ë„¤ê°€ ìš”ì²­í•œ 4ê°œ
             Compare("isBlinded", localData.isBlinded, incomingData.isBlinded);
             Compare("rightOrLeft", localData.rightOrLeft, incomingData.rightOrLeft);
             Compare("myCard", localData.myCard, incomingData.myCard);
@@ -834,7 +838,7 @@ public class LocalRenderingManager : MonoBehaviour
                     case "isStealthed": targetData.isStealthed = (bool)newVal; break;
                     case "elements": targetData.elements = new List<apProp>((List<apProp>)newVal); break;
 
-                    // ¡Ú Ãß°¡: ³×°¡ ¿äÃ»ÇÑ 4°³
+                    // â˜… ì¶”ê°€: ë„¤ê°€ ìš”ì²­í•œ 4ê°œ
                     case "isBlinded": targetData.isBlinded = (bool)newVal; break;
                     case "rightOrLeft": targetData.rightOrLeft = (string)newVal; break;
                     case "myCard": targetData.myCard = (string)newVal; break;
@@ -849,10 +853,10 @@ public class LocalRenderingManager : MonoBehaviour
         if (d == null) return;
         if (!LocalState.Instance.PlayerObDic.TryGetValue(actorNum, out var go) || go == null) return;
 
-        // "right"¸é ¿À¸¥ÂÊÀ» º¸°Ô(±âº»Àº ¿ŞÂÊÀ» º½)
+        // "right"ë©´ ì˜¤ë¥¸ìª½ì„ ë³´ê²Œ(ê¸°ë³¸ì€ ì™¼ìª½ì„ ë´„)
         bool faceRight = string.Equals(d.rightOrLeft, "right", System.StringComparison.OrdinalIgnoreCase);
 
-        // ¿ì¼± SpriteRenderer.flipX·Î Ã³¸® (¿©·¯ ÆÄÃ÷°¡ ÀÖÀ¸¸é ÀüºÎ µÚÁı±â)
+        // ìš°ì„  SpriteRenderer.flipXë¡œ ì²˜ë¦¬ (ì—¬ëŸ¬ íŒŒì¸ ê°€ ìˆìœ¼ë©´ ì „ë¶€ ë’¤ì§‘ê¸°)
         var srs = go.GetComponentsInChildren<SpriteRenderer>(true);
         if (srs != null && srs.Length > 0)
         {
@@ -860,10 +864,10 @@ public class LocalRenderingManager : MonoBehaviour
             return;
         }
 
-        // ½ºÇÁ¶óÀÌÆ®°¡ ¾Æ´Ï¶ó¸é(È¤Àº ·»´õ·¯°¡ ¾ø´Ù¸é) ½ºÄÉÀÏ·Î Æú¹é
+        // ìŠ¤í”„ë¼ì´íŠ¸ê°€ ì•„ë‹ˆë¼ë©´(í˜¹ì€ ë Œë”ëŸ¬ê°€ ì—†ë‹¤ë©´) ìŠ¤ì¼€ì¼ë¡œ í´ë°±
         var t = go.transform;
         var ls = t.localScale;
-        ls.x = Mathf.Abs(ls.x) * (faceRight ? -1f : 1f); // ±âº» ¿ŞÂÊ(+), ¿À¸¥ÂÊÀº -·Î µÚÁı±â
+        ls.x = Mathf.Abs(ls.x) * (faceRight ? -1f : 1f); // ê¸°ë³¸ ì™¼ìª½(+), ì˜¤ë¥¸ìª½ì€ -ë¡œ ë’¤ì§‘ê¸°
         t.localScale = ls;
     }
 
@@ -874,35 +878,35 @@ public class LocalRenderingManager : MonoBehaviour
 
 
 
-    //¶Ñµå·ÁÆĞ±â ¤¾ÆÇÁ¤¿ë
+    //ëšœë“œë ¤íŒ¨ê¸° ã…íŒì •ìš©
 
     private HitResolution EvaluateHitOutcome(int attackerActorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action)
     {
-        // 1) Å¸ÀÏÇü -1 ¡æ ÀÚµ¿ Miss
+        // 1) íƒ€ì¼í˜• -1 â†’ ìë™ Miss
         if (action.tileType == -1)
             return HitResolution.Missed;
 
-        // 2) »ó´ë actorNumber (2ÀÎ ÀüÁ¦)
+        // 2) ìƒëŒ€ actorNumber (2ì¸ ì „ì œ)
         int victimActorNum = Overmind.Instance.GetOtherPlayerNumber(attackerActorNum);
 
-        // 3) »ó´ë ·»´õ¸µµ¥ÀÌÅÍ Ã£±â
+        // 3) ìƒëŒ€ ë Œë”ë§ë°ì´í„° ì°¾ê¸°
         var victimData =
             (data1 != null && data1.actorNum == victimActorNum) ? data1 :
             (data2 != null && data2.actorNum == victimActorNum) ? data2 : null;
 
         if (victimData == null)
-            return HitResolution.Missed; // ¾ÈÀü»§
+            return HitResolution.Missed; // ì•ˆì „ë¹µ
 
         int victimIndex = victimData.curpos;
 
-        // 4) È¿°ú ¹üÀ§ Å¸ÀÏ
+        // 4) íš¨ê³¼ ë²”ìœ„ íƒ€ì¼
         var effectTiles = GetEffectTilesSafe(action);
 
-        // 5) ¹üÀ§ ¹ÛÀÌ¸é Miss
+        // 5) ë²”ìœ„ ë°–ì´ë©´ Miss
         if (effectTiles == null || effectTiles.Count == 0 || !effectTiles.Contains(victimIndex))
             return HitResolution.Missed;
 
-        // 6) ¹æ¾î/µ¥¹ÌÁö ºñ±³
+        // 6) ë°©ì–´/ë°ë¯¸ì§€ ë¹„êµ
         int dmg = Mathf.Max(0, action.damage);
         int def = GetDefenseFromRenderingData(victimData);
 
@@ -911,17 +915,17 @@ public class LocalRenderingManager : MonoBehaviour
 
     private HashSet<int> GetEffectTilesSafe(ActionData action)
     {
-        // ActionData¿¡ effectTiles°¡ Ã¤¿öÁ® ÀÖ´Ù°í ÇßÀ¸´Ï ±×°É ±×´ë·Î »ç¿ë
+        // ActionDataì— effectTilesê°€ ì±„ì›Œì ¸ ìˆë‹¤ê³  í–ˆìœ¼ë‹ˆ ê·¸ê±¸ ê·¸ëŒ€ë¡œ ì‚¬ìš©
         if (action.effectTiles != null && action.effectTiles.Count > 0)
             return new HashSet<int>(action.effectTiles);
 
-        // ¾øÀ¸¸é ºó ÁıÇÕ ¡æ Miss·Î Ã³¸®µÊ
+        // ì—†ìœ¼ë©´ ë¹ˆ ì§‘í•© â†’ Missë¡œ ì²˜ë¦¬ë¨
         return new HashSet<int>();
     }
 
     private int GetDefenseFromRenderingData(LocalRenderingData rd)
     {
-        // ³×°¡ ÁØ ÇÊµå¸í ±×´ë·Î
+        // ë„¤ê°€ ì¤€ í•„ë“œëª… ê·¸ëŒ€ë¡œ
         return rd.defense;
     }
 

@@ -762,4 +762,20 @@ public class CameraLovesAlisha : MonoBehaviour
         var t = ResolveLocalPlayerTransform() ?? _defaultTargetCache ?? target;
         ReturnToDefault(durationOverride, t);
     }
+
+    public void SnapLockTo(Transform t)
+    {
+        if (t == null || _cam == null) return;
+
+        _cinematicLock = true;        // LateUpdate 팔로우 끔
+        target = t;                   // 이후 디폴트/복귀용 타깃도 일치
+
+        Vector3 targetPoint = t.position + offset;
+        float depth = lockFollowDepth ? followDepth : DepthAlongCamera(targetPoint);
+        Vector3 dest = targetPoint - (_cam.transform.forward * depth);
+
+        transform.position = dest;    // 즉시 스냅
+        ResetTiltZ();                 // 혹시 롤 남아있으면 정리
+    }
+
 }

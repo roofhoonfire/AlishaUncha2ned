@@ -66,6 +66,7 @@ c23,Activate,Burn_Op,3,2
 c23,Activate,Remove_Element,111,1
 c23,Activate,Flag_Off,1,1
 c23,Activate,Flag_Off,2,2
+c23,Activate,Damage,0,0
 c24,Activate,Damage,0,0
 c24,Activate,Element_Check_FlagOn,10001,0
 c24,Activate,Get_Element,1,1
