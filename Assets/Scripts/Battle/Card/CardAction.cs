@@ -83,7 +83,7 @@ public class CardAction : MonoBehaviour
                 nthaction = ++Overmind.Instance.globalaction,
                 tileType = -1,
                 zoneIndex = 4,
-                cardcode = "¹Ì½Ì³ë",
+                cardcode = "dot_burn",
                 Dot_to = hOpActorNum,
                 isDot = true,
             };

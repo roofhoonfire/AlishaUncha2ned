@@ -25363,7 +25363,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a42b6cfc2c8d7914fadc9715f2135c42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HealthBar_UI: {fileID: 8611201056070623234, guid: e1761d444d8ba344c8c706dce1b1ee79,
+  HealthBar_UI: {fileID: 8611201056070623234, guid: 104ccf7e299207244bf304c99801471f,
     type: 3}
   HealthBar_Char: {fileID: 977506294386380642, guid: f09a4ead614c11d4fbd67a00a81dee59,
     type: 3}

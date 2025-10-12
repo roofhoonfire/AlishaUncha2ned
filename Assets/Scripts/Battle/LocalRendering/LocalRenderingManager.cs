@@ -549,14 +549,22 @@ public class LocalRenderingManager : MonoBehaviour
 
     public void Rendering_Dot_Action(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h)
     {
+        StartCoroutine(RenderDotAndContinue(actorNum, data1, data2, action, h));
+    }
 
-       // AlertDialogue.Instance.StartDialogue(action, actorNum, h, 0, DialogueType.Activate);
-
-
-        //훅 타입에 맞는 애니메이션 재생해주고 
-
-
-
+    private IEnumerator RenderDotAndContinue(int actorNum, LocalRenderingData data1, LocalRenderingData data2, ActionData action, HookType h)
+    {
+        if (action.cardcode == "dot_burn")
+        {
+            if (LocalState.Instance.PlayerObDic.TryGetValue(action.Dot_to, out var tgt) && tgt != null)
+            {
+                var anim = tgt.GetComponentInChildren<Animator>();
+                if (anim != null)
+                    yield return StartCoroutine(PlayTriggerAndWaitExit(anim, "Trig_Dot_Burn", 0, 0.75f, 10f));
+            }
+        }
+        Debug.Log("으악 도트 ");
+        // 여기부터 원래 이어지던 작업 수행
         List<RenderDiff> diffs = CopyandDifferences(data1, data2);
         StartCoroutine(AnimateStatChange("defense", diffs));
         HPBarManager.Instance.DamageMe(GetMine(data1, data2).hp);
@@ -565,26 +573,16 @@ public class LocalRenderingManager : MonoBehaviour
         StartCoroutine(AnimateStatChange("hp", diffs));
         StartCoroutine(AnimateStatChange("remainingCost", diffs));
 
-
-        //캐릭터 위치도 바꿔죠야 함 
-        //이쁘게하는법이나 좀 찾아라
-        //임시이동
-        //나중에 스킬이동인지 그냥이동인지 구분하고 애니메이션이랑 연동해서 잘 동작하게끔 바꾸 3
         LocalState.Instance.PlayerObDic[data1.actorNum].transform.position = tileIndextoPosition(data1.curpos).position;
         LocalState.Instance.PlayerObDic[data2.actorNum].transform.position = tileIndextoPosition(data2.curpos).position;
 
-
         ApplyDiffsToLocalRenderingData(diffs);
-        //일케하면 또 ㄱㅊ을지도 모르겟군 
-        StealthPlayer(diffs); //아마 스텔스도 지금 data1, data2가 각각 신 구로 이해하고 잇을 가능성이 잇음 
+        StealthPlayer(diffs);
         ElementRenderer.Instance.RenderElementsFromDiffs(diffs);
 
-
-
         Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
-
-
     }
+
     private void StealthPlayer(List<RenderDiff> diffs)
     {
         foreach (var diff in diffs)
@@ -927,6 +925,66 @@ public class LocalRenderingManager : MonoBehaviour
     {
         // 네가 준 필드명 그대로
         return rd.defense;
+    }
+    private IEnumerator PlayTriggerAndWaitExit(
+    Animator anim, string trigger, int layer = 0,
+    float enterTimeout = 0.75f, float maxWait = 10f)
+    {
+        if (anim == null) yield break;
+
+        // 이전 상태 해시 저장
+        int prevHash = anim.GetCurrentAnimatorStateInfo(layer).fullPathHash;
+
+        // 트리거 세팅
+        anim.ResetTrigger(trigger);
+        anim.SetTrigger(trigger);
+
+        // --- 상태 진입 대기(트리거로 바뀌는 첫 상태를 잡아냄) ---
+        int playedHash = -1;
+        float enterEnd = Time.realtimeSinceStartup + Mathf.Max(0.05f, enterTimeout);
+        while (Time.realtimeSinceStartup < enterEnd)
+        {
+            var cur = anim.GetCurrentAnimatorStateInfo(layer);
+            if (cur.fullPathHash != prevHash)
+            {
+                playedHash = cur.fullPathHash;
+                break;
+            }
+            if (anim.IsInTransition(layer))
+            {
+                var next = anim.GetNextAnimatorStateInfo(layer);
+                if (next.fullPathHash != prevHash)
+                {
+                    playedHash = next.fullPathHash;
+                    break;
+                }
+            }
+            yield return null;
+        }
+
+        // --- 재생 종료 또는 상태 이탈 대기 ---
+        float end = Time.realtimeSinceStartup + Mathf.Max(0.2f, maxWait);
+        while (Time.realtimeSinceStartup < end)
+        {
+            var cur = anim.GetCurrentAnimatorStateInfo(layer);
+
+            // 대상 상태를 아직 재생 중이면 normalizedTime 1.0 이상이 되고 전이가 아니면 종료
+            if (cur.fullPathHash == playedHash)
+            {
+                if (!anim.IsInTransition(layer) && cur.normalizedTime >= 1f)
+                    break;
+            }
+            else
+            {
+                // 대상 상태에서 이미 벗어났으면 종료 (컨트롤러가 다음 상태로 넘김)
+                if (!anim.IsInTransition(layer))
+                    break;
+            }
+            yield return null;
+        }
+
+        // 뒷정리
+        anim.ResetTrigger(trigger);
     }
 
 }

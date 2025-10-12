@@ -279,7 +279,7 @@ public class CardAnimationRouter : MonoBehaviour
                         entry.prepPoseHoldSec,
                         entry.prepOverlayMaxAlpha,
                         entry.prepOverlayAnchoredPos,
-                        ApplyFacingToOverlayScale(entry.prepOverlayScale)
+                        ApplyFacingToOverlayScale(entry.prepOverlayScale, attackerGO)
                     );
 
 
@@ -835,7 +835,7 @@ public class CardAnimationRouter : MonoBehaviour
                     StartCoroutine(ToggleGlobalVolumeAfter(0f, false));
 
                     CameraLovesAlisha.Instance.BeginPoint1Overlay(
-                        preOverlay, preOvFadeIn, holdSec, preOvMaxA, preOvPos, ApplyFacingToOverlayScale(preOvScale));
+                        preOverlay, preOvFadeIn, holdSec, preOvMaxA, preOvPos, ApplyFacingToOverlayScale(preOvScale,origAttackerT.gameObject));
 
                 }// [중요] 컷라인 재생 시간 == holdSec 이므로, 그 시간이 끝난 뒤에 Wait!를 띄움
                 yield return new WaitForSecondsRealtime(holdSec);
@@ -938,23 +938,20 @@ public class CardAnimationRouter : MonoBehaviour
     // 클래스 하단 임의 위치
 
     // 로컬 플레이어의 SpriteRenderer.flipX 읽기
-    private bool GetLocalFlipX()
+    private bool GetLocalFlipX(GameObject go)
     {
-        var ls = LocalState.Instance;
-        if (ls != null && ls.PlayerObDic != null &&
-            ls.PlayerObDic.TryGetValue(PhotonNetwork.LocalPlayer.ActorNumber, out var go) && go != null)
-        {
-            var sr = go.GetComponentInChildren<SpriteRenderer>();
-            if (sr != null) return sr.flipX;
-        }
+        
+        var sr = go.GetComponentInChildren<SpriteRenderer>();
+        if (sr != null) return sr.flipX;
+  
         return false;
     }
 
     // 오버레이 스케일에 좌우 방향 적용(X만 ±로 맞춤)
-    private Vector3 ApplyFacingToOverlayScale(Vector3 baseScale)
+    private Vector3 ApplyFacingToOverlayScale(Vector3 baseScale, GameObject go)
     {
         if (!overlayFollowLocalFacing) return baseScale;
-        bool flip = GetLocalFlipX();
+        bool flip = GetLocalFlipX(go);
         float sx = Mathf.Abs(baseScale.x) * (flip ? -1f : 1f);
         return new Vector3(sx, baseScale.y, baseScale.z);
     }
