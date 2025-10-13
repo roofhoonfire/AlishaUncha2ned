@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using DG.Tweening;
@@ -18,7 +18,7 @@ public class LocalState : MonoBehaviour
     [SerializeField] private GameObject charaprefab;
 
     public Dictionary<int, GameObject> PlayerObDic;
-    // °¢ ActorNumber¿¡ ´ëÀÀÇÏ´Â ÇÃ·¹ÀÌ¾î »óÅÂ
+    // ê° ActorNumberì— ëŒ€ì‘í•˜ëŠ” í”Œë ˆì´ì–´ ìƒíƒœ
     public Dictionary<int, PlayerData> localPlayers = new Dictionary<int, PlayerData>();
 
     public List<(int actorNumber, int remainingCost)> localActionQueue = new List<(int actorNumber, int remainingCost)>();
@@ -27,7 +27,7 @@ public class LocalState : MonoBehaviour
     public BacktoMaster btmPacket;
 
 
-    private int previousHPMe = 100; //ÇÃ·¹ÀÌ¾î µ¥ÀÌÅÍ¿¡ ºÙÀº prev´Â ½ÎÀÌÅ¬ Ã¼Ä¿¿ëÀÌ¶ó º°°³ÀÓ
+    private int previousHPMe = 100; //í”Œë ˆì´ì–´ ë°ì´í„°ì— ë¶™ì€ prevëŠ” ì‹¸ì´í´ ì²´ì»¤ìš©ì´ë¼ ë³„ê°œì„
 
     private int previousHPOp = 100;
 
@@ -39,14 +39,19 @@ public class LocalState : MonoBehaviour
     public TextMeshProUGUI opponencostRemainTxt;
     public TextMeshProUGUI mycostRemainTxt;
 
+    // â˜… ì¶”ê°€: ChooseLoop í™œì„± ì—¬ë¶€ ì™¸ë¶€ ë…¸ì¶œ
+    public bool IsChooseLoopActive { get; private set; }
+
+    // â˜… ì¶”ê°€: ìµœê·¼ AP ë°ì´í„° ì™¸ë¶€ ë…¸ì¶œ(í”„ë¦¬ë·°ìš©)
+    public ActionPacketData LastApData => _lastApData;
 
 
-    //Ãß°¡µÊ ³¥·Æ
+    //ì¶”ê°€ë¨ ë‚„ë µ
     private ActionPacketData _lastApData;
     private bool _isReturningToChoose;
     //
 
-    public GameObject alim; // ³ªÁß¿£ °Á ¾Ö´Ï¸ŞÀÌ¼ÇÀ¸·Î ÅüÃÄÀÕ~
+    public GameObject alim; // ë‚˜ì¤‘ì—” ê± ì• ë‹ˆë©”ì´ì…˜ìœ¼ë¡œ í‰ì³ì‡~
 
     void Awake()
     {
@@ -62,14 +67,14 @@ public class LocalState : MonoBehaviour
     }
 
     /// <summary>
-    /// ¸¶½ºÅÍ Å¬¶óÀÌ¾ğÆ®¿¡¼­ ¹ŞÀº data·Î ·ÎÄÃ ÇÃ·¹ÀÌ¾î »óÅÂ¸¸ ºÎºĞ µ¿±âÈ­ÇÕ´Ï´Ù.
-    /// ÀÌ¹Ì localPlayers¿¡ Å°°¡ Á¸ÀçÇÑ´Ù°í °¡Á¤ÇÏ°í, °ª¸¸ °»½ÅÇÕ´Ï´Ù.
+    /// ë§ˆìŠ¤í„° í´ë¼ì´ì–¸íŠ¸ì—ì„œ ë°›ì€ dataë¡œ ë¡œì»¬ í”Œë ˆì´ì–´ ìƒíƒœë§Œ ë¶€ë¶„ ë™ê¸°í™”í•©ë‹ˆë‹¤.
+    /// ì´ë¯¸ localPlayersì— í‚¤ê°€ ì¡´ì¬í•œë‹¤ê³  ê°€ì •í•˜ê³ , ê°’ë§Œ ê°±ì‹ í•©ë‹ˆë‹¤.
     /// </summary>
 
 
     /// <summary>
-    /// ÀüÃ¼ ·ÎÄÃ »óÅÂ¸¦ ÃÊ±âÈ­ÇÕ´Ï´Ù.
-    /// (¿¹: Battle ¾À ÁøÀÔ ½Ã ÃÊ±â µ¿±âÈ­¿ë)
+    /// ì „ì²´ ë¡œì»¬ ìƒíƒœë¥¼ ì´ˆê¸°í™”í•©ë‹ˆë‹¤.
+    /// (ì˜ˆ: Battle ì”¬ ì§„ì… ì‹œ ì´ˆê¸° ë™ê¸°í™”ìš©)
     /// </summary>
     public void GameStart(Dictionary<int, LocalRenderingData> copiedData)
     {
@@ -84,7 +89,7 @@ public class LocalState : MonoBehaviour
                 curpos = kvp.Value.curpos,
                 hp = kvp.Value.hp,
                 defense = kvp.Value.defense,
-                bounds = new List<string>(kvp.Value.bounds), // ÂüÁ¶Çü ÇÊµå´Â º¹Á¦
+                bounds = new List<string>(kvp.Value.bounds), // ì°¸ì¡°í˜• í•„ë“œëŠ” ë³µì œ
                 remainingCost = kvp.Value.remainingCost,
                 boundIndex = kvp.Value.boundIndex,
                 rightOrLeft = kvp.Value.rightOrLeft,
@@ -96,10 +101,10 @@ public class LocalState : MonoBehaviour
             i++;
         }
 
-        Debug.Log("LocalState: ÀüÃ¼ ÇÃ·¹ÀÌ¾î »óÅÂ ÃÊ±âÈ­µÊ");
-        //d¾Æ·¡´Â µğ¹ö±ë ¿ëÀÌ´Ù ³ªÁß¿¡ Áö¿ì±â
+        Debug.Log("LocalState: ì „ì²´ í”Œë ˆì´ì–´ ìƒíƒœ ì´ˆê¸°í™”ë¨");
+        //dì•„ë˜ëŠ” ë””ë²„ê¹… ìš©ì´ë‹¤ ë‚˜ì¤‘ì— ì§€ìš°ê¸°
 
-        //°ÔÀÓ ½ÃÀÛ ¿¬Ãâ ÇÏ³ª Áı¾î³Ö±â ;
+        //ê²Œì„ ì‹œì‘ ì—°ì¶œ í•˜ë‚˜ ì§‘ì–´ë„£ê¸° ;
 
 
         CharaObInit();
@@ -112,8 +117,8 @@ public class LocalState : MonoBehaviour
 
     public void CharaObInit()
     {
-        //¿©±â¼­ ·»´õ¸µ Á¤º¸ ´ÙÇÏ±â . ½ºÅ² º¸´Â ¹æÇâ µî.
-        //¼¿·º¼Ç ¹Ù ¿¬°á
+        //ì—¬ê¸°ì„œ ë Œë”ë§ ì •ë³´ ë‹¤í•˜ê¸° . ìŠ¤í‚¨ ë³´ëŠ” ë°©í–¥ ë“±.
+        //ì…€ë ‰ì…˜ ë°” ì—°ê²°
         foreach (var pinfo in LocalRenderingStatic.localRenderingDatas)
 
 
@@ -123,7 +128,7 @@ public class LocalState : MonoBehaviour
             GameObject mcChecker = temp.transform.Find("MyChara")?.gameObject;
 
 
-            //·»´õ¸µ ¿ë Ä¿³Ø¼Ç º¯¼ö
+            //ë Œë”ë§ ìš© ì»¤ë„¥ì…˜ ë³€ìˆ˜
             CharaInfo charinfo = temp.GetComponent<CharaInfo>();
 
 
@@ -143,7 +148,7 @@ public class LocalState : MonoBehaviour
                 SelectionBarManager.Instance.JM.gameObject.SetActive(false);
                 CameraLovesAlisha.Instance.target = temp.GetComponent<Transform>();
 
-                //HP ¹Ù ¼ÂÆÃ
+                //HP ë°” ì…‹íŒ…
 
                 HPBarManager.Instance.mycharBarHolder = temp.GetComponent<Transform>().Find("HPHolder");
 
@@ -166,21 +171,21 @@ public class LocalState : MonoBehaviour
     private Transform tileIndextoPosition(int tileindex)
     {
 
-        //ÀÌ°Å ·ÎÄÃ¿¡¼­µµ ±×¸®µå ÃÊ±âÈ­ ÇØ¾ßÇÔ 
+        //ì´ê±° ë¡œì»¬ì—ì„œë„ ê·¸ë¦¬ë“œ ì´ˆê¸°í™” í•´ì•¼í•¨ 
         return GridManagement.Instance?.tileObjects[tileindex].transform.Find("charpoint");
-        //¸®ÅÏ µÈ ³ğÀº TransformÀ¸·Î ¹Ş°í .transform.positionÀ¸·Î ½á¾ß ÀÛµ¿
+        //ë¦¬í„´ ëœ ë†ˆì€ Transformìœ¼ë¡œ ë°›ê³  .transform.positionìœ¼ë¡œ ì¨ì•¼ ì‘ë™
 
     }
 
 
 
 
-    //ÇØÁÙÀÏ ¾×ÅÍ ³Ñ¹öµµ °°ÀÌ º¯¼ö·Î ³Ñ°ÜÁà¼­ ¾î´À ¾×ÅÍÀÎÁö
+    //í•´ì¤„ì¼ ì•¡í„° ë„˜ë²„ë„ ê°™ì´ ë³€ìˆ˜ë¡œ ë„˜ê²¨ì¤˜ì„œ ì–´ëŠ ì•¡í„°ì¸ì§€
 
     public void Start_NormChoose_Phase(int actorNumber, string apjson)
     {
         var apData = JsonConvert.DeserializeObject<ActionPacketData>(apjson);
-        _lastApData = apData;                             // ¡Ú º¸°ü
+        _lastApData = apData;                             // â˜… ë³´ê´€
         if (_chooseMoveRoutine != null) StopCoroutine(_chooseMoveRoutine);
         _chooseMoveRoutine = StartCoroutine(ChooseMoveInputLoop(apData));
     }
@@ -188,22 +193,22 @@ public class LocalState : MonoBehaviour
     public void Start_FaceDown_Phase(int actorNumber, string apjson)
     {
         var apData = JsonConvert.DeserializeObject<ActionPacketData>(apjson);
-        _lastApData = apData;                             // ¡Ú º¸°ü
+        _lastApData = apData;                             // â˜… ë³´ê´€
         if (_chooseMoveRoutine != null) StopCoroutine(_chooseMoveRoutine);
         _chooseMoveRoutine = StartCoroutine(ChooseMoveInputLoop(apData));
     }
-    //Ãß°¡µÊ ³¥·Æ
+    //ì¶”ê°€ë¨ ë‚„ë µ
 
     /*  public void Start_NormChoose_Phase(int actorNumber, string apjson)
       {
           ActionPacketData apData = JsonConvert.DeserializeObject<ActionPacketData>(apjson);
           var playerData = LocalRenderingStatic.localRenderingDatas[actorNumber];
-          Debug.Log($"ÀÌ¹øÅÏÀÇ Á¦¾àÀº {playerData.bounds[playerData.boundIndex]}");
-          // ÀÌ¹Ì ´ë±â ÁßÀÌ¸é Áß´Ü
+          Debug.Log($"ì´ë²ˆí„´ì˜ ì œì•½ì€ {playerData.bounds[playerData.boundIndex]}");
+          // ì´ë¯¸ ëŒ€ê¸° ì¤‘ì´ë©´ ì¤‘ë‹¨
           if (_chooseMoveRoutine != null)
               StopCoroutine(_chooseMoveRoutine);
 
-          // Å° ÀÔ·Â ´ë±â ÄÚ·çÆ¾ ½ÃÀÛ
+          // í‚¤ ì…ë ¥ ëŒ€ê¸° ì½”ë£¨í‹´ ì‹œì‘
           _chooseMoveRoutine = StartCoroutine(ChooseMoveInputLoop(apData));
 
       }
@@ -214,20 +219,20 @@ public class LocalState : MonoBehaviour
           if (_chooseMoveRoutine != null)
               StopCoroutine(_chooseMoveRoutine);
 
-          // Å° ÀÔ·Â ´ë±â ÄÚ·çÆ¾ ½ÃÀÛ
+          // í‚¤ ì…ë ¥ ëŒ€ê¸° ì½”ë£¨í‹´ ì‹œì‘
           _chooseMoveRoutine = StartCoroutine(ChooseMoveInputLoop(apData));
 
       }*/
-    //Ãß°¡µÊ ³¥·Æ
+    //ì¶”ê°€ë¨ ë‚„ë µ
     public void ReturnToChooseLoop()
     {
-        if (_isReturningToChoose) return;                 // ÀçÁøÀÔ ¹æÁö
+        if (_isReturningToChoose) return;                 // ì¬ì§„ì… ë°©ì§€
         _isReturningToChoose = true;
 
-        // ¼±ÅÃ¹Ù´Â ¡®¼û±è ´ë±â¡¯ »óÅÂ·Î ÃÊ±âÈ­(¾Ö´Ï ¾øÀÌ ±ò²û)
+        // ì„ íƒë°”ëŠ” â€˜ìˆ¨ê¹€ ëŒ€ê¸°â€™ ìƒíƒœë¡œ ì´ˆê¸°í™”(ì• ë‹ˆ ì—†ì´ ê¹”ë”)
         SelectionBarManager.Instance?.PrepareHiddenStandby();
 
-        // È¤½Ã ³²¾ÆÀÖÀ»Áö ¸ğ¸¦ ÄÚ·çÆ¾ Á¤¸® ÈÄ Àç½ÃÀÛ
+        // í˜¹ì‹œ ë‚¨ì•„ìˆì„ì§€ ëª¨ë¥¼ ì½”ë£¨í‹´ ì •ë¦¬ í›„ ì¬ì‹œì‘
         if (_chooseMoveRoutine != null) StopCoroutine(_chooseMoveRoutine);
         _chooseMoveRoutine = StartCoroutine(ChooseMoveInputLoop(_lastApData));
 
@@ -235,20 +240,18 @@ public class LocalState : MonoBehaviour
     }
     private IEnumerator ChooseMoveInputLoop(ActionPacketData apData)
     {
+        if (CardModeState.Instance != null && CardModeState.Instance.isActive)
+            CardModeState.Instance.StopSelectCardLoop(null);
+
+        IsChooseLoopActive = true;  // ì‹œì‘ ì‹œ true
+
         InitBacktoMaster();
-
-        // 1) ¼±ÅÃ¹Ù Åä±Û(³ªÅ¸³ª±â ½ÃÀÛ)
         SelectionBarManager.Instance.SetActive();
-
-        // 2) µîÀå ¾Ö´Ï ³¡³¯ ¶§±îÁö ´ë±â ¡æ ÀÔ·Â °æÇÕ Â÷´Ü
-        //    (À¯Æ¿ ¾²°Å³ª, ÇÑ ÁÙ °è»ê½ÄÀ¸·Îµµ °¡´É)
-        // yield return SelectionBarManager.Instance.WaitUntilIdle();
         yield return new WaitForSeconds(
             SelectionBarManager.Instance.rotationDuration
             + SelectionBarManager.Instance.overlapDelay * 2f
         );
 
-        // 3) ÀÌÁ¦ºÎÅÍ C/M ÀÔ·ÂÀ» ¹ŞÀ½
         while (true)
         {
             if (Input.GetKeyDown(KeyCode.M) && apData.canMove)
@@ -258,7 +261,7 @@ public class LocalState : MonoBehaviour
             }
             else if (Input.GetKeyDown(KeyCode.C))
             {
-                CardModeState.Instance.SetActive(true, apData);
+                CardModeState.Instance.SetActive(true, apData, interactive: true);
                 break;
             }
             yield return null;
@@ -266,13 +269,15 @@ public class LocalState : MonoBehaviour
 
         _chooseMoveRoutine = null;
 
-        // 4) ¸ğµå ÁøÀÔÀÌ °áÁ¤µÆÀ¸´Ï ¼±ÅÃ¹Ù´Â Åä±Û·Î ´İ±â
+        // ì„ íƒë°” ë‹«ê¸°
         SelectionBarManager.Instance.SetActive();
+
+        // â›”ï¸ ì—¬ê¸°ì„œ IsChooseLoopActive = false ë‚´ë ¤ì£¼ë˜ ì½”ë“œ ì‚­ì œ!
     }
 
 
 
-    //¸¶½ºÅÍÇÑÅ× µ¹·ÁÁÙ °ÍµéÀ» ´ã´Â ÆĞÅ°Áö¸¦ ÃÊ±âÈ­ÇÑ´Ù
+    //ë§ˆìŠ¤í„°í•œí…Œ ëŒë ¤ì¤„ ê²ƒë“¤ì„ ë‹´ëŠ” íŒ¨í‚¤ì§€ë¥¼ ì´ˆê¸°í™”í•œë‹¤
     private void InitBacktoMaster()
     {
         btmPacket = new BacktoMaster();
@@ -281,21 +286,24 @@ public class LocalState : MonoBehaviour
 
     }
 
-
+    public void EndChoosePhase()
+    {
+        IsChooseLoopActive = false;
+    }
 
 
     public int GetMinOpLocalRemainingCost(int actorNum)
     {
-        // actorNum°ú ´Ù¸£°í, ³²Àº ÄÚ½ºÆ®¸¦ »Ì¾Æ¼­
+        // actorNumê³¼ ë‹¤ë¥´ê³ , ë‚¨ì€ ì½”ìŠ¤íŠ¸ë¥¼ ë½‘ì•„ì„œ
         var opponentCosts = localActionQueue
             .Where(entry => entry.actorNumber != actorNum)
             .Select(entry => entry.remainingCost);
 
-        // ¸¸¾à »ó´ë ¾×¼ÇÀÌ ¾ø´Ù¸é 0À» ¹İÈ¯ (ÇÊ¿äÇÏ´Ù¸é ´Ù¸¥ ±âº»°ªÀ¸·Î ¹Ù²ãµµ µÊ)
+        // ë§Œì•½ ìƒëŒ€ ì•¡ì…˜ì´ ì—†ë‹¤ë©´ 0ì„ ë°˜í™˜ (í•„ìš”í•˜ë‹¤ë©´ ë‹¤ë¥¸ ê¸°ë³¸ê°’ìœ¼ë¡œ ë°”ê¿”ë„ ë¨)
         if (!opponentCosts.Any())
             return 0;
 
-        // ±×Áß ÃÖ¼Ú°ª ¹İÈ¯
+        // ê·¸ì¤‘ ìµœì†Ÿê°’ ë°˜í™˜
         return opponentCosts.Min();
     }
 

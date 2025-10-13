@@ -20,6 +20,10 @@ public class CardModeState : MonoBehaviour
     public List<GameObject> spawnedCards = new List<GameObject>();
 
     public bool isActive = false;
+
+    public bool isInteractiveSession = false; // 추가: 인터랙티브(ChooseLoop) 진입 여부
+
+
     private Coroutine _selectCardCoroutine;
     public ActionPacketData apDataRef;
 
@@ -31,23 +35,33 @@ public class CardModeState : MonoBehaviour
 
     public void SetActive(bool active, ActionPacketData apData)
     {
+        // 기존 호출 호환: ChooseLoop 경로는 인터랙티브로 취급
+        SetActive(active, apData, interactive: true);
+    }
+
+    // ★ 추가 오버로드: 진입 성격 명시
+    public void SetActive(bool active, ActionPacketData apData, bool interactive)
+    {
         if (active == isActive) return;
         isActive = active;
+        isInteractiveSession = interactive;
 
         if (isActive) StartSelectCardLoop(apData);
         else StopSelectCardLoop(null);
     }
-
     private void StartSelectCardLoop(ActionPacketData apdata)
     {
-        // 생각 모션 트리거
-        var me = PhotonNetwork.LocalPlayer.ActorNumber;
-        if (LocalState.Instance?.PlayerObDic != null &&
-            LocalState.Instance.PlayerObDic.TryGetValue(me, out var meGo) &&
-            meGo != null)
+        // ★ 인터랙티브일 때만 생각 모션 트리거
+        if (isInteractiveSession)
         {
-            var anim = meGo.GetComponentInChildren<Animator>();
-            if (anim) anim.SetTrigger("Trig_Think");
+            var me = PhotonNetwork.LocalPlayer.ActorNumber;
+            if (LocalState.Instance?.PlayerObDic != null &&
+                LocalState.Instance.PlayerObDic.TryGetValue(me, out var meGo) &&
+                meGo != null)
+            {
+                var anim = meGo.GetComponentInChildren<Animator>();
+                if (anim) anim.SetTrigger("Trig_Think");
+            }
         }
 
         apDataRef = apdata;
@@ -101,7 +115,7 @@ public class CardModeState : MonoBehaviour
         }
     }
 
-    private void CancelAndReturn()
+    public void CancelAndReturn()
     {
         if (_selectCardCoroutine != null)
         {
@@ -113,7 +127,6 @@ public class CardModeState : MonoBehaviour
         // 카드 제거 → 손 사라짐 애니 → ChooseLoop 복귀
         StartCoroutine(CloseHandsThenReturn());
     }
-
     private IEnumerator CloseHandsThenReturn()
     {
         ClearAllCards();
@@ -121,16 +134,20 @@ public class CardModeState : MonoBehaviour
 
         if (LocalState.Instance?.alim) LocalState.Instance.alim.SetActive(false);
 
-        var me = PhotonNetwork.LocalPlayer.ActorNumber;
-        if (LocalState.Instance?.PlayerObDic != null &&
-            LocalState.Instance.PlayerObDic.TryGetValue(me, out var meGo) &&
-            meGo != null)
+        // ★ 인터랙티브일 때만 Think_Done 트리거 + ChooseLoop 복귀
+        if (isInteractiveSession)
         {
-            var anim = meGo.GetComponentInChildren<Animator>();
-            if (anim) anim.SetTrigger("Trig_Think_Done");
-        }
+            var me = PhotonNetwork.LocalPlayer.ActorNumber;
+            if (LocalState.Instance?.PlayerObDic != null &&
+                LocalState.Instance.PlayerObDic.TryGetValue(me, out var meGo) &&
+                meGo != null)
+            {
+                var anim = meGo.GetComponentInChildren<Animator>();
+                if (anim) anim.SetTrigger("Trig_Think_Done");
+            }
 
-        LocalState.Instance.ReturnToChooseLoop();
+            LocalState.Instance.ReturnToChooseLoop();
+        }
     }
 
     public void StopSelectCardLoop(ActionData action)
@@ -142,27 +159,28 @@ public class CardModeState : MonoBehaviour
         }
         isActive = false;
 
-        var me = PhotonNetwork.LocalPlayer.ActorNumber;
-        if (LocalState.Instance?.PlayerObDic != null &&
-            LocalState.Instance.PlayerObDic.TryGetValue(me, out var meGo) &&
-            meGo != null)
+        // ★ 인터랙티브일 때만 Think_Done 트리거
+        if (isInteractiveSession)
         {
-            var anim = meGo.GetComponentInChildren<Animator>();
-            if (anim) anim.SetTrigger("Trig_Think_Done");
+            var me = PhotonNetwork.LocalPlayer.ActorNumber;
+            if (LocalState.Instance?.PlayerObDic != null &&
+                LocalState.Instance.PlayerObDic.TryGetValue(me, out var meGo) &&
+                meGo != null)
+            {
+                var anim = meGo.GetComponentInChildren<Animator>();
+                if (anim) anim.SetTrigger("Trig_Think_Done");
+            }
         }
 
         StartCoroutine(CloseHandsThenSubmit(action));
     }
 
+
     private IEnumerator CloseHandsThenSubmit(ActionData action)
     {
-        // 1) 카드 UI 제거
         ClearAllCards();
-
-        // 2) 손 사라짐 애니 끝까지
         yield return BothArmsAnimator.Instance.PlayExit();
 
-        // 3) 제출/정리
         if (action != null)
         {
             if (LocalState.Instance?.alim) LocalState.Instance.alim.SetActive(false);
@@ -171,8 +189,12 @@ public class CardModeState : MonoBehaviour
                 PhotonNetwork.LocalPlayer.ActorNumber,
                 LocalState.Instance.btmPacket
             );
+
+            // ★ 실제 선택을 제출했을 때만 ChooseLoop 종료 플래그 내리기
+            LocalState.Instance?.EndChoosePhase();
         }
     }
+
 
     public void PopulateCards(ActionPacketData apData)
     {

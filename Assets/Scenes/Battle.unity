@@ -14851,6 +14851,7 @@ MonoBehaviour:
   actionClockBuffer: 0
   spawnedCards: []
   isActive: 0
+  isInteractiveSession: 0
 --- !u!114 &1334487634
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15638,6 +15639,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1360472837}
   m_CullTransparentMesh: 1
+--- !u!1 &1361288034
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1361288036}
+  - component: {fileID: 1361288035}
+  m_Layer: 0
+  m_Name: cardmodestateCon
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1361288035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1361288034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e4129d2217be0c44ba0e282977f7ecd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1361288036
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1361288034}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 943.5788, y: 490.4407, z: -1.2087797}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1367562394
 GameObject:
   m_ObjectHideFlags: 0
@@ -25902,3 +25947,4 @@ SceneRoots:
   - {fileID: 1655046326}
   - {fileID: 1293044640}
   - {fileID: 663813080}
+  - {fileID: 1361288036}

@@ -86,6 +86,8 @@ public class CardDragHandler : MonoBehaviour,
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (CardModeState.Instance == null || !CardModeState.Instance.isActive || !CardModeState.Instance.isInteractiveSession)
+            return;
         canvas = GetComponentInParent<Canvas>(); // 호출 순서 고려해서 여기서 획득
         thisCardData = GetComponent<EachCardInfo>().cardData;
 
@@ -114,6 +116,9 @@ public class CardDragHandler : MonoBehaviour,
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (CardModeState.Instance == null || !CardModeState.Instance.isActive || !CardModeState.Instance.isInteractiveSession)
+            return;
+
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvas.transform as RectTransform,
             eventData.position,
@@ -127,6 +132,8 @@ public class CardDragHandler : MonoBehaviour,
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (CardModeState.Instance == null || !CardModeState.Instance.isActive || !CardModeState.Instance.isInteractiveSession)
+            return;
         canvasGroup.blocksRaycasts = true;
         layoutElement.ignoreLayout = false;
 
@@ -173,6 +180,21 @@ public class CardDragHandler : MonoBehaviour,
                 CardModeState.Instance.curAction.damage = Mathf.Max(0, thisCardData.damage + apData.tempDam + apData.permDam);
 
                 btmPacketAdd(thisCardData.code);
+
+                Debug.Log("로컬 핸드를 위한 apdata 초기화!!");
+
+                // ── 여기부터 추가 ─────────────────────────────────────────────
+                // 1) 로컬 핸드 AP 임시 수치 리셋
+                if (LocalState.Instance?.LastApData != null)
+                {
+                    LocalState.Instance.LastApData.tempDef = 0;
+                    LocalState.Instance.LastApData.tempCast = 0;
+                    LocalState.Instance.LastApData.tempDam = 0;
+
+                    // 2) usedCard 목록을 멀티셋 방식으로 hands에서 제거
+                    RemoveUsedFromHands(LocalState.Instance.LastApData, LocalState.Instance.btmPacket?.usedCard);
+                }
+                // ───────────────────────────────────────────────────────────────
                 CardModeState.Instance.StopSelectCardLoop(CardModeState.Instance.curAction);
             }
             else if (thisCardData.cardType == 1)
@@ -213,8 +235,27 @@ public class CardDragHandler : MonoBehaviour,
                 CardModeState.Instance.ActionPacketUpgrade(apData);
 
                 btmPacketAdd(thisCardData.code);
+
+
+                
+
                 Destroy(gameObject);
             }
+
+
+
+
+        }
+    }
+    private static void RemoveUsedFromHands(ActionPacketData ap, List<string> used)
+    {
+        if (ap == null || ap.hands == null || used == null) return;
+
+        // 멀티셋 제거: used 에 있는 각 코드마다 hands에서 "첫 번째 매칭"만 제거
+        foreach (var code in used)
+        {
+            int idx = ap.hands.IndexOf(code);
+            if (idx >= 0) ap.hands.RemoveAt(idx);
         }
     }
 
