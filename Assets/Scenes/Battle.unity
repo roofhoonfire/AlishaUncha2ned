@@ -1592,6 +1592,7 @@ GameObject:
   - component: {fileID: 187938555}
   - component: {fileID: 187938557}
   - component: {fileID: 187938558}
+  - component: {fileID: 187938559}
   m_Layer: 0
   m_Name: Tile 25
   m_TagString: Tile
@@ -1725,6 +1726,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &187938559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 187938553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &195360713
 GameObject:
   m_ObjectHideFlags: 0
@@ -2414,6 +2432,7 @@ GameObject:
   - component: {fileID: 252134914}
   - component: {fileID: 252134915}
   - component: {fileID: 252134916}
+  - component: {fileID: 252134917}
   m_Layer: 0
   m_Name: Tile 34
   m_TagString: Tile
@@ -2547,6 +2566,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &252134917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 252134911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &258835098
 GameObject:
   m_ObjectHideFlags: 0
@@ -2560,6 +2596,7 @@ GameObject:
   - component: {fileID: 258835101}
   - component: {fileID: 258835102}
   - component: {fileID: 258835103}
+  - component: {fileID: 258835104}
   m_Layer: 0
   m_Name: Tile 17
   m_TagString: Tile
@@ -2693,6 +2730,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &258835104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 258835098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &274414054
 GameObject:
   m_ObjectHideFlags: 0
@@ -4462,6 +4516,7 @@ GameObject:
   - component: {fileID: 379649612}
   - component: {fileID: 379649613}
   - component: {fileID: 379649614}
+  - component: {fileID: 379649615}
   m_Layer: 0
   m_Name: Tile 14
   m_TagString: Tile
@@ -4527,7 +4582,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -15
   m_Sprite: {fileID: 21300000, guid: 7b97cf53a855e7b49ac6bda6f0df0777, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.990566, g: 0.990566, b: 0.990566, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -4595,6 +4650,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &379649615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379649609}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &383362884
 GameObject:
   m_ObjectHideFlags: 0
@@ -4989,6 +5061,7 @@ GameObject:
   - component: {fileID: 412048789}
   - component: {fileID: 412048791}
   - component: {fileID: 412048792}
+  - component: {fileID: 412048793}
   m_Layer: 0
   m_Name: Tile 24
   m_TagString: Tile
@@ -5122,6 +5195,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &412048793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 412048787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &412093230
 GameObject:
   m_ObjectHideFlags: 0
@@ -5832,6 +5922,7 @@ GameObject:
   - component: {fileID: 518308692}
   - component: {fileID: 518308694}
   - component: {fileID: 518308695}
+  - component: {fileID: 518308696}
   m_Layer: 0
   m_Name: Tile 26
   m_TagString: Tile
@@ -5965,6 +6056,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &518308696
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 518308690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &521978641
 GameObject:
   m_ObjectHideFlags: 0
@@ -6197,6 +6305,7 @@ GameObject:
   - component: {fileID: 529749228}
   - component: {fileID: 529749229}
   - component: {fileID: 529749230}
+  - component: {fileID: 529749231}
   m_Layer: 0
   m_Name: Tile 11
   m_TagString: Tile
@@ -6330,6 +6439,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &529749231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 529749225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &534475422
 GameObject:
   m_ObjectHideFlags: 0
@@ -7629,6 +7755,7 @@ GameObject:
   - component: {fileID: 664580995}
   - component: {fileID: 664580997}
   - component: {fileID: 664580998}
+  - component: {fileID: 664580999}
   m_Layer: 0
   m_Name: Tile 20
   m_TagString: Tile
@@ -7762,6 +7889,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &664580999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 664580993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &670943448
 GameObject:
   m_ObjectHideFlags: 0
@@ -7775,6 +7919,7 @@ GameObject:
   - component: {fileID: 670943450}
   - component: {fileID: 670943452}
   - component: {fileID: 670943453}
+  - component: {fileID: 670943454}
   m_Layer: 0
   m_Name: Tile 27
   m_TagString: Tile
@@ -7908,6 +8053,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &670943454
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 670943448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &711382824
 GameObject:
   m_ObjectHideFlags: 0
@@ -9544,6 +9706,7 @@ GameObject:
   - component: {fileID: 903743408}
   - component: {fileID: 903743409}
   - component: {fileID: 903743410}
+  - component: {fileID: 903743411}
   m_Layer: 0
   m_Name: Tile 37
   m_TagString: Tile
@@ -9677,6 +9840,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &903743411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 903743405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &907317071
 GameObject:
   m_ObjectHideFlags: 0
@@ -9774,6 +9954,7 @@ GameObject:
   - component: {fileID: 909436048}
   - component: {fileID: 909436049}
   - component: {fileID: 909436050}
+  - component: {fileID: 909436051}
   m_Layer: 0
   m_Name: Tile 16
   m_TagString: Tile
@@ -9907,6 +10088,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &909436051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 909436045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &916389381
 GameObject:
   m_ObjectHideFlags: 0
@@ -10236,6 +10434,7 @@ GameObject:
   - component: {fileID: 941629511}
   - component: {fileID: 941629512}
   - component: {fileID: 941629513}
+  - component: {fileID: 941629514}
   m_Layer: 0
   m_Name: Tile 36
   m_TagString: Tile
@@ -10369,6 +10568,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &941629514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 941629508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &955902407
 GameObject:
   m_ObjectHideFlags: 0
@@ -10734,6 +10950,7 @@ GameObject:
   - component: {fileID: 995616312}
   - component: {fileID: 995616314}
   - component: {fileID: 995616315}
+  - component: {fileID: 995616316}
   m_Layer: 0
   m_Name: Tile 29
   m_TagString: Tile
@@ -10867,6 +11084,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &995616316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 995616310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &997774708
 GameObject:
   m_ObjectHideFlags: 0
@@ -12088,6 +12322,7 @@ GameObject:
   - component: {fileID: 1107438210}
   - component: {fileID: 1107438212}
   - component: {fileID: 1107438213}
+  - component: {fileID: 1107438214}
   m_Layer: 0
   m_Name: Tile 32
   m_TagString: Tile
@@ -12221,6 +12456,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1107438214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1107438208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1116605763
 GameObject:
   m_ObjectHideFlags: 0
@@ -12467,6 +12719,7 @@ GameObject:
   - component: {fileID: 1140553798}
   - component: {fileID: 1140553800}
   - component: {fileID: 1140553801}
+  - component: {fileID: 1140553802}
   m_Layer: 0
   m_Name: Tile 28
   m_TagString: Tile
@@ -12600,6 +12853,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1140553802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1140553796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1150598455
 GameObject:
   m_ObjectHideFlags: 0
@@ -12710,6 +12980,7 @@ GameObject:
   - component: {fileID: 1157431726}
   - component: {fileID: 1157431728}
   - component: {fileID: 1157431729}
+  - component: {fileID: 1157431730}
   m_Layer: 0
   m_Name: Tile 23
   m_TagString: Tile
@@ -12843,6 +13114,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1157431730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1157431724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1163808912
 GameObject:
   m_ObjectHideFlags: 0
@@ -12856,6 +13144,7 @@ GameObject:
   - component: {fileID: 1163808914}
   - component: {fileID: 1163808916}
   - component: {fileID: 1163808917}
+  - component: {fileID: 1163808918}
   m_Layer: 0
   m_Name: Tile 1
   m_TagString: Tile
@@ -12989,6 +13278,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1163808918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163808912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1174828120
 GameObject:
   m_ObjectHideFlags: 0
@@ -13161,6 +13467,7 @@ GameObject:
   - component: {fileID: 1182906957}
   - component: {fileID: 1182906959}
   - component: {fileID: 1182906960}
+  - component: {fileID: 1182906961}
   m_Layer: 0
   m_Name: Tile 5
   m_TagString: Tile
@@ -13294,6 +13601,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1182906961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1182906955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1200636409
 GameObject:
   m_ObjectHideFlags: 0
@@ -13359,6 +13683,7 @@ GameObject:
   - component: {fileID: 1201915037}
   - component: {fileID: 1201915039}
   - component: {fileID: 1201915040}
+  - component: {fileID: 1201915041}
   m_Layer: 0
   m_Name: Tile 3
   m_TagString: Tile
@@ -13492,6 +13817,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1201915041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1201915035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1207727472
 GameObject:
   m_ObjectHideFlags: 0
@@ -13537,6 +13879,7 @@ GameObject:
   - component: {fileID: 1214995072}
   - component: {fileID: 1214995074}
   - component: {fileID: 1214995075}
+  - component: {fileID: 1214995076}
   m_Layer: 0
   m_Name: Tile 21
   m_TagString: Tile
@@ -13670,6 +14013,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1214995076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1214995070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1227188846
 GameObject:
   m_ObjectHideFlags: 0
@@ -13798,6 +14158,7 @@ GameObject:
   - component: {fileID: 1233021887}
   - component: {fileID: 1233021889}
   - component: {fileID: 1233021890}
+  - component: {fileID: 1233021891}
   m_Layer: 0
   m_Name: Tile 22
   m_TagString: Tile
@@ -13931,6 +14292,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1233021891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1233021885}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1234847837
 GameObject:
   m_ObjectHideFlags: 0
@@ -14028,6 +14406,7 @@ GameObject:
   - component: {fileID: 1245416449}
   - component: {fileID: 1245416450}
   - component: {fileID: 1245416451}
+  - component: {fileID: 1245416452}
   m_Layer: 0
   m_Name: Tile 6
   m_TagString: Tile
@@ -14161,6 +14540,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1245416452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1245416446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1248244944
 GameObject:
   m_ObjectHideFlags: 0
@@ -14309,6 +14705,7 @@ GameObject:
   - component: {fileID: 1271468937}
   - component: {fileID: 1271468939}
   - component: {fileID: 1271468940}
+  - component: {fileID: 1271468941}
   m_Layer: 0
   m_Name: Tile 2
   m_TagString: Tile
@@ -14442,6 +14839,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1271468941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1271468935}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1286001520
 GameObject:
   m_ObjectHideFlags: 0
@@ -15053,6 +15467,7 @@ GameObject:
   - component: {fileID: 1334508147}
   - component: {fileID: 1334508149}
   - component: {fileID: 1334508150}
+  - component: {fileID: 1334508151}
   m_Layer: 0
   m_Name: Tile 10
   m_TagString: Tile
@@ -15186,6 +15601,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1334508151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334508145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1342503273
 GameObject:
   m_ObjectHideFlags: 0
@@ -15992,6 +16424,7 @@ GameObject:
   - component: {fileID: 1401319522}
   - component: {fileID: 1401319523}
   - component: {fileID: 1401319524}
+  - component: {fileID: 1401319525}
   m_Layer: 0
   m_Name: Tile 13
   m_TagString: Tile
@@ -16125,6 +16558,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1401319525
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1401319519}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1418717232
 GameObject:
   m_ObjectHideFlags: 0
@@ -16306,6 +16756,7 @@ GameObject:
   - component: {fileID: 1430700025}
   - component: {fileID: 1430700026}
   - component: {fileID: 1430700027}
+  - component: {fileID: 1430700028}
   m_Layer: 0
   m_Name: Tile 35
   m_TagString: Tile
@@ -16439,6 +16890,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1430700028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1430700022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1433090537
 GameObject:
   m_ObjectHideFlags: 0
@@ -16755,6 +17223,7 @@ GameObject:
   - component: {fileID: 1458758900}
   - component: {fileID: 1458758902}
   - component: {fileID: 1458758903}
+  - component: {fileID: 1458758904}
   m_Layer: 0
   m_Name: Tile 31
   m_TagString: Tile
@@ -16888,6 +17357,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1458758904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1458758898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1459267567
 GameObject:
   m_ObjectHideFlags: 0
@@ -17036,6 +17522,7 @@ GameObject:
   - component: {fileID: 1462083230}
   - component: {fileID: 1462083232}
   - component: {fileID: 1462083233}
+  - component: {fileID: 1462083234}
   m_Layer: 0
   m_Name: Tile 4
   m_TagString: Tile
@@ -17169,6 +17656,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1462083234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1462083228}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1471900402
 GameObject:
   m_ObjectHideFlags: 0
@@ -17646,6 +18150,7 @@ GameObject:
   - component: {fileID: 1511241824}
   - component: {fileID: 1511241826}
   - component: {fileID: 1511241827}
+  - component: {fileID: 1511241828}
   m_Layer: 0
   m_Name: Tile 15
   m_TagString: Tile
@@ -17779,6 +18284,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1511241828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511241822}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1514762906
 GameObject:
   m_ObjectHideFlags: 0
@@ -18059,6 +18581,7 @@ GameObject:
   - component: {fileID: 1538919563}
   - component: {fileID: 1538919564}
   - component: {fileID: 1538919565}
+  - component: {fileID: 1538919566}
   m_Layer: 0
   m_Name: Tile 7
   m_TagString: Tile
@@ -18192,6 +18715,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1538919566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1538919560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1547984911
 GameObject:
   m_ObjectHideFlags: 0
@@ -19849,6 +20389,7 @@ GameObject:
   - component: {fileID: 1713110896}
   - component: {fileID: 1713110897}
   - component: {fileID: 1713110898}
+  - component: {fileID: 1713110899}
   m_Layer: 0
   m_Name: Tile 12
   m_TagString: Tile
@@ -19982,6 +20523,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1713110899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1713110893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1714870871
 GameObject:
   m_ObjectHideFlags: 0
@@ -20219,6 +20777,7 @@ GameObject:
   - component: {fileID: 1734600832}
   - component: {fileID: 1734600834}
   - component: {fileID: 1734600835}
+  - component: {fileID: 1734600836}
   m_Layer: 0
   m_Name: Tile 30
   m_TagString: Tile
@@ -20352,6 +20911,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1734600836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1734600830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1738531371
 GameObject:
   m_ObjectHideFlags: 0
@@ -21191,6 +21767,7 @@ GameObject:
   - component: {fileID: 1871250367}
   - component: {fileID: 1871250368}
   - component: {fileID: 1871250369}
+  - component: {fileID: 1871250370}
   m_Layer: 0
   m_Name: Tile 18
   m_TagString: Tile
@@ -21324,6 +21901,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1871250370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1871250364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1876878054
 GameObject:
   m_ObjectHideFlags: 0
@@ -21337,6 +21931,7 @@ GameObject:
   - component: {fileID: 1876878057}
   - component: {fileID: 1876878058}
   - component: {fileID: 1876878059}
+  - component: {fileID: 1876878060}
   m_Layer: 0
   m_Name: Tile 9
   m_TagString: Tile
@@ -21470,6 +22065,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1876878060
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1876878054}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1881724363
 GameObject:
   m_ObjectHideFlags: 0
@@ -21558,6 +22170,7 @@ GameObject:
   - component: {fileID: 1899042517}
   - component: {fileID: 1899042518}
   - component: {fileID: 1899042519}
+  - component: {fileID: 1899042520}
   m_Layer: 0
   m_Name: Tile 8
   m_TagString: Tile
@@ -21691,6 +22304,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1899042520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1899042514}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &1915759818
 GameObject:
   m_ObjectHideFlags: 0
@@ -24055,6 +24685,7 @@ GameObject:
   - component: {fileID: 2127227037}
   - component: {fileID: 2127227038}
   - component: {fileID: 2127227039}
+  - component: {fileID: 2127227040}
   m_Layer: 0
   m_Name: Tile 19
   m_TagString: Tile
@@ -24188,6 +24819,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2127227040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2127227034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &2128898809
 GameObject:
   m_ObjectHideFlags: 0
@@ -24495,6 +25143,7 @@ GameObject:
   - component: {fileID: 2144392612}
   - component: {fileID: 2144392614}
   - component: {fileID: 2144392615}
+  - component: {fileID: 2144392616}
   m_Layer: 0
   m_Name: Tile 33
   m_TagString: Tile
@@ -24628,6 +25277,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2144392616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2144392610}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e308bf43a02d4c54c994f3154fefa700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  additiveMat: {fileID: 2100000, guid: ccb6dc9ef26f8214f911f8b5d491fe6a, type: 2}
+  scaleMul: 1.12
+  alphaMin: 0.25
+  alphaMax: 0.8
+  pulseSec: 0.75
 --- !u!1 &2145271004
 GameObject:
   m_ObjectHideFlags: 0

@@ -523,4 +523,18 @@ public class GridManagement : MonoBehaviour
         }
     }
 
+    public void ShowGlowForIndices(IEnumerable<int> indices, Color c)
+    {
+        foreach (var idx in indices)
+            if (tileObjects.TryGetValue(idx, out var go) && go)
+                (go.GetComponent<TileGlow>() ?? go.AddComponent<TileGlow>()).ShowGlow(c);
+    }
+    public void HideAllGlow()
+    {
+        foreach (var go in tileObjects.Values)
+            if (go && go.TryGetComponent<TileGlow>(out var tg))
+                tg.HideGlow();
+    }
+
+
 }
