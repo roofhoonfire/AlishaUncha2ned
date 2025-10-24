@@ -173,6 +173,7 @@ public class ActionData //여기 뭐 추가할 거면 carddragHandler로 수정�
     public int Dot_to; //도트 딜이 노리는 액터넘버
     public List<int> effectTiles = new();
     //public HitResolution? resolvedOutcome;
+    public List <string> blessList = new();
 
     [NonSerialized]
     public bool hasOtherExecutedSinceInsertion = false; //선공, 대처 결정용 변수
@@ -844,40 +845,7 @@ public class Overmind : MonoBehaviourPunCallbacks
      //   action.InitializeEffects();
 
     }
-    IEnumerator Rumble_Mult_After_Hook(int winner)
-    {
-      
-        //lr 패킷
-        var keys = players.Keys.ToList();
-
-        if (keys.Count < 2)
-        {
-            Debug.LogError("플레이어 수가 2명 미만입니다.");
-            yield break;
-        }
-
-        int var1ActorNum = keys[0];
-        int var2ActorNum = keys[1];
-
-        LocalRenderingData var1 = RenderingConverter.FromPlayer(players[var1ActorNum]);
-        LocalRenderingData var2 = RenderingConverter.FromPlayer(players[var2ActorNum]);
-
-        string var1json = JsonConvert.SerializeObject(var1);
-        string var2json = JsonConvert.SerializeObject(var2);
-        //lr 패킷
-
-
-
-
-        //여기서 출력되어야하는 애니메이션을 한번에 보여주면 됨 그냥(순차적으로)
-        //한번의 해프터 후커당 하나의 애니메이션이 출력된다고 생각해라 게이야 
-       
-            photonView.RPC(nameof(RPC_Rumble_Play_Multi_Action_M2C), RpcTarget.All, winner, var1json, var2json);
-
-        yield return new WaitUntil(() => syncCount == 2); //나중에 수정하든가 
-        syncCount = 0;
-
-    }
+    
     IEnumerator Rumble_Multi_Action_Calc(int ttActorNum1, int ttActorNum2, ActionData ttAction1, ActionData ttAction2, ActionData ttMainAction1, ActionData ttMainAction2, int winner)
         {
        
@@ -1392,6 +1360,16 @@ public class Overmind : MonoBehaviourPunCallbacks
 
 
 
+    [PunRPC]
+    void RPC_Log_Rendering_M2C(int actorNumber, string actionJson,  HookType h)
+    {
+        //actionJson2 는 가드시 상대 액션 애니메용
+        // GA_On은 가드 애니메이션 재생 여부 결정용
+        var action = JsonConvert.DeserializeObject<ActionData>(actionJson);
+
+        LogManager.Instance.Push(action, h);
+    }
+
 
 
 
@@ -1673,7 +1651,6 @@ public class Overmind : MonoBehaviourPunCallbacks
 
 
 
-
         //여기서 출력되어야하는 애니메이션을 한번에 보여주면 됨 그냥(순차적으로)
         //한번의 해프터 후커당 하나의 애니메이션이 출력된다고 생각해라 게이야 
         string actionJson = JsonConvert.SerializeObject(Nowhooker.action);
@@ -1682,6 +1659,12 @@ public class Overmind : MonoBehaviourPunCallbacks
         photonView.RPC(nameof(RPC_Norm_Play_Action_M2C), RpcTarget.All, Nowhooker.actorNum, actionJson, var1json, var2json, h, actionJson2, isGA);
         
          yield return new WaitUntil(() => syncCount == 2); //나중에 수정하든가 
+        syncCount = 0;
+
+
+        photonView.RPC(nameof(RPC_Log_Rendering_M2C), RpcTarget.All, Nowhooker.actorNum, actionJson, h);
+
+        yield return new WaitUntil(() => syncCount == 2); //나중에 수정하든가 
         syncCount = 0;
 
     }
@@ -1722,8 +1705,53 @@ public class Overmind : MonoBehaviourPunCallbacks
         yield return new WaitUntil(() => syncCount == 2); //나중에 수정하든가 
         syncCount = 0;
 
+
+        photonView.RPC(nameof(RPC_Log_Rendering_M2C), RpcTarget.All, Nowhooker.actorNum, actionJson, h);
+
+        yield return new WaitUntil(() => syncCount == 2); //나중에 수정하든가 
+        syncCount = 0;
     }
 
+    IEnumerator Rumble_Mult_After_Hook(int winner)
+    {
+
+        //lr 패킷
+        var keys = players.Keys.ToList();
+
+        if (keys.Count < 2)
+        {
+            Debug.LogError("플레이어 수가 2명 미만입니다.");
+            yield break;
+        }
+
+        int var1ActorNum = keys[0];
+        int var2ActorNum = keys[1];
+
+        LocalRenderingData var1 = RenderingConverter.FromPlayer(players[var1ActorNum]);
+        LocalRenderingData var2 = RenderingConverter.FromPlayer(players[var2ActorNum]);
+
+        string var1json = JsonConvert.SerializeObject(var1);
+        string var2json = JsonConvert.SerializeObject(var2);
+        //lr 패킷
+
+
+
+
+        //여기서 출력되어야하는 애니메이션을 한번에 보여주면 됨 그냥(순차적으로)
+        //한번의 해프터 후커당 하나의 애니메이션이 출력된다고 생각해라 게이야 
+
+        photonView.RPC(nameof(RPC_Rumble_Play_Multi_Action_M2C), RpcTarget.All, winner, var1json, var2json);
+
+        yield return new WaitUntil(() => syncCount == 2); //나중에 수정하든가 
+        syncCount = 0;
+
+
+     //   photonView.RPC(nameof(RPC_Log_Rendering_M2C), RpcTarget.All, Nowhooker.actorNum, actionJson, h);
+
+       // yield return new WaitUntil(() => syncCount == 2); //나중에 수정하든가 
+        //syncCount = 0;
+
+    }
     IEnumerator Dot_After_Hook((int actorNum, ActionData action) Nowhooker, HookType h)
     {
         if (!Nowhooker.action.effects.Any(effect => effect.hookType == h)) //이번 액션에 해당 훅없으면 스킵.
@@ -1760,6 +1788,10 @@ public class Overmind : MonoBehaviourPunCallbacks
         yield return new WaitUntil(() => syncCount == 2); //나중에 수정하든가 
         syncCount = 0;
 
+        photonView.RPC(nameof(RPC_Log_Rendering_M2C), RpcTarget.All, Nowhooker.actorNum, actionJson, h);
+
+        yield return new WaitUntil(() => syncCount == 2); //나중에 수정하든가 
+        syncCount = 0;
     }
 
 

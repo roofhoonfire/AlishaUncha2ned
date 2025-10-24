@@ -212,6 +212,10 @@ public class CardDragHandler : MonoBehaviour,
                 btmPacketAdd(thisCardData.code);
                 Destroy(gameObject);
 
+                //쓴 블레스 추가 
+
+                CardModeState.Instance.curAction.blessList.Add(thisCardData.code);
+
                 LocalState.Instance.PlayerObDic[PhotonNetwork.LocalPlayer.ActorNumber]
                     .GetComponentInChildren<Animator>()
                     .SetTrigger("Trig_Support_Buff");
@@ -232,6 +236,8 @@ public class CardDragHandler : MonoBehaviour,
                         Debug.Log("support added");
                     }
                 }
+                CardModeState.Instance.curAction.blessList.Add(thisCardData.code);
+
                 CardModeState.Instance.ActionPacketUpgrade(apData);
 
                 btmPacketAdd(thisCardData.code);

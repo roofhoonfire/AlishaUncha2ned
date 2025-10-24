@@ -11,7 +11,7 @@ c3,Activate,Damage,0,0
 c4 ,Activate,Damage,0,0
 c4 ,Priority,DamageMeBangMoo,10,0
 c5,Activate,Damage,0,0
-c5,Counter,whenDamaged_FlagOn,1,0
+c5,Counter,whenDamaged_FlagOn,101,0
 c5,Counter,DamageMeBangMoo,10,1
 c5,Counter,Flag_Off,1,1
 c6,Activate,Damage,0,0
@@ -109,7 +109,7 @@ c33,Counter,ReduceMyNextTurnActionClock,-5,1
 c33,Counter,AddDamage,10,1
 c33,Counter,GetDefense,10,1
 c33,Counter,Flag_Off,1,1
-c35,Counter,whenDamaged_FlagOn,1,0
+c35,Counter,whenDamaged_FlagOn,101,0
 c35,Activate,withOutFlag_FlagOn,102,0
 c35,Activate,Get_Element,1,2
 c35,Activate,Get_Element,2,2
