@@ -310,8 +310,8 @@ public class CardModeState : MonoBehaviour
 
         int delta_cast = apData.permCast + apData.tempCast;
         int delta_def = apData.tempDef + apData.permDef;
-
-        if (delta_cast == 0 && delta_def == 0) return;
+        int delta_dam = apData.tempDam + apData.permDam;
+        if (delta_cast == 0 && delta_def == 0 && delta_dam==0) return;
 
         foreach (var card in spawnedCards)
         {
@@ -323,12 +323,15 @@ public class CardModeState : MonoBehaviour
             // 이름 기준 깊이 탐색으로 TMP 바로 가져오기 (자식의 자식 대응)
             var tmpTime = card.transform.FindComponentByNameDeep<TextMeshProUGUI>("TimeClock");
             var tmpDef = card.transform.FindComponentByNameDeep<TextMeshProUGUI>("Defense");
+            var tmpPT = card.transform.FindComponentByNameDeep<TextMeshProUGUI>("pt");
 
             if (tmpTime != null && int.TryParse(tmpTime.text, out int v1))
                 tmpTime.text = Mathf.Max(apData.CastingMinumum, v1 + delta_cast).ToString();
 
             if (tmpDef != null && int.TryParse(tmpDef.text, out int v2))
                 tmpDef.text = Mathf.Max(0, v2 + delta_def).ToString();
+           
+            tmpPT.text = info.cardData.GetDisplayText("damage", delta_dam);
         }
     }
 }

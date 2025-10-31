@@ -27,7 +27,7 @@ public class EachCardInfo : MonoBehaviour
             if (cardData != null && nameText != null)
             {
                 nameText.text = cardData.name;
-                playtext.text = cardData.cardText.Replace("\\n", "\n"); ;
+                playtext.text = cardData.GetDisplayText();
                 rumble.text = cardData.rumblePoint.ToString();
                 defense.text = cardData.defense.ToString();
                 clock.text = cardData.actionClock.ToString();

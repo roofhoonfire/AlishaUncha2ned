@@ -1,5 +1,5 @@
 code,cardType,name,sprite,animation,actionClock,rumblePoint,damage,defense,disappear,mana,tileType,zoneIndex,energy,cardText
-c1,0,빠른 집행,ActionCards/AC_C1,,6,2,15,10,0,0,0,0,,피해를 15 줍니다 \n 선공 : 피해를 15 추가로 줍니다
+c1,0,빠른 집행,ActionCards/AC_C1,,6,2,15,10,0,0,0,0,,피해를 {damage} 줍니다 \n 선공 : 피해를 15 추가로 줍니다
 c2,0,십자베기,ActionCards/AC_C2,,8,3,25,10,0,0,0,2,,피해를 25 줍니다 \n 
 c3 ,0,공방 일체 ,ActionCards/AC_C3,,9,3,20,5,0,0,0,0,,피해를 20 줍니다 \n 대처 : 공격을 받으면 방어도를 10 얻습니다
 c4,0,사악한 찌르기,ActionCards/AC_C4,,2,1,20,0,0,0,0,3,,피해를 20줍니다 \n 선공 : 자신에게 피해를 10줍니다

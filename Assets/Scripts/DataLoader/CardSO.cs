@@ -32,6 +32,18 @@ public class Card
     public int damage;
 
     public string cardText;
+
+    public string GetDisplayText()
+    {
+        return CardTextFormatter.Resolve(cardText, this);
+    }
+    // 확장: 특정 필드(placeHolderName)만 delta를 더해서 치환
+
+    public string GetDisplayText(string placeHolderName, int delta)
+    {
+        Debug.Log($"{placeHolderName}, {delta}가보자구 ");
+        return CardTextFormatter.Resolve(cardText, this, placeHolderName, delta);
+    }
 }
 public enum HookType { Activate, Priority, IQA, Counter, Guard ,BeforeRumble, RumbleWin, RumbleLose, Combo, Support, Dot }
 public enum EffectType {

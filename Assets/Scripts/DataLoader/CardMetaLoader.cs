@@ -53,6 +53,7 @@ public static class CardMetaDatabase // 이름은 데이터 베이스지만 실제 메타 데이�
 
         try
         {
+            string cardTextRaw = cols.Length > 14 ? string.Join(",", cols.Skip(14)) : string.Empty;
             return new Card
             {
                 code = cols[0].Trim(),
@@ -62,14 +63,14 @@ public static class CardMetaDatabase // 이름은 데이터 베이스지만 실제 메타 데이�
                 animations = LoadAnimations(cols[4]),
                 actionClock = TryParseInt(cols[5], 0),
                 rumblePoint = TryParseInt(cols[6], 0),
-                damage = TryParseInt(cols[7], 0),    // ★ damage 추가됨
+                damage = TryParseInt(cols[7], 0),
                 defense = TryParseInt(cols[8], 0),
                 disappear = TryParseInt(cols[9], 0),
                 mana = TryParseInt(cols[10], 0),
                 tileType = TryParseInt(cols[11], 0),
                 zoneIndex = TryParseInt(cols[12], 0),
                 energy = TryParseInt(cols[13], 0),
-                cardText = cols.Length > 14 ? cols[14].Trim() : string.Empty, // 혹시 cardText 컬럼이 빠졌으면 빈 문자열 처리
+                cardText = cardTextRaw.Trim(),  // 원문 템플릿 그대로 저장(개행은 표시 시 변환)
             };
         }
         catch (Exception e)
