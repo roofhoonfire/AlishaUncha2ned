@@ -129,6 +129,11 @@ public class LogIconHoverPreview_ActionData : MonoBehaviour, IPointerEnterHandle
                 {
                     var desc = card.cardText ?? string.Empty;
                     desc = NormalizeDesc(desc);
+
+                    // ★ 추가: {damage} 치환
+                    // (없으면 아무 변화 없음)
+                    desc = desc.Replace("{damage}", ad.damage.ToString());
+
                     ptText.text = desc;
                 }
 
@@ -160,6 +165,7 @@ public class LogIconHoverPreview_ActionData : MonoBehaviour, IPointerEnterHandle
                      .SetEase(fadeInEase)
                      .SetUpdate(useUnscaledTime);
     }
+
 
     private void HidePreview()
     {

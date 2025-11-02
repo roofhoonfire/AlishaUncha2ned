@@ -306,12 +306,14 @@ public class Overmind : MonoBehaviourPunCallbacks
 
     private int syncCount = 0;
 
-
+    private int actionPreviewSyncp1 = 0;
+    private int actionPreviewSyncp2 = 0;
 
     public bool GA_On = false;
 
     public int initialHP = 100;
 
+    private readonly Dictionary<int, Coroutine> waitPreviewSyncRoutines = new();
 
 
     public string extraSelectionJson;
@@ -1094,12 +1096,105 @@ public class Overmind : MonoBehaviourPunCallbacks
         Action_Selection_Result_Calc(actorNumber, btm, action);
 
         //여기서 다시 M2C로 채워 넣게 해주면 될 것이다 크크큭
+        //액션 싱크 체크 
 
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // 모든 클라(마스터 포함)에게 프리뷰 데이터 전파
+            photonView.RPC(nameof(Sync_Action_Preview_M2C), RpcTarget.All, actorNumber, actionjson);
+
+            // actorNumber에 맞는 대기 코루틴 시작(이미 돌고 있으면 교체)
+            StartWaitForPreviewSync(actorNumber, cost, action);
+        }
+
+
+
+
+
+
+
+    }
+
+    private void StartWaitForPreviewSync(int actorNumber, int cost, ActionData action)
+    {
+        if (waitPreviewSyncRoutines.TryGetValue(actorNumber, out var co) && co != null)
+            StopCoroutine(co);
+
+        var routine = StartCoroutine(WaitForActionPreviewSync(actorNumber, cost, action));
+        waitPreviewSyncRoutines[actorNumber] = routine;
+    }
+
+    private IEnumerator WaitForActionPreviewSync(int actorNumber, int cost, ActionData action)
+    {
+        if (actorNumber == 1)
+        {
+            while (actionPreviewSyncp1 < 2) yield return null; // 두 클라의 ACK 도착까지
+            actionPreviewSyncp1 = 0;                           // 리셋
+        }
+        else if (actorNumber == 2)
+        {
+            while (actionPreviewSyncp2 < 2) yield return null;
+            actionPreviewSyncp2 = 0;
+        }
+        else
+        {
+            yield break; // 정의된 액터 범위 밖이면 즉시 종료
+        }
+
+        waitPreviewSyncRoutines[actorNumber] = null;
+
+        // 필요 시: 여기서 다음 단계 로직 진행 (예: 큐 정합성 확인/연출 트리거 등)
+        // ProceedAfterPreviewSync(actorNumber);
+
+       
+        
+        
+        
+        
+        
+        
+        
+        
         pendingSelections[actorNumber] = (action, cost);
 
     }
 
+    // ---- 클라이언트들이 받는 M2C: 로컬 프리뷰 데이터 저장 후 마스터에 ACK ----
+    [PunRPC]
+    void Sync_Action_Preview_M2C(int actorNumber, string actionjson)
+    {
+        var action = JsonConvert.DeserializeObject<ActionData>(actionjson);
 
+        // 프리뷰에 사용할 로컬 액션 캐시 갱신
+        LocalRenderingStatic.localRenderingActions[actorNumber] = action;
+
+       
+        // 마스터에게 동기화 완료 ACK
+        photonView.RPC(nameof(Sync_Action_Preview_C2M), RpcTarget.MasterClient, actorNumber);
+
+        if (actorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
+        {
+            LocalRenderingManager.Instance.myCardCode.myCardCode = action.cardcode;
+        }
+        else
+        {
+            LocalRenderingManager.Instance.opCardCode.opCardCode = action.cardcode;
+
+        }
+    }
+
+    // ---- C2M: 마스터가 ACK 카운트만 증가 ----
+    [PunRPC]
+    void Sync_Action_Preview_C2M(int actorNumber)
+    {
+        if (!PhotonNetwork.IsMasterClient) return;
+
+        if (actorNumber == 1)
+            actionPreviewSyncp1 = Mathf.Min(actionPreviewSyncp1 + 1, 2); // 관전자 존재 시 과증가 방지
+        else if (actorNumber == 2)
+            actionPreviewSyncp2 = Mathf.Min(actionPreviewSyncp2 + 1, 2);
+    }
 
 
 

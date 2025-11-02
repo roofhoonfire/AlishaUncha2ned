@@ -124,8 +124,8 @@ public class LocalRenderingManager : MonoBehaviour
         List<RenderDiff> diffs = CopyandDifferences(data1, data2);
         ApplyDiffsToLocalRenderingData(diffs);
 
-        myCardCode.myCardCode = LocalRenderingStatic.localRenderingDatas[myActor].myCard;
-        opCardCode.opCardCode = LocalRenderingStatic.localRenderingDatas[Overmind.Instance.GetOtherPlayerNumber(myActor)].myCard;
+        //myCardCode.myCardCode = LocalRenderingStatic.localRenderingDatas[myActor].myCard;
+        //opCardCode.opCardCode = LocalRenderingStatic.localRenderingDatas[Overmind.Instance.GetOtherPlayerNumber(myActor)].myCard;
 
 
         // 진행 중이면 정리하고 새로 시작 (원하면 Kill 생략 가능)

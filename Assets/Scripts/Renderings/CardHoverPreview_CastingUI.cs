@@ -3,8 +3,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
-using UnityEditor.Rendering;
 using UnityEngine.UI; // ★ Image 사용
+using Photon.Pun;
 
 public class CardHoverPreview_CastingUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -59,6 +59,18 @@ public class CardHoverPreview_CastingUI : MonoBehaviour, IPointerEnterHandler, I
             _cg.interactable = false;
         }
     }
+    private ActionData GetPreviewActionForThisHover()
+    {
+        int localActor = (PhotonNetwork.LocalPlayer != null) ? PhotonNetwork.LocalPlayer.ActorNumber : -1;
+        if (localActor < 0) return null;
+
+        int targetActor = isOp
+            ? Overmind.Instance.GetOtherPlayerNumber(localActor)
+            : localActor;
+
+        LocalRenderingStatic.localRenderingActions.TryGetValue(targetActor, out var act);
+        return act;
+    }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
@@ -81,7 +93,6 @@ public class CardHoverPreview_CastingUI : MonoBehaviour, IPointerEnterHandler, I
         }
         ShowPreviewNow();
     }
-
     private void ShowPreviewNow()
     {
         if (previewRoot == null) return;
@@ -89,52 +100,66 @@ public class CardHoverPreview_CastingUI : MonoBehaviour, IPointerEnterHandler, I
         EnsureCanvasGroup();
 
         _fadeTween?.Kill();
-
-        // 활성/비활성 토글 없이, 텍스트/이미지 초기화 → 데이터 채움 → 알파 페이드 인
         ClearFields();
 
         string code = isOp ? opCardCode : myCardCode;
         if (string.IsNullOrEmpty(code))
-        {
-            // if (tooltiptriggerDis) tooltiptriggerDis.description = "캐스팅 중인 액션이 없습니다";
             return;
+
+        // ① 이번 프리뷰 대상 액터의 액션(로컬 캐시) 가져오기
+        var act = GetPreviewActionForThisHover();
+
+        // ② 카드 원본 조회(이름/이미지/설명은 카드 기준)
+        var card = (CardCSVLoader.Instance != null)
+            ? CardCSVLoader.Instance.GetCardByCode(code)
+            : null;
+
+        // ③ 숫자 정보 채우기: act 우선, 없으면 카드 값으로 폴백
+        if (act != null)
+        {
+            if (timeClockText) timeClockText.text = act.actionClock.ToString();
+            if (defenseText) defenseText.text = act.defense.ToString();
+            if (rumbleText) rumbleText.text = act.rumblePoint.ToString();
+        }
+        else if (card != null)
+        {
+            if (timeClockText) timeClockText.text = card.actionClock.ToString();
+            if (defenseText) defenseText.text = card.defense.ToString();
+            if (rumbleText) rumbleText.text = card.rumblePoint.ToString();
         }
 
-        if (CardCSVLoader.Instance != null)
+        // ④ 이름/이미지/설명: 카드 원본 + {damage} 치환
+        if (card != null)
         {
-            var card = CardCSVLoader.Instance.GetCardByCode(code);
-            if (card != null)
+            if (nameText) nameText.text = card.name ?? string.Empty;
+
+            string desc = card.cardText ?? string.Empty;
+            desc = desc.Replace("\\r\\n", "\n")
+                       .Replace("\\n", "\n")
+                       .Replace("<br>", "\n")
+                       .Replace("<br/>", "\n");
+
+            if (act != null)
+                desc = desc.Replace("{damage}", act.damage.ToString());
+
+            if (ptText) ptText.text = desc;
+
+            if (previewImage != null)
             {
-                // ===== 텍스트 채우기 =====
-                if (timeClockText) timeClockText.text = card.actionClock.ToString();
-                if (defenseText) defenseText.text = card.defense.ToString();
-                if (rumbleText) rumbleText.text = card.rumblePoint.ToString();
-                if (nameText) nameText.text = card.name ?? string.Empty;
-
-                var desc = card.cardText ?? string.Empty;
-                desc = desc.Replace("\\r\\n", "\n").Replace("\\n", "\n").Replace("<br>", "\n").Replace("<br/>", "\n");
-                if (ptText) ptText.text = desc;
-
-                // ===== 이미지 채우기 =====
-                if (previewImage != null)
-                {
-                    previewImage.sprite = card.sprite;         // ★ card.sprite 사용
-                    previewImage.enabled = (previewImage.sprite != null);
-                }
-
-                // if (tooltiptriggerDis) tooltiptriggerDis.description = $"{card.name}의 캐스팅까지 남은시간";
+                previewImage.sprite = card.sprite;
+                previewImage.enabled = (previewImage.sprite != null);
             }
         }
 
         _cg.blocksRaycasts = false;
         _cg.interactable = false;
 
-        // 알파만 0 → 1
         _cg.alpha = 0f;
         _fadeTween = _cg.DOFade(1f, fadeInDuration)
                      .SetEase(fadeInEase)
                      .SetUpdate(useUnscaledTime);
     }
+
 
     private void HidePreview()
     {

@@ -86,6 +86,8 @@ MonoBehaviour:
   - RPC_Rumble_Play_Multi_Action_M2C
   - RPC_CycleSync_M2C
   - RPC_Log_Rendering_M2C
+  - Sync_Action_Preview_C2M
+  - Sync_Action_Preview_M2C
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
