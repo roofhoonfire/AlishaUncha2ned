@@ -121,7 +121,7 @@ public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 
 
         //기찮으므로로로로루뢰뢰
         Bounds = new List<string> {"b1", "b3", "b4","b5","b6","b7" };
-        JujuCode = new List<string> { "j10", "j11", "j12" };
+        JujuCode = new List<string> { "j1", "j2", "j3", "j5" ,"j8" , "j11" };
 
 
 
@@ -619,6 +619,10 @@ public class Overmind : MonoBehaviourPunCallbacks
         string var1json = JsonConvert.SerializeObject(var1);
         string var2json = JsonConvert.SerializeObject(var2);
 
+
+
+
+
         photonView.RPC(nameof(RPC_After_Action_Selection_Sync_M2C), RpcTarget.All, var1json, var2json, cycleState);
         yield return new WaitUntil(() => syncCount == 2);
         syncCount = 0;
@@ -1089,7 +1093,7 @@ public class Overmind : MonoBehaviourPunCallbacks
 
         Action_Selection_Result_Calc(actorNumber, btm, action);
 
-
+        //여기서 다시 M2C로 채워 넣게 해주면 될 것이다 크크큭
 
         pendingSelections[actorNumber] = (action, cost);
 
@@ -1367,7 +1371,11 @@ public class Overmind : MonoBehaviourPunCallbacks
         // GA_On은 가드 애니메이션 재생 여부 결정용
         var action = JsonConvert.DeserializeObject<ActionData>(actionJson);
 
-        LogManager.Instance.Push(action, h);
+        if (h == HookType.Dot)
+            LogManager.Instance.Push(action, h, action.Dot_to);
+
+        else 
+            LogManager.Instance.Push(action, h, actorNumber);
     }
 
 
@@ -2146,7 +2154,7 @@ public class Overmind : MonoBehaviourPunCallbacks
              var BC_ret =    BoundChecker.BoundCheck(cycleState);
                 //    yield return new WaitUntil(() => syncCount == 2);
                 //   syncCount = 0;
-
+            //카운트 동기화 오류로 여기를 건드렷다1!!>!>!>!
                 CallRPCJuju(cycleState, BC_ret.ret_bound, BC_ret.ret_check);
                 yield return new WaitUntil(() => syncCount == 2);
                 Debug.Log("여기 못온거잖아 그치?");

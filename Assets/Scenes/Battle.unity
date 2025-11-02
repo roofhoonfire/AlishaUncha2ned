@@ -17214,10 +17214,14 @@ MonoBehaviour:
   settleTime: 0.1
   popUpEase: 27
   settleEase: 7
-  action: {fileID: 21300000, guid: b19190bee8195a148a76762ceb880eac, type: 3}
-  counter: {fileID: 21300000, guid: 05dd713ffd78c9e47b421be2547ea4a0, type: 3}
-  dot: {fileID: 21300000, guid: 7a9c7aa9aae264b41aba61f3ffa212c4, type: 3}
-  guard: {fileID: 21300000, guid: f03e810f44967e64da752f4277ec3107, type: 3}
+  action_me: {fileID: 21300000, guid: 69ccb71ed9faf7f4d8899877f2293948, type: 3}
+  action_op: {fileID: 21300000, guid: 24595767cfdb0614ebde934f6bdb102e, type: 3}
+  counter_me: {fileID: 21300000, guid: b143a38a16beaa84e8486ba20ebbd15b, type: 3}
+  counter_op: {fileID: 21300000, guid: 26aaf5e5dff96a046afa774ed80d10ab, type: 3}
+  dot_me: {fileID: 21300000, guid: fdae5e36995951f4e9c3994bd36f593a, type: 3}
+  dot_op: {fileID: 21300000, guid: b927a0ad5bcccfb4d81391e3b50c6727, type: 3}
+  guard_me: {fileID: 21300000, guid: 484efe643d2f2134e921e9ac668a7f51, type: 3}
+  guard_op: {fileID: 21300000, guid: 96de7c59432a9044bab97322515ad598, type: 3}
   previewRoot: {fileID: 593586528}
   previewImage: {fileID: 1083330417}
   blessRoots:

@@ -77,7 +77,7 @@ public class LocalRenderingData
 public class LocalRenderingStatic : MonoBehaviour
 {
     public static Dictionary<int, LocalRenderingData> localRenderingDatas = new Dictionary<int, LocalRenderingData>();
-
+    public static Dictionary <int, ActionData> localRenderingActions = new Dictionary<int, ActionData>();
 
    
 

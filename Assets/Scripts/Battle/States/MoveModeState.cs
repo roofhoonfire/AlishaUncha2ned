@@ -190,17 +190,20 @@ public class MoveModeState : MonoBehaviour
 
                     // 코루틴/연출 정리 먼저
                     StopSelectDestLoop();
+                    int actualCost = Mathf.Min(distance, apData.defaultMoveCast);
 
                     // 액션 제출
                     ActionData action = new ActionData
                     {
                         actionId = 0,
-                        destindex = destinationIndex
+                        destindex = destinationIndex,
+                        actionClock = actualCost,
+                        cardcode = "c972",
+                        
                     };
                     CardEffect moveEffect = new CardEffect(HookType.Activate, EffectType.Move, destinationIndex, 0);
                     action.effects.Add(moveEffect);
 
-                    int actualCost = Mathf.Min(distance, apData.defaultMoveCast);
                     Overmind.Instance?.SubmitSelection(action, actualCost, actorNum, LocalState.Instance.btmPacket);
 
                     isActive = false;

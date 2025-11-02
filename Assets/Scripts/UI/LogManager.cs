@@ -27,15 +27,15 @@ public class LogManager : MonoBehaviour
     [SerializeField] private Ease popUpEase = Ease.OutBack;
     [SerializeField] private Ease settleEase = Ease.InOutQuad;
 
-    [Header("Sprites (Drag & Drop 이미지 파일)")]
-    [Tooltip("기본 액션/발동(Activate)")]
-    public Sprite action;
-    [Tooltip("카운터/대처(Counter)")]
-    public Sprite counter;
-    [Tooltip("도트/지속 피해(Dot)")]
-    public Sprite dot;
-    [Tooltip("가드/방어(Guard)")]
-    public Sprite guard;
+    [Header("Sprites - Me/Op (선택)")]
+    public Sprite action_me;
+    public Sprite action_op;
+    public Sprite counter_me;
+    public Sprite counter_op;
+    public Sprite dot_me;
+    public Sprite dot_op;
+    public Sprite guard_me;
+    public Sprite guard_op;
 
     // === Hovering Preview ===
     [Header("Hovering Preview")]
@@ -91,7 +91,7 @@ public class LogManager : MonoBehaviour
     /// <summary>
     /// 외부에서 호출 — ActionData를 큐잉하고 코루틴 시작
     /// </summary>
-    public void Push(ActionData data, HookType h)
+    public void Push(ActionData data, HookType h, int actorNum)
     {
         if (data == null)
         {
@@ -99,16 +99,23 @@ public class LogManager : MonoBehaviour
             return;
         }
 
-        Debug.Log($"[LogManager] Push — HookType: {h}, name: {data.cardname}, code: {data.cardcode}");
-        StartCoroutine(AddLogRoutine(data, h));
+        int localActor = (PhotonNetwork.LocalPlayer != null)
+            ? PhotonNetwork.LocalPlayer.ActorNumber
+            : -1;
+
+        bool isMine = (actorNum == localActor);
+
+        Debug.Log($"[LogManager] Push — HookType:{h}, name:{data.cardname}, code:{data.cardcode}, actor:{actorNum}, local:{localActor}, isMine:{isMine}");
+        StartCoroutine(AddLogRoutine(data, h, isMine));
     }
+
 
     /// <summary>
     /// 리스트/아이콘 추가 + 용량 관리 + 생성 애니 + 스프라이트 적용 + 프리뷰 주입
     /// </summary>
-    private IEnumerator AddLogRoutine(ActionData data, HookType h)
+    private IEnumerator AddLogRoutine(ActionData data, HookType h, bool isMine)
     {
-        // 1) 용량 관리 (FIFO)
+        // (기존: 용량 관리/FIFO 그대로)
         if (_actions.Count >= capacity)
         {
             _actions.RemoveAt(0);
@@ -120,41 +127,39 @@ public class LogManager : MonoBehaviour
             }
         }
 
-        // 2) 새 데이터 추가
         _actions.Add(data);
 
-        // 3) UI 아이콘 인스턴스
         if (logIconPrefab != null && logArea != null)
         {
             GameObject go = Instantiate(logIconPrefab, logArea);
 
-            // (0) 액션데이터 주입
             var info = go.GetComponent<EachLogIconInfo>();
             if (info != null) info.actionData = data;
 
-            // (A) 생성 애니
             Transform visual = FindVisual(go.transform);
             if (visual != null)
             {
                 visual.DOKill(true);
                 visual.localScale = Vector3.one;
 
-                Sequence seq = DOTween.Sequence();
-                seq.Append(visual.DOScale(Vector3.one * popScale, popUpTime).SetEase(popUpEase))
-                   .Append(visual.DOScale(Vector3.one, settleTime).SetEase(settleEase));
+                DOTween.Sequence()
+                    .Append(visual.DOScale(Vector3.one * popScale, popUpTime).SetEase(popUpEase))
+                    .Append(visual.DOScale(Vector3.one, settleTime).SetEase(settleEase))
+                    .SetTarget(visual);
             }
 
-            // (B) 훅 스프라이트
-            TryApplyHookSprite(go, h);
+            // ★ me/op 기준으로 스프라이트 적용
+            TryApplyHookSprite(go, h, isMine);
 
-            // (C) Hover 프리뷰 주입 (previewRoot / previewImage / blessRoots)
+            // 프리뷰 바인딩 기존대로
             TryBindHoverPreview(go);
 
             _icons.Add(go);
         }
 
-        // (선택) 렌더링 완료 콜백
-        Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
+        // 렌더링 완료 콜백 기존대로
+        if (Overmind.Instance != null)
+            Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
 
         yield return null;
     }
@@ -185,25 +190,12 @@ public class LogManager : MonoBehaviour
         if (fBless != null && blessRoots != null) fBless.SetValue(hover, blessRoots);
     }
 
-    /// <summary>
-    /// HookType → Sprite 매핑
-    /// </summary>
-    private Sprite GetSpriteForHook(HookType h)
-    {
-        switch (h)
-        {
-            case HookType.Activate: return action != null ? action : null;
-            case HookType.Guard: return guard != null ? guard : null;
-            case HookType.Dot: return dot != null ? dot : null;
-            case HookType.Counter: return counter != null ? counter : null;
-            default: return action;
-        }
-    }
+
 
     /// <summary>
     /// 아이콘 프리팹의 Hook Image에 스프라이트 적용
     /// </summary>
-    private void TryApplyHookSprite(GameObject iconGO, HookType h)
+    private void TryApplyHookSprite(GameObject iconGO, HookType h, bool isMine)
     {
         var info = iconGO.GetComponent<EachLogIconInfo>();
         if (info == null)
@@ -219,17 +211,41 @@ public class LogManager : MonoBehaviour
             return;
         }
 
-        var sprite = GetSpriteForHook(h);
+        var sprite = GetSpriteForHook(h, isMine);
         if (sprite == null)
         {
-            Debug.LogWarning($"[LogManager] Sprite for HookType {h} is null. Assign in inspector.");
+            Debug.LogWarning($"[LogManager] Sprite for HookType {h} (isMine:{isMine}) is null. Assign in inspector.");
             return;
         }
 
         img.sprite = sprite;
         img.preserveAspect = true;
         img.enabled = true;
+
+        img.color = isMine
+        ? new Color32(250, 255, 220, 255)
+        : new Color32(255, 221, 221, 255);
     }
+
+    private Sprite GetSpriteForHook(HookType h, bool isMine)
+    {
+        switch (h)
+        {
+            case HookType.Activate:
+                return isMine ? action_me : action_op;
+            case HookType.Counter:
+                return isMine ? counter_me : counter_op;
+            case HookType.Dot:
+                return isMine ? dot_me : dot_op;
+            case HookType.Guard:
+                return isMine ? guard_me : guard_op;
+            default:
+                // 알 수 없는 훅 타입은 '액션' 계열로 폴백
+                return isMine ? action_me : action_op;
+        }
+    }
+
+
 
     /// <summary>
     /// 자식 중 이름이 "Visual"인 Transform을 찾아 반환(없으면 루트)

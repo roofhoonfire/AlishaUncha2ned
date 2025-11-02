@@ -121,6 +121,7 @@ public class JujuSelectModeState : MonoBehaviour
 
                         var jujuCode = juju.GetComponent<EachJujuInfo>().jujuCode;
                         StopSelectJujuLoop(jujuCode);
+                        return;
                     }
                 }
             }
