@@ -13,7 +13,9 @@ public class CardModeState : MonoBehaviour
     [Header("Card UI")]
     public GameObject cardPrefab;
     public RectTransform cardContentArea;
-
+    [Header("Input Locks")]
+    [SerializeField] private bool cancelLocked = false;  // ← 필드(Inspector 노출)
+    public bool CancelLocked => cancelLocked;
     // Buffer
     public ActionData curAction;
     public int actionClockBuffer = 0;
@@ -46,7 +48,11 @@ public class CardModeState : MonoBehaviour
         isActive = active;
         isInteractiveSession = interactive;
 
-        if (isActive) StartSelectCardLoop(apData);
+        if (isActive)
+        {
+            cancelLocked = false;   // ← 필드로 접근
+            StartSelectCardLoop(apData);
+        }
         else StopSelectCardLoop(null);
     }
     private void StartSelectCardLoop(ActionPacketData apdata)
@@ -106,7 +112,8 @@ public class CardModeState : MonoBehaviour
             // ESC 취소
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                CancelAndReturn();
+                if (!cancelLocked) CancelAndReturn();     // ← 필드로 체크
+                else Debug.Log("[CardMode] Cancel locked after using support/bless.");
                 yield break;
             }
 
@@ -117,6 +124,8 @@ public class CardModeState : MonoBehaviour
 
     public void CancelAndReturn()
     {
+        if (cancelLocked) { Debug.Log("[CardMode] Cancel locked; ignoring."); return; }
+
         if (_selectCardCoroutine != null)
         {
             StopCoroutine(_selectCardCoroutine);
@@ -334,6 +343,10 @@ public class CardModeState : MonoBehaviour
             tmpPT.text = info.cardData.GetDisplayText("damage", delta_dam);
         }
     }
+
+    public void LockCancel(string why = null) { cancelLocked = true; if (!string.IsNullOrEmpty(why)) Debug.Log($"[CardMode] Cancel locked: {why}"); }
+    public void UnlockCancel() { cancelLocked = false; Debug.Log("[CardMode] Cancel unlocked."); }
+
 }
 
 // ===== 여기부터 같은 파일 바깥(전역)에 두는 확장 메서드 유틸 =====
@@ -350,4 +363,5 @@ public static class TransformUtil
             if (c != null && c.name == targetName) return c;
         return null;
     }
+
 }

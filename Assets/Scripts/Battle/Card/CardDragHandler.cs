@@ -15,7 +15,7 @@ public class CardDragHandler : MonoBehaviour,
     IPointerClickHandler
 {
     [Header("Animator")]
-    public Animator animator;                     // 카드 오브젝트(또는 자식)에 Animator 달아두기
+    public Animator animator;// 카드 오브젝트(또는 자식)에 Animator 달아두기
     [SerializeField] private string trigInZone = "Trig_InZone";
     [SerializeField] private string trigOffZone = "Trig_OffZone";
 
@@ -219,6 +219,8 @@ public class CardDragHandler : MonoBehaviour,
                 LocalState.Instance.PlayerObDic[PhotonNetwork.LocalPlayer.ActorNumber]
                     .GetComponentInChildren<Animator>()
                     .SetTrigger("Trig_Support_Buff");
+                CardModeState.Instance.LockCancel("support/bless (type 1) used");
+
             }
             else if (thisCardData.cardType == 2)
             {
@@ -246,6 +248,8 @@ public class CardDragHandler : MonoBehaviour,
                 
 
                 Destroy(gameObject);
+                CardModeState.Instance.LockCancel("support/bless (type 2) used");
+
             }
 
 
@@ -285,6 +289,7 @@ public class CardDragHandler : MonoBehaviour,
                 }
                 else
                 {
+
                     AnimTriggerManager.Instance.FireByLabel("myCasting", "Trig_Close");
                     animator.ResetTrigger(trigInZone);
                     animator.SetTrigger(trigOffZone);

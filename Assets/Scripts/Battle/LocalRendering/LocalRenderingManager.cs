@@ -18,6 +18,7 @@ public class LocalRenderingManager : MonoBehaviour
     public TextMeshProUGUI opponencostRemainTxt;
     public TextMeshProUGUI mycostRemainTxt;
 
+    public Animator castingshit;
 
     public TextMeshProUGUI myBound;
     public TextMeshProUGUI OpBound;
@@ -25,6 +26,7 @@ public class LocalRenderingManager : MonoBehaviour
     public GameObject paching_Op;
     public GameObject paching_Me;
 
+    public GameObject Op_jujuPick;
 
     public static LocalRenderingManager Instance;
     [SerializeField] BoundImageConductor myBoundConductor;
@@ -74,6 +76,9 @@ public class LocalRenderingManager : MonoBehaviour
         //바운드 인덱스 넘어가는 거 보여줌 
 
         //주술 선택 애니메이션 출력 등 
+
+        Op_jujuPick.SetActive(false);
+
 
         myBoundConductor.UpdateByIndex(GetMine(data1, data2).boundIndex);
         opBoundConductor.UpdateByIndex(GetOp(data1, data2).boundIndex);
@@ -749,6 +754,7 @@ public class LocalRenderingManager : MonoBehaviour
                 target.text = "0";
                 target.text = string.Empty;
 
+                castingshit.ResetTrigger("Trig_Open");
                 // 트리거 발사 (라벨 기반)
                 AnimTriggerManager.Instance?.FireByLabel("myCasting", "Trig_End");
             }

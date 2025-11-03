@@ -17,6 +17,7 @@ using UnityEngine.UIElements;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Analytics;
 using System.Numerics;
+using DG.Tweening;
 
 public enum apProp
 {
@@ -2545,8 +2546,23 @@ public class Overmind : MonoBehaviourPunCallbacks
 
         else
         {
-            //여기서 상대 제약이 뭐였는지 판단하는 함수 호출 
+            // 여기서 상대 제약이 뭐였는지 판단하는 함수 호출 
             // LocalState.Instance.GuessJuju(index);
+
+            // ── Op_jujuPick 팡! 등장 ───────────────────────────────
+            var go = LocalRenderingManager.Instance?.Op_jujuPick;
+            if (go != null)
+            {
+                var t = go.transform;
+                go.SetActive(true);     // 보이게
+                t.DOKill();             // 기존 트윈 정리
+                t.localScale =UnityEngine.Vector3.zero;  // 0에서 시작
+
+                DOTween.Sequence()
+                    .Append(t.DOScale(1.08f, 0.14f).SetEase(Ease.OutQuad)) // 팡 키우기
+                    .Append(t.DOScale(1.00f, 0.09f).SetEase(Ease.InQuad)); // 살짝 안착
+            }
+            // ────────────────────────────────────────────────────────
 
             Submit_Juju(actorNum, null);
         }

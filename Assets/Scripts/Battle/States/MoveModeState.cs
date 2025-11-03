@@ -206,6 +206,10 @@ public class MoveModeState : MonoBehaviour
 
                     Overmind.Instance?.SubmitSelection(action, actualCost, actorNum, LocalState.Instance.btmPacket);
 
+
+                    //핫키 C로 비인터랙티브 모드 돌입
+                    LocalState.Instance?.EndChoosePhase();
+
                     isActive = false;
                     hoveredTile = null;
                     selectedTile = null;
