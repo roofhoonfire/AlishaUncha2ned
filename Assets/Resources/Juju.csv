@@ -7,7 +7,7 @@ j5,handAdd,술법 두루마리,Juju/Juju_Jutsu,,c15,2,0,none,,바꿔치기 술�
 j6,handAdd,나비효과,Juju/Juju_Beffect ,,c32,2,0,none,,이번 싸이클에 입힌 피해를 “저장”합니다
 j7,handAdd,유비무환,Juju/Juju_insurance,,c33,2,0,none,,“약점 보험” 카드를 손 패에 추가합니다
 j8,handAdd,철벽,Juju/Juju_defense,,c34,1,0,none,,“철벽” 카드를 손 패에 추가합니다
-j9,handAdd,싸구려 물약,Juju/Juju_Potion,,c10,1,0,none,,체력을 10 회복합니다
+j9,heal_15,싸구려 물약,Juju/Juju_Potion,,c10,1,0,none,,체력을 15 회복합니다
 j10,handAdd,제물 서약,Juju/Juju_drop,,c10,1,0,none,,체력을 10 잃는 대신 상대의 다음 메인 액션의 피해량을 10 줄입니다
 j11,handAdd,기어 프리,Juju/Juju_GearFree,,c32,1,0,none,,“서두르기” 카드를 손 패에 추가합니다
 j12,handAdd,뒤엉켜 구르기,Juju/Juju_Rumble,,c32,1,0,none,,“뒤엉켜 구르기” 카드를 손 패에 추가합니다 

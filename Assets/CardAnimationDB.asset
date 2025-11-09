@@ -1190,3 +1190,43 @@ MonoBehaviour:
     prepOverlayMaxAlpha: 1
     prepOverlayAnchoredPos: {x: 0, y: 0}
     prepOverlayScale: {x: 1, y: 1, z: 1}
+  - cardCode: c39
+    hook: 0
+    victimDefendTrigger: Trig_Defend
+    victimDefendStateName: Base Layer.Alisha_Defend
+    guardAnimatorTrigger: 
+    guardStateName: 
+    guardClip: {fileID: 0}
+    prepTrigger: Trig_Prep_Slash
+    prepStateName: Base Layer.Alisha_Prep_Slash
+    prepClip: {fileID: 7400000, guid: 7fb552cbf3b38a749882866e3dc5d288, type: 2}
+    prepTotalFramesOverride: 0
+    prepPoseHoldSec: 1
+    animatorTrigger: Trig_Slash
+    stateName: Base Layer.Alisha_Slash
+    clip: {fileID: 7400000, guid: c052ebee4afb8ff4aac20e219294e11a, type: 2}
+    totalFramesOverride: 0
+    victimAnimatorTrigger: Trig_Damaged_Headshot
+    victimStateName: Base Layer.Alisha_Damaged_HeadShot
+    victimClip: {fileID: 7400000, guid: c9e840f7907527544b0ac4b5ae3d3939, type: 2}
+    victimStartFrames: 02000000
+    usePrepBackdrop: 1
+    prepBackdropSprite: {fileID: 21300000, guid: 2f0421c3c8964b0419d48f65575ebaa0,
+      type: 3}
+    prepBackdropFadeIn: 0.15
+    prepBackdropFadeOut: 0.12
+    hitStops:
+    - frame: 3
+      duration: 0.7
+      pauseAttacker: 1
+      pauseVictim: 1
+      pauseEffects: 1
+      pauseScene: 0
+    usePrepOverlay: 1
+    prepOverlaySprite: {fileID: 21300000, guid: 20998472bea5dbb40955aab21fe74453,
+      type: 3}
+    prepOverlayFadeIn: 0.12
+    prepOverlayFadeOut: 0.1
+    prepOverlayMaxAlpha: 1
+    prepOverlayAnchoredPos: {x: 0, y: 0}
+    prepOverlayScale: {x: 1, y: 1, z: 1}

@@ -18,6 +18,9 @@ using UnityEngine.Rendering.Universal;
 using UnityEngine.Analytics;
 using System.Numerics;
 using DG.Tweening;
+using Unity.Mathematics;
+using SRandom = System.Random;
+
 
 public enum apProp
 {
@@ -47,7 +50,21 @@ public class ConstraintStats
     public List<int> prevCycleActionClocks = new();
 }
 public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 SyncPartial 업뎃 해야함
-{
+{private static readonly string[] BoundPool = { "b1","b3","b4","b5","b6","b7" };
+
+    private static List<string> PickBounds(int count, int seed)
+    {
+        var rng = new SRandom(seed);              // 동일 seed → 동일 결과
+        var arr = (string[])BoundPool.Clone();    // Fisher–Yates
+        for (int i = arr.Length - 1; i > 0; i--)
+        {
+            int j = rng.Next(i + 1);              // 0..i (상한 배제 아님)
+            (arr[i], arr[j]) = (arr[j], arr[i]);
+        }
+        var res = new List<string>(count);
+        for (int k = 0; k < count; k++) res.Add(arr[k]);
+        return res;
+    }
     public int ActorNumber;
     public int prevHP;
     public int HP ;//currentHp
@@ -121,8 +138,8 @@ public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 
         energy = 3;
 
         //기찮으므로로로로루뢰뢰
-        Bounds = new List<string> {"b1", "b3", "b4","b5","b6","b7" };
-        JujuCode = new List<string> { "j1", "j2", "j3", "j5" ,"j8" , "j11" };
+        Bounds = PickBounds(3, seed: actorNumber); // actorNumber로 결정적 선택
+        JujuCode = new List<string> { "j1", "j2", "j3", "j5" ,"j8" ,"j9" ,"j11" };
 
 
 
@@ -709,6 +726,9 @@ public class Overmind : MonoBehaviourPunCallbacks
                     //액션 발동 되는 곳1
                     yield return ShowDown();
                     Turn_End_Call();
+               
+
+
 
 
                     if (actionQueue.Count <= 0 ||
@@ -1117,7 +1137,7 @@ public class Overmind : MonoBehaviourPunCallbacks
 
     }
 
-    private void StartWaitForPreviewSync(int actorNumber, int cost, ActionData action)
+    public void StartWaitForPreviewSync(int actorNumber, int cost, ActionData action)
     {
         if (waitPreviewSyncRoutines.TryGetValue(actorNumber, out var co) && co != null)
             StopCoroutine(co);
@@ -1160,7 +1180,14 @@ public class Overmind : MonoBehaviourPunCallbacks
         pendingSelections[actorNumber] = (action, cost);
 
     }
+    public void OuterCall_Sync_Action_Preview_M2C(int actorNumber, ActionData action)
+    {
+        string actionjson = JsonConvert.SerializeObject(action);
 
+        Overmind.Instance.photonView.RPC(nameof(Sync_Action_Preview_M2C), RpcTarget.All, actorNumber, actionjson);
+
+
+    }
     // ---- 클라이언트들이 받는 M2C: 로컬 프리뷰 데이터 저장 후 마스터에 ACK ----
     [PunRPC]
     void Sync_Action_Preview_M2C(int actorNumber, string actionjson)
@@ -1169,6 +1196,30 @@ public class Overmind : MonoBehaviourPunCallbacks
 
         // 프리뷰에 사용할 로컬 액션 캐시 갱신
         LocalRenderingStatic.localRenderingActions[actorNumber] = action;
+
+
+        //스파게티
+        /*if (actornum != PhotonNetwork.LocalPlayer.ActorNumber)
+        {
+            //상대 생각중!
+
+            var chooserOb = LocalState.Instance?.PlayerObDic[actornum];
+            var tile_chooser_anim = chooserOb.GetComponentInChildren<Animator>();
+            if (tile_chooser_anim == null)
+            {
+                Debug.LogError("난 처맞을 건데, 공격자 Animator 없음");
+
+                return;
+            }
+            tile_chooser_anim.SetTrigger("Trig_TileChoose");
+
+
+        }*/
+        if (action.cardcode == "c7858")
+        {
+            LocalState.Instance.PlayerObDic[actorNumber].GetComponentInChildren<Animator>().SetTrigger("Trig_Stunned");
+
+        }
 
        
         // 마스터에게 동기화 완료 ACK
@@ -1594,17 +1645,25 @@ public class Overmind : MonoBehaviourPunCallbacks
 
         var action = JsonConvert.DeserializeObject<ActionData>(actioJson);
 
+        
+
         // var data1 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson1);
 
         //var data2 = JsonConvert.DeserializeObject<LocalRenderingData>(lrjson2);
         //LocalRenderingManager.Instance.Rendering_Before_Tile_Choose(actornum, data1, data2, action);
         //
-      //  LocalRenderingManager.Instance.Rendering_Tile_Choose(actornum, action);
+        //  LocalRenderingManager.Instance.Rendering_Tile_Choose(actornum, action);
         if (actornum != PhotonNetwork.LocalPlayer.ActorNumber)
         {
             //상대 생각중!
+            if (action.cardcode == "c7858")
+            {
 
-           var  chooserOb = LocalState.Instance?.PlayerObDic[actornum];
+
+                return;
+
+            }
+            var  chooserOb = LocalState.Instance?.PlayerObDic[actornum];
             var tile_chooser_anim = chooserOb.GetComponentInChildren<Animator>();
             if (tile_chooser_anim == null)
             {
@@ -1612,6 +1671,7 @@ public class Overmind : MonoBehaviourPunCallbacks
            
                  return;
             }
+          
             tile_chooser_anim.SetTrigger("Trig_TileChoose");
 
 

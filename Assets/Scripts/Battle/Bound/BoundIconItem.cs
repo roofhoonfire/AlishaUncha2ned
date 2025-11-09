@@ -1,4 +1,6 @@
 using UnityEngine;
+using System;            // ← 이거 추가
+
 using UnityEngine.UI;
 using TMPro;
 
@@ -21,4 +23,6 @@ public class BoundIconItem : MonoBehaviour
         if (iconImage) iconImage.sprite = sp;
         if (tooltip) tooltip.description = desc ?? string.Empty;
     }
+
+   
 }

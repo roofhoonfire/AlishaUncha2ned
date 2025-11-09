@@ -1,7 +1,9 @@
 using JetBrains.Annotations;
+using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -45,7 +47,7 @@ public class CardAction : MonoBehaviour
             rumblePoint = 0,
             defense = 0,
             hasOtherExecutedSinceInsertion = false,
-            cardname = "앞을 볼 수 있어요 이제 ㅠㅠ",
+            cardname = "시력 회복",
             nthaction = ++Overmind.Instance.globalaction,
             tileType = -1,
             zoneIndex = 4,
@@ -57,6 +59,40 @@ public class CardAction : MonoBehaviour
         Blindoff.effects.Add(new CardEffect(HookType.Dot, EffectType.Dot_Blind_Off, 0, 0));
 
         Overmind.Instance.actionQueue.Add((0, Blindoff, actualClock));
+
+        // 정렬
+        Overmind.Instance.actionQueue.Sort((a, b) =>
+            a.remainingCost != b.remainingCost
+                ? a.remainingCost.CompareTo(b.remainingCost)
+                : a.action.nthaction.CompareTo(b.action.nthaction)
+        );
+    }
+    public void StartDot_Stun_Recovery(int ActorNum, int amount)
+    {
+        int actualClock = amount;    // clock 간격으로 증가
+
+        // 먼저 기존 (22) 액션 제거
+        Overmind.Instance.actionQueue.RemoveAll(tuple => tuple.action.actionId == 224);
+
+        ActionData StunRecover = new ActionData
+        {
+            actionId = 224, //
+            actionClock = actualClock,
+            rumblePoint = 0,
+            defense = 0,
+            hasOtherExecutedSinceInsertion = false,
+            cardname = "기절 회복",
+            nthaction = ++Overmind.Instance.globalaction,
+            tileType = -1,
+            zoneIndex = 4,
+            cardcode = "dot_stun_rec",
+            Dot_to = ActorNum,
+            isDot = true,
+        };
+
+        StunRecover.effects.Add(new CardEffect(HookType.Dot, EffectType.StunRecovery, 0, 0));
+
+        Overmind.Instance.actionQueue.Add((0, StunRecover, actualClock));
 
         // 정렬
         Overmind.Instance.actionQueue.Sort((a, b) =>
@@ -119,15 +155,15 @@ public class CardAction : MonoBehaviour
             rumblePoint = 0,
             defense = 0,
             hasOtherExecutedSinceInsertion = false,
-            cardname = "기절회복",
+            cardname = "기절 중",
             nthaction = Overmind.Instance.globalaction,
             tileType =-1,
             zoneIndex = 4,
-            cardcode = "미싱노",
+            cardcode = "c7858",
         }
         ;
         stun.actionClock = amount;
-        stun.effects.Add(new CardEffect(HookType.Activate, EffectType.StunRecovery, 0, 0));
+      //  stun.effects.Add(new CardEffect(HookType.Activate, EffectType.StunRecovery, 0, 0));
         
         Overmind.Instance.actionQueue.Add((hOpActorNum, stun, amount));
         Overmind.Instance.actionQueue.Sort((a, b) =>
@@ -135,6 +171,18 @@ public class CardAction : MonoBehaviour
                 ? a.remainingCost.CompareTo(b.remainingCost)
                 : a.action.nthaction.CompareTo(b.action.nthaction)
         );
+
+        StartDot_Stun_Recovery(hOpActorNum, amount);
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // 모든 클라(마스터 포함)에게 프리뷰 데이터 전파
+            Overmind.Instance.OuterCall_Sync_Action_Preview_M2C(hOpActorNum, stun);
+
+            // actorNumber에 맞는 대기 코루틴 시작(이미 돌고 있으면 교체)
+            Overmind.Instance.StartWaitForPreviewSync(hOpActorNum, amount, stun);
+        }
+
+
 
 
     }
@@ -210,7 +258,7 @@ public class CardAction : MonoBehaviour
                 rumblePoint = 0,
                 defense = 0,
                 hasOtherExecutedSinceInsertion = false,
-                cardname = "찔끔힐",
+                cardname = "회복",
                 nthaction = ++Overmind.Instance.globalaction,
                 tileType = -1,
                 zoneIndex = 4,

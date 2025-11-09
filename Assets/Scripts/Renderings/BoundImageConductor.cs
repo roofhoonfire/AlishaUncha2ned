@@ -59,7 +59,7 @@ public class BoundImageConductor : MonoBehaviour
     public GameObject myGridArea;
     public GameObject opGridArea;
 
-
+    public int boundlength = 0;
     // 내부 상태
     private readonly List<string> _bounds = new();
     private int _index = -1;
@@ -67,7 +67,7 @@ public class BoundImageConductor : MonoBehaviour
     private Coroutine _running;
 
     // ★ 생성한 프리뷰 아이콘들 보관(설명 업데이트 용)
-    private readonly List<BoundIconItem> _myIcons = new();
+    public  List<BoundIconItem> _myIcons = new();
     private readonly List<BoundIconItem> _opIcons = new();
 
     void Awake()
@@ -139,23 +139,26 @@ public class BoundImageConductor : MonoBehaviour
     public string InitBounds(IList<string> boundsFromData)
     {
         // 초기화
+        boundlength = boundsFromData.Count;
         _bounds.Clear();
         if (boundsFromData != null) _bounds.AddRange(boundsFromData);
         _initialized = true;
         _index = 0;
 
         // 그리드/아이콘 초기화
-        ClearGrid(myGridRoot, _myIcons);
-        ClearGrid(opGridRoot, _opIcons);
 
         // isOp 여부에 따라 프리뷰 생성
         if (!isOp)
         {
             // 내 바운드: 실제 키로 프리뷰 고정 생성
+            ClearGrid(myGridRoot, _myIcons);
+
             BuildMyGridPreview(_bounds);
         }
         else
         {
+            ClearGrid(opGridRoot, _opIcons);
+
             // 상대 바운드: b0 이미지 + 초기 guess로 생성
             if (boundGuesses == null) boundGuesses = new List<string>();
             boundGuesses.Clear();
@@ -238,7 +241,7 @@ public class BoundImageConductor : MonoBehaviour
         // ★ 추가: 프리뷰 그리드 아이콘의 해당 인덱스 툴팁도 동기화
         if (isOp)
         {
-            int indexBefore = (index + 5) % 6;
+            int indexBefore = (index + boundlength-1) % boundlength;
 
             if (index >= 0 && index < _opIcons.Count && _opIcons[index] != null && _opIcons[index].tooltip != null)
                 Debug.Log("상수정이되");
@@ -279,12 +282,13 @@ public class BoundImageConductor : MonoBehaviour
 
     void BuildMyGridPreview(IList<string> keys)
     {
+        Debug.Log($"{keys}락락");
         if (myGridRoot == null || iconPrefab == null) return;
-        Debug.Log("여긴아님1");
+        Debug.Log("여긴아님1락락");
         ConfigureGrid(myGridRoot, keys?.Count ?? 0);
 
         if (keys == null) return;
-        Debug.Log("여긴아님3");
+        Debug.Log("여긴아님3락락");
 
         foreach (var key in keys)
         {
@@ -292,9 +296,17 @@ public class BoundImageConductor : MonoBehaviour
             if (database != null && database.TryGet(key, out var e))
             {
                 sp = e.sprite; desc = e.description;
+                Debug.Log($"{sp} 오로로로락락");
             }
             var item = Instantiate(iconPrefab, myGridRoot, false);
+
+            var go = item.gameObject;
+           // Debug.Log($"[MY] Before Set: {go.name}, active={go.activeSelf}, parent={go.transform.parent?.name}");
             item.Set(sp, desc);
+ //           Debug.Log($"[MY] After  Set: item null? {(item == null ? "YES" : "NO")}, " +
+  //                    $"go active={(go ? go.activeSelf : false)}");
+     //       Debug.Log("생성완료3락락");
+//
             _myIcons.Add(item);
         }
     }

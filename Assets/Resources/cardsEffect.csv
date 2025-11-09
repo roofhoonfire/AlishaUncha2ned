@@ -119,3 +119,6 @@ c38,Activate,Damage,0,0
 c38,Activate,intheRange_FlagOn,1,0
 c38,Activate,Blind_Op,4,1
 c38,Activate,Flag_Off,1,1
+c39,Activate,Damage,0,0
+c39,Activate,ReplaceNextOpsMovetoStun,2,0
+c7858,Activate,NotRumbleFlagOn,30,1

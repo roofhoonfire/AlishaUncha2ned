@@ -79,6 +79,8 @@ public class LocalRenderingManager : MonoBehaviour
 
         Op_jujuPick.SetActive(false);
 
+        HPBarManager.Instance.DamageMe(GetMine(data1, data2).hp);
+        HPBarManager.Instance.DamageOp(GetOp(data1, data2).hp);
 
         myBoundConductor.UpdateByIndex(GetMine(data1, data2).boundIndex);
         opBoundConductor.UpdateByIndex(GetOp(data1, data2).boundIndex);
@@ -88,7 +90,11 @@ public class LocalRenderingManager : MonoBehaviour
         ApplyImmediateUI(data1);
         ApplyImmediateUI(data2);
 
+        List<RenderDiff> diffs = CopyandDifferences(data1, data2);
 
+        StartCoroutine(AnimateStatChange("remainingCost", diffs));
+
+        ApplyDiffsToLocalRenderingData(diffs);
 
         Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
     }
@@ -272,7 +278,6 @@ public class LocalRenderingManager : MonoBehaviour
     {
 
         //게임시작 렌더링 연출 넣고 싶은거 집어 옇어라 스발아
-
 
 
         ApplyFacingFromRightOrLeft(data1.actorNum, data1);
@@ -514,6 +519,7 @@ public class LocalRenderingManager : MonoBehaviour
         // [MOD] 혹시 백드롭을 안 썼거나 중간 스킵 경로였을 때를 대비한 안전 복구
         CameraLovesAlisha.Instance?.UnhideAutoHiddenNow();
 
+
         Overmind.Instance.Submit_RenderingDone(PhotonNetwork.LocalPlayer.ActorNumber);
     }
 
@@ -566,6 +572,22 @@ public class LocalRenderingManager : MonoBehaviour
                 var anim = tgt.GetComponentInChildren<Animator>();
                 if (anim != null)
                     yield return StartCoroutine(PlayTriggerAndWaitExit(anim, "Trig_Dot_Burn", 0, 0.75f, 10f));
+            }
+        }
+
+
+        if (action.cardcode == "dot_stun_rec")
+        {
+            if (LocalState.Instance.PlayerObDic.TryGetValue(action.Dot_to, out var tgt) && tgt != null)
+            {
+                var anim = tgt.GetComponentInChildren<Animator>();
+                if (anim != null) {
+
+                    Debug.Log("기절회복완료");
+
+                    yield return StartCoroutine(PlayTriggerAndWaitExit(anim, "Trig_Stun_Rec", 0, 0.75f, 10f));
+
+                }
             }
         }
         Debug.Log("으악 도트 ");

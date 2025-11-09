@@ -87,8 +87,8 @@ namespace Microlight.MicroBar {
         public void DamageMe(int newHP)
         {
             float damageAmount = myHP- newHP;
-            if (damageAmount < 0)
-                return;
+           // if (damageAmount < 0)
+             //   return;
 
 
             // Update HealthBar
@@ -104,8 +104,8 @@ namespace Microlight.MicroBar {
         public void DamageOp(int  newHP)
         {
             float damageAmount = opHP - newHP;
-            if (damageAmount < 0)
-                return;
+            //if (damageAmount < 0)
+              //  return;
 
             //  soundSource.clip = hurtSound;
             // if(soundOn) soundSource.Play();

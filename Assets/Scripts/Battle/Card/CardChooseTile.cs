@@ -95,7 +95,7 @@ public class CardChooseTile : MonoBehaviour
 
 
         //마우스 라인 쿠쿠
-        SetupAimLine();
+//  SetupAimLine();
 
 
         _ragingNow.Clear();
@@ -114,7 +114,8 @@ public class CardChooseTile : MonoBehaviour
 
             yield break;
         }
-        tile_chooser_anim.SetTrigger("Trig_TileChoose");
+        if(action.cardcode!="c7858")
+             tile_chooser_anim.SetTrigger("Trig_TileChoose");
       //  GridManagement.Instance.RageOn();
 
 
@@ -151,7 +152,7 @@ public class CardChooseTile : MonoBehaviour
         
         while (isActive)
         {
-            UpdateAimLine();
+          //  UpdateAimLine();
 
             SelectTile(action.tileType, action.zoneIndex);
 
@@ -205,7 +206,7 @@ public class CardChooseTile : MonoBehaviour
             _selectTileCoroutine = null;
             //여기서 마스터 클라이언트한테 넘겨주면 된다
 
-            TeardownAimLine();
+        //    TeardownAimLine();
 
 
             GridManagement.Instance.RageDone();

@@ -10,6 +10,7 @@ public enum JujuType
 {
   handAdd,
   Reinforce,
+  heal_15,
 }
 public class Juju
 {
@@ -57,6 +58,19 @@ public class Juju
             case JujuType.Reinforce:
                 playerData.forActionPacket[apProp.defaultMoveCast] = 0;
                 break;
+
+            case JujuType.heal_15:
+                if (playerData.HP >= 85)
+                {
+                    playerData.prevHP = playerData.HP;
+                    playerData.HP = 100;
+                    break;
+                }
+                
+                playerData.prevHP = playerData.HP;
+                playerData.HP += 15;
+                break;
+
         }
 
 

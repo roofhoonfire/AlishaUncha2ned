@@ -93,6 +93,13 @@ public class LogManager : MonoBehaviour
     /// </summary>
     public void Push(ActionData data, HookType h, int actorNum)
     {
+
+        if (data.cardcode == "c7858")
+        {
+            Debug.LogWarning("기절회복은 만들 필요없음");
+            return;
+
+        }
         if (data == null)
         {
             Debug.LogWarning("[LogManager] Push called with null ActionData.");
