@@ -5,7 +5,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System.Text.RegularExpressions;
+static class TmpParseUtil
+{
+    static readonly Regex RichTag = new Regex("<.*?>", RegexOptions.Compiled);
 
+    public static bool TryParseInt(TMP_Text t, out int value)
+    {
+        value = 0;
+        if (t == null || string.IsNullOrEmpty(t.text)) return false;
+        var raw = RichTag.Replace(t.text, "");   // <color=...>12</color> → 12
+        return int.TryParse(raw, out value);
+    }
+}
 public class CardModeState : MonoBehaviour
 {
     public static CardModeState Instance;
@@ -320,7 +332,7 @@ public class CardModeState : MonoBehaviour
         int delta_cast = apData.permCast + apData.tempCast;
         int delta_def = apData.tempDef + apData.permDef;
         int delta_dam = apData.tempDam + apData.permDam;
-        if (delta_cast == 0 && delta_def == 0 && delta_dam==0) return;
+        if (delta_cast == 0 && delta_def == 0 && delta_dam == 0) return;
 
         foreach (var card in spawnedCards)
         {
@@ -334,15 +346,66 @@ public class CardModeState : MonoBehaviour
             var tmpDef = card.transform.FindComponentByNameDeep<TextMeshProUGUI>("Defense");
             var tmpPT = card.transform.FindComponentByNameDeep<TextMeshProUGUI>("pt");
 
-            if (tmpTime != null && int.TryParse(tmpTime.text, out int v1))
-                tmpTime.text = Mathf.Max(apData.CastingMinumum, v1 + delta_cast).ToString();
+            // TimeClock
+            if (tmpTime != null && TmpParseUtil.TryParseInt(tmpTime, out var baseClock))
+            {
+                Debug.Log($"{baseClock}무챠 로코");
+                var newClock = Mathf.Max(apData.CastingMinumum, baseClock + delta_cast);
+                tmpTime.text = CardFieldColorizer.GetColoredValue(info.cardData.code, "actionClock", newClock);
+            }
 
-            if (tmpDef != null && int.TryParse(tmpDef.text, out int v2))
-                tmpDef.text = Mathf.Max(0, v2 + delta_def).ToString();
-           
+            // Defense
+            if (tmpDef != null && TmpParseUtil.TryParseInt(tmpDef, out var baseDef))
+            {
+                var newDef = Mathf.Max(0, baseDef + delta_def);
+                tmpDef.text = CardFieldColorizer.GetColoredValue(info.cardData.code, "defense", newDef);
+            }
             tmpPT.text = info.cardData.GetDisplayText("damage", delta_dam);
         }
     }
+    public void ActionPacketUpgrade_Bless(ActionPacketData apData, int delta_rumb, int delta_cast, int delta_def, int thisBlessDam)
+    {
+
+        Debug.Log("손패 업글 눈에 보이지예?");
+
+      //  int delta_cast = apData.permCast + apData.tempCast;
+      //  int delta_def = apData.tempDef + apData.permDef;
+     int delta_dam = apData.tempDam + apData.permDam;
+        if (delta_cast == 0 && delta_def == 0 && delta_dam == 0 && delta_rumb == 0 && thisBlessDam == 0) return;
+
+        foreach (var card in spawnedCards)
+        {
+            if (card == null) continue;
+
+            var info = card.GetComponentInChildren<EachCardInfo>();
+            if (info == null || info.cardData.cardType == 1) continue; // 카드타입 1은 스킵
+
+            // 이름 기준 깊이 탐색으로 TMP 바로 가져오기 (자식의 자식 대응)
+            var tmpTime = card.transform.FindComponentByNameDeep<TextMeshProUGUI>("TimeClock");
+            var tmpDef = card.transform.FindComponentByNameDeep<TextMeshProUGUI>("Defense");
+            var tmpPT = card.transform.FindComponentByNameDeep<TextMeshProUGUI>("pt");
+
+            // TimeClock
+            if (tmpTime != null && TmpParseUtil.TryParseInt(tmpTime, out var baseClock))
+            {
+                Debug.Log($"{baseClock}무챠 로코");
+                var newClock = Mathf.Max(apData.CastingMinumum, baseClock + delta_cast);
+                tmpTime.text = CardFieldColorizer.GetColoredValue(info.cardData.code, "actionClock", newClock);
+            }
+
+            // Defense
+            if (tmpDef != null && TmpParseUtil.TryParseInt(tmpDef, out var baseDef))
+            {
+                var newDef = Mathf.Max(0, baseDef + delta_def);
+                tmpDef.text = CardFieldColorizer.GetColoredValue(info.cardData.code, "defense", newDef);
+            }
+            if (thisBlessDam != 0) {
+                tmpPT.text = info.cardData.GetDisplayText("damage", delta_dam);
+
+            }
+        }
+    }
+
 
     public void LockCancel(string why = null) { cancelLocked = true; if (!string.IsNullOrEmpty(why)) Debug.Log($"[CardMode] Cancel locked: {why}"); }
     public void UnlockCancel() { cancelLocked = false; Debug.Log("[CardMode] Cancel unlocked."); }

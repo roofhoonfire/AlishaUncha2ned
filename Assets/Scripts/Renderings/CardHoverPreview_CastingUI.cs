@@ -116,10 +116,14 @@ public class CardHoverPreview_CastingUI : MonoBehaviour, IPointerEnterHandler, I
 
         // ③ 숫자 정보 채우기: act 우선, 없으면 카드 값으로 폴백
         if (act != null)
-        {
+        {/*
             if (timeClockText) timeClockText.text = act.actionClock.ToString();
             if (defenseText) defenseText.text = act.defense.ToString();
             if (rumbleText) rumbleText.text = act.rumblePoint.ToString();
+            */
+            if (timeClockText) timeClockText.text = CardFieldColorizer.GetColoredValue(code, "actionClock", act.actionClock);
+            if (defenseText) defenseText.text = CardFieldColorizer.GetColoredValue(code, "defense", act.defense);
+            if (rumbleText) rumbleText.text = CardFieldColorizer.GetColoredValue(code, "rumblePoint", act.rumblePoint);
         }
         else if (card != null)
         {
@@ -140,9 +144,10 @@ public class CardHoverPreview_CastingUI : MonoBehaviour, IPointerEnterHandler, I
                        .Replace("<br/>", "\n");
 
             if (act != null)
-                desc = desc.Replace("{damage}", act.damage.ToString());
+                // desc = desc.Replace("{damage}", act.damage.ToString());
+                desc = desc.Replace("{damage}", CardFieldColorizer.GetColoredValue(code, "damage", act.damage));
 
-            if (ptText) ptText.text = desc;
+                if (ptText) ptText.text = desc;
 
             if (previewImage != null)
             {

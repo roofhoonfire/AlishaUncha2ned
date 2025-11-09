@@ -207,7 +207,7 @@ public class CardDragHandler : MonoBehaviour,
 
                 CardModeState.Instance.ActivatePachingOnCodeZero();
 
-                CardModeState.Instance.ActionPacketUpgrade(apData);
+                CardModeState.Instance.ActionPacketUpgrade_Bless(apData, thisCardData.rumblePoint, thisCardData.actionClock, thisCardData.defense, thisCardData.damage);
 
                 btmPacketAdd(thisCardData.code);
                 Destroy(gameObject);

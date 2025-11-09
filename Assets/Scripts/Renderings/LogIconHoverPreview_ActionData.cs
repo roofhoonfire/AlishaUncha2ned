@@ -108,9 +108,9 @@ public class LogIconHoverPreview_ActionData : MonoBehaviour, IPointerEnterHandle
         if (ad == null) return;
 
         // --- 1) 수치: ActionData에서 직접 ---
-        if (timeClockText) timeClockText.text = ad.actionClock.ToString();
-        if (defenseText) defenseText.text = ad.defense.ToString();
-        if (rumbleText) rumbleText.text = ad.rumblePoint.ToString();
+        if (timeClockText) timeClockText.text = CardFieldColorizer.GetColoredValue(ad.cardcode, "actionClock", ad.actionClock);
+        if (defenseText) defenseText.text = CardFieldColorizer.GetColoredValue(ad.cardcode, "defense", ad.defense);
+        if (rumbleText) rumbleText.text = CardFieldColorizer.GetColoredValue(ad.cardcode, "rumblePoint", ad.rumblePoint);
 
         // --- 2) 텍스트/스프라이트: SO에서 불변 데이터 채우기 ---
         string code = ad.cardcode;
@@ -132,7 +132,7 @@ public class LogIconHoverPreview_ActionData : MonoBehaviour, IPointerEnterHandle
 
                     // ★ 추가: {damage} 치환
                     // (없으면 아무 변화 없음)
-                    desc = desc.Replace("{damage}", ad.damage.ToString());
+                    desc = desc.Replace("{damage}", CardFieldColorizer.GetColoredValue(ad.cardcode, "damage", ad.damage));
 
                     ptText.text = desc;
                 }
