@@ -139,7 +139,7 @@ public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 
 
         //기찮으므로로로로루뢰뢰
         Bounds = PickBounds(3, seed: actorNumber); // actorNumber로 결정적 선택
-        JujuCode = new List<string> { "j1", "j2", "j3", "j5" ,"j7","j8" ,"j9" ,"j11" ,"j13"};
+       JujuCode = new List<string> { "j1", "j2", "j3", "j5" ,"j7","j8" ,"j9" ,"j11" ,"j13"};
 
 
 
@@ -2263,6 +2263,8 @@ public class Overmind : MonoBehaviourPunCallbacks
     /// <summary>두 액션이 서로의 효과 범위에 들어왔는지 체크</summary>
     private bool IsInEffectRange(int sourceActor, ActionData sourceAction, int targetActor)
     {
+        if (sourceAction.tileType == -1)
+            return true;
         var srcTiles = sourceAction.effectTiles;
         int pos = players[targetActor].curpos;
         return srcTiles.Contains(pos);

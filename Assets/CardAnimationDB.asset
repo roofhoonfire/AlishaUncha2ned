@@ -675,9 +675,9 @@ MonoBehaviour:
     stateName: Base Layer.Alisha_SpellDam
     clip: {fileID: 7400000, guid: fdfca1722f13df34bb359b2494759738, type: 2}
     totalFramesOverride: 0
-    victimAnimatorTrigger: Trig_Damaged
-    victimStateName: Base Layer.Alisha_Damaged
-    victimClip: {fileID: 7400000, guid: 7fd8eff2fb1d3c04288c0e7d00ae7d49, type: 2}
+    victimAnimatorTrigger: Trig_Damaged_Frozen
+    victimStateName: Base Layer.Alisha_Damaged_Frozen
+    victimClip: {fileID: 7400000, guid: baf5f33a3747b2642802fc413dcdc2c2, type: 2}
     victimStartFrames: 01000000
     usePrepBackdrop: 1
     prepBackdropSprite: {fileID: 21300000, guid: 2f0421c3c8964b0419d48f65575ebaa0,
@@ -715,9 +715,9 @@ MonoBehaviour:
     stateName: Base Layer.Alisha_SpellDam
     clip: {fileID: 7400000, guid: fdfca1722f13df34bb359b2494759738, type: 2}
     totalFramesOverride: 0
-    victimAnimatorTrigger: Trig_Damaged
-    victimStateName: Base Layer.Alisha_Damaged
-    victimClip: {fileID: 7400000, guid: 7fd8eff2fb1d3c04288c0e7d00ae7d49, type: 2}
+    victimAnimatorTrigger: Trig_Damaged_Trapped
+    victimStateName: Base Layer.Alisha_Damaged_Trapped
+    victimClip: {fileID: 7400000, guid: a8249260a89db444e8778f4024515e31, type: 2}
     victimStartFrames: 01000000
     usePrepBackdrop: 1
     prepBackdropSprite: {fileID: 21300000, guid: 2f0421c3c8964b0419d48f65575ebaa0,

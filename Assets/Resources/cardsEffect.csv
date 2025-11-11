@@ -113,7 +113,6 @@ c35,Activate,withOutFlag_FlagOn,102,0
 c35,Activate,Get_Element,1,2
 c35,Activate,Get_Element,2,2
 c35,Activate,Get_Element,3,2
-c35,Activate,Get_Element,4,2
 c38,Activate,Damage,0,0
 c38,Activate,intheRange_FlagOn,1,0
 c38,Activate,Blind_Op,4,1
