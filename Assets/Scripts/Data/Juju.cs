@@ -11,6 +11,7 @@ public enum JujuType
   handAdd,
   Reinforce,
   heal_15,
+  handAddRan,
 }
 public class Juju
 {
@@ -70,6 +71,38 @@ public class Juju
                 playerData.prevHP = playerData.HP;
                 playerData.HP += 15;
                 break;
+
+            case JujuType.handAddRan:
+                {
+                    if (string.IsNullOrEmpty(addingCard))
+                    {
+                        Debug.LogWarning("[Juju] handAddRan: addingCard 비어있음");
+                        break;
+                    }
+
+                    // "c3,c5,c6" → ["c3","c5","c6"] (공백/빈 토큰 제거)
+                    string[] tokens = addingCard.Split(',');
+                    List<string> options = new List<string>(tokens.Length);
+                    for (int i = 0; i < tokens.Length; i++)
+                    {
+                        string s = tokens[i]?.Trim();
+                        if (!string.IsNullOrEmpty(s)) options.Add(s);
+                    }
+
+                    if (options.Count == 0)
+                    {
+                        Debug.LogWarning("[Juju] handAddRan: 유효한 카드 코드가 없음");
+                        break;
+                    }
+
+                    int pick = UnityEngine.Random.Range(0, options.Count);
+                    string chosen = options[pick];
+
+                    playerData.hands.Add(chosen);
+                    // 필요하면 로그:
+                    // Debug.Log($"[Juju] handAddRan: '{chosen}' 추가");
+                    break;
+                }
 
         }
 

@@ -40,6 +40,7 @@ public class CardModeState : MonoBehaviour
 
     private Coroutine _selectCardCoroutine;
     public ActionPacketData apDataRef;
+    private int _populateVersion = 0;
 
     void Awake()
     {
@@ -96,7 +97,7 @@ public class CardModeState : MonoBehaviour
         // 2) 카드 생성 (등장 완료 후 실행)
         PopulateCards(apdata);
         InitBuffer();
-        ActionPacketUpgrade(apdata);
+       // ActionPacketUpgrade(apdata);
 
         // 3) 선택 루프
         yield return StartCoroutine(SelectCardLoop());
@@ -228,26 +229,11 @@ public class CardModeState : MonoBehaviour
 
             if (apData.isBlinded)
             {
-                Debug.Log("장님련 ㅋㅋ");
-
-                // VisualRoot → BloodShed 경로로 찾기 (자식의 자식 대응)
                 Transform visualRoot = cardGO.transform.Find("VisualRoot");
                 if (visualRoot != null)
                 {
                     Transform blood = visualRoot.Find("BloodShed");
-                    if (blood != null)
-                    {
-                        blood.gameObject.SetActive(true);
-                        Debug.Log("안보여유 ㅋㅋ");
-                    }
-                    else
-                    {
-                        Debug.LogWarning("VisualRoot 아래에 BloodShed 없음");
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("VisualRoot 없음");
+                    if (blood != null) blood.gameObject.SetActive(true);
                 }
             }
 
@@ -256,7 +242,6 @@ public class CardModeState : MonoBehaviour
 
             info.cardData = CardCSVLoader.Instance.GetCardByCode(code);
 
-            //여기가 바뀟다
             var anim = cardGO.GetComponentInChildren<Animator>();
             if (anim != null)
             {
@@ -266,15 +251,18 @@ public class CardModeState : MonoBehaviour
                     info, anim,
                     idleStateName: "Card_Actioin_Idle",
                     layerIndex: 0,
-                    requireInitStateName: "Card_Actioin_Init" // ★ Init을 실제로 본 뒤에만 적용
+                    requireInitStateName: "Card_Actioin_Init"
                 );
             }
             else
             {
-                info.ApplyCardData();
+                info.ApplyCardData(); // 애니 없으면 즉시 적용
             }
-            //음 여기가 말이지
         }
+
+        // ★ 여기 추가: 이번 생성 라운드 버전 고유값 부여 후, 모두 적용될 때까지 기다렸다가 업그레이드 호출
+        int myVersion = ++_populateVersion;
+        StartCoroutine(WaitCardsAppliedThenUpgrade(apData, myVersion));
 
         Debug.Log("손패 생성완료");
     }
@@ -323,44 +311,53 @@ public class CardModeState : MonoBehaviour
             }
         }
     }
-
     public void ActionPacketUpgrade(ActionPacketData apData)
     {
-
-        Debug.Log("손패 업글 눈에 보이지예?");
-
         int delta_cast = apData.permCast + apData.tempCast;
         int delta_def = apData.tempDef + apData.permDef;
         int delta_dam = apData.tempDam + apData.permDam;
-        if (delta_cast == 0 && delta_def == 0 && delta_dam == 0) return;
+        int delta_rum = apData.tempRum;
+
+        if (delta_cast == 0 && delta_def == 0 && delta_dam == 0 && delta_rum == 0) return;
 
         foreach (var card in spawnedCards)
         {
             if (card == null) continue;
 
             var info = card.GetComponentInChildren<EachCardInfo>();
-            if (info == null || info.cardData.cardType == 1) continue; // 카드타입 1은 스킵
+            if (info == null || info.cardData == null || info.cardData.cardType == 1) continue;
 
-            // 이름 기준 깊이 탐색으로 TMP 바로 가져오기 (자식의 자식 대응)
+            // 1) 데이터(모델) 기준으로 신규 값 계산
+            int baseClock = info.cardData.actionClock;
+            int baseDef = info.cardData.defense;
+            int baseDam = info.cardData.damage;
+            int baseRum = info.cardData.rumblePoint;
+
+            int newClock = Mathf.Max(apData.CastingMinumum, baseClock + delta_cast);
+            int newDef = Mathf.Max(0, baseDef + delta_def);
+            int newDam = baseDam + delta_dam;
+            int newRum = baseRum + delta_rum;
+
+            // 2) UI 참조(이름기반 깊이 탐색 그대로 유지)
             var tmpTime = card.transform.FindComponentByNameDeep<TextMeshProUGUI>("TimeClock");
             var tmpDef = card.transform.FindComponentByNameDeep<TextMeshProUGUI>("Defense");
             var tmpPT = card.transform.FindComponentByNameDeep<TextMeshProUGUI>("pt");
+            var tmpRum = card.transform.FindComponentByNameDeep<TextMeshProUGUI>("Rumble");
 
-            // TimeClock
-            if (tmpTime != null && TmpParseUtil.TryParseInt(tmpTime, out var baseClock))
-            {
-                Debug.Log($"{baseClock}무챠 로코");
-                var newClock = Mathf.Max(apData.CastingMinumum, baseClock + delta_cast);
+            // 3) 색상 적용 표기 (정책은 GetColoredValue에 위임)
+            if (tmpTime != null)
                 tmpTime.text = CardFieldColorizer.GetColoredValue(info.cardData.code, "actionClock", newClock);
-            }
 
-            // Defense
-            if (tmpDef != null && TmpParseUtil.TryParseInt(tmpDef, out var baseDef))
-            {
-                var newDef = Mathf.Max(0, baseDef + delta_def);
+            if (tmpDef != null)
                 tmpDef.text = CardFieldColorizer.GetColoredValue(info.cardData.code, "defense", newDef);
-            }
-            tmpPT.text = info.cardData.GetDisplayText("damage", delta_dam);
+
+
+            if (tmpRum != null)
+                tmpRum.text = CardFieldColorizer.GetColoredValue(info.cardData.code, "rumblePoint", newRum);
+
+            // 설명문은 기존 로직대로 damage만 델타/컬러 반영
+            if (tmpPT != null)
+                tmpPT.text = info.cardData.GetDisplayText("damage", delta_dam);
         }
     }
     public void ActionPacketUpgrade_Bless(ActionPacketData apData, int delta_rumb, int delta_cast, int delta_def, int thisBlessDam)
@@ -410,6 +407,45 @@ public class CardModeState : MonoBehaviour
     public void LockCancel(string why = null) { cancelLocked = true; if (!string.IsNullOrEmpty(why)) Debug.Log($"[CardMode] Cancel locked: {why}"); }
     public void UnlockCancel() { cancelLocked = false; Debug.Log("[CardMode] Cancel unlocked."); }
 
+
+    private IEnumerator WaitCardsAppliedThenUpgrade(ActionPacketData apData, int version)
+    {
+        // 한 프레임 정도는 애니 초기 진입을 위해 양보
+        yield return null;
+
+        float start = Time.realtimeSinceStartup;
+        const float TIMEOUT = 5f;
+
+        // 모든 카드에서 CardApplyDeferrer가 사라질 때까지 대기
+        while (true)
+        {
+            // 다른 PopulateCards 호출로 version 바뀌면 중단
+            if (version != _populateVersion) yield break;
+
+            bool anyPending = false;
+            foreach (var go in spawnedCards)
+            {
+                if (go == null) continue;
+                if (go.GetComponent<CardApplyDeferrer>() != null) { anyPending = true; break; }
+            }
+
+            if (!anyPending) break;                    // 모두 적용 완료
+            if (Time.realtimeSinceStartup - start > TIMEOUT)
+            {
+                Debug.LogWarning("[WaitCardsAppliedThenUpgrade] Timeout. 강제 진행.");
+                break;
+            }
+
+            yield return null;
+        }
+
+        // 마지막으로 한 프레임 더 양보해 텍스트/바인딩 정착
+        yield return null;
+
+        // 여전히 최신 라운드인지 확인 후 실행
+        if (version == _populateVersion)
+            ActionPacketUpgrade(apData);
+    }
 }
 
 // ===== 여기부터 같은 파일 바깥(전역)에 두는 확장 메서드 유틸 =====

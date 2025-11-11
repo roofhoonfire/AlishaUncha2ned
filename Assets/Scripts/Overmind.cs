@@ -25,7 +25,7 @@ using SRandom = System.Random;
 public enum apProp
 {
 
-   blinded, defaultMove,defaultMoveCast,tempCast,permCast,tempDef,permDef,tempDam,permDam, CastingMinimum, elem_fire, elem_ice, elem_wind, elem_earth
+   blinded, defaultMove,defaultMoveCast,tempCast,permCast,tempDef,permDef,tempDam, tempRum,permDam, CastingMinimum, elem_fire, elem_ice, elem_wind, elem_earth
 }
 
 public enum ExtraSelection
@@ -139,7 +139,7 @@ public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 
 
         //기찮으므로로로로루뢰뢰
         Bounds = PickBounds(3, seed: actorNumber); // actorNumber로 결정적 선택
-        JujuCode = new List<string> { "j1", "j2", "j3", "j5" ,"j8" ,"j9" ,"j11" };
+        JujuCode = new List<string> { "j1", "j2", "j3", "j5" ,"j7","j8" ,"j9" ,"j11" ,"j13"};
 
 
 
@@ -155,6 +155,7 @@ public class PlayerData //여기 변수 추가할 때마다 local의 SyncAll과 
             {apProp.permCast,0},
             {apProp.permDam,0},
             {apProp.tempDam,0},
+            {apProp.tempRum,0},
             {apProp.CastingMinimum,1},
           
 

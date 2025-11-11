@@ -105,7 +105,6 @@ c30,Activate,Flag_Off,1,1
 c31,Activate,DamageMeBangMoo,20,0
 c31,Activate,StartDot_Heal,31010,0
 c33,Counter,whenDamaged_FlagOn,2001,0
-c33,Counter,ReduceMyNextTurnActionClock,-5,1
 c33,Counter,AddDamage,10,1
 c33,Counter,GetDefense,10,1
 c33,Counter,Flag_Off,1,1

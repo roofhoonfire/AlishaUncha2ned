@@ -20,6 +20,7 @@ public static class ActionPacketConverter
             tempCast = player.forActionPacket[apProp.tempCast],
             permDam = player.forActionPacket[apProp.permDam],
             tempDam = player.forActionPacket[apProp.tempDam],
+            tempRum = player.forActionPacket[apProp.tempRum],
             
             
             //이즈 블라인디드, 캔무브는 플레이어 데이터에 잇는 값을 액션 패킷으로 넘겨주는 거임 둘의 변수이름은 같지만
@@ -62,6 +63,7 @@ public class ActionPacketData
     public int tempDef;
     public int permCast;
     public int tempCast;
+    public int tempRum;
     public int permDam;
     public int tempDam;
     public bool isBlinded;

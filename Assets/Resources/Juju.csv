@@ -1,13 +1,14 @@
 #code,type,name,sprite,animation,addingCard,boundPoint,onlyOnce,require,isUsed,cardText
 j1,handAdd,마무리 일격,Juju/Juju_finalblow,,c7,1,0,none,,메인 액션에 피해를 10추가하는 “마무리 일격”을 손 패에 추가합니다
-j2,handAdd,속임수 주사위,Juju/Juju_dice,,c8,2,0,none,,캐스팅을 +-3 조절할 수 있는 “속임수 주사위”를 손 패에 추가합니다
-j3,handAdd,가속,Juju/Juju_rush,,c10,2,0,none,,선공 시 유리해지는 멋진 카드를 손 패에 추가합니다 
+j2,handAddRan,속임수 주사위,Juju/Juju_dice,,"cd1,cd2,cd3,cd4,cd5,cd6",2,0,none,,캐스팅을 랜덤하게 조절하는 “속임수 주사위”를 손패에 추가합니다
+j3,handAdd,기어업,Juju/Juju_rush,,c10,2,0,none,,“기어업” 카드를 손 패에 추가합니다
 j4,Reinforce,전광석화,Juju/Juju_Pikachu,,,2,1,none,,이제 부터 이동하는데 더 이상 캐스팅이 소요되지 않습니다
 j5,handAdd,술법 두루마리,Juju/Juju_Jutsu,,c15,2,0,none,,바꿔치기 술법의 두루마리를 손 패에 추가합니다
 j6,handAdd,나비효과,Juju/Juju_Beffect ,,c32,2,0,none,,이번 싸이클에 입힌 피해를 “저장”합니다
-j7,handAdd,유비무환,Juju/Juju_insurance,,c33,2,0,none,,“약점 보험” 카드를 손 패에 추가합니다
+j7,handAdd,약점보험,Juju/Juju_insurance,,c33,2,0,none,,“약점 보험” 카드를 손 패에 추가합니다
 j8,handAdd,철벽,Juju/Juju_defense,,c34,1,0,none,,“철벽” 카드를 손 패에 추가합니다
-j9,heal_15,싸구려 물약,Juju/Juju_Potion,,c10,1,0,none,,체력을 15 회복합니다
+j9,heal_15,싸구려 물약,Juju/Juju_Potion,,,1,0,none,,체력을 15 회복합니다
 j10,handAdd,제물 서약,Juju/Juju_drop,,c10,1,0,none,,체력을 10 잃는 대신 상대의 다음 메인 액션의 피해량을 10 줄입니다
-j11,handAdd,기어 프리,Juju/Juju_GearFree,,c32,1,0,none,,“서두르기” 카드를 손 패에 추가합니다
+j11,handAdd,기어 프리,Juju/Juju_GearFree,,c32,1,0,none,,“기어프리” 카드를 손 패에 추가합니다
 j12,handAdd,뒤엉켜 구르기,Juju/Juju_Rumble,,c32,1,0,none,,“뒤엉켜 구르기” 카드를 손 패에 추가합니다 
+j13,handAdd,고양,Juju/Juju_Cat,,c101,1,0,none,,“고양” 카드를 손 패에 추가합니다

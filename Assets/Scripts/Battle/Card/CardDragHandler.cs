@@ -169,7 +169,7 @@ public class CardDragHandler : MonoBehaviour,
             {
                 CardModeState.Instance.curAction.actionId = 1;
                 CardModeState.Instance.curAction.defense = Mathf.Max(0, thisCardData.defense + apData.tempDef + apData.permDef);
-                CardModeState.Instance.curAction.rumblePoint = thisCardData.rumblePoint;
+                CardModeState.Instance.curAction.rumblePoint = thisCardData.rumblePoint+ apData.tempRum;
                 CardModeState.Instance.curAction.cardcode = thisCardData.code;
                 CardModeState.Instance.curAction.animations = thisCardData.animations;
                 CardModeState.Instance.curAction.actionClock = Mathf.Max(apData.CastingMinumum, thisCardData.actionClock + apData.permCast + apData.tempCast);
@@ -190,6 +190,7 @@ public class CardDragHandler : MonoBehaviour,
                     LocalState.Instance.LastApData.tempDef = 0;
                     LocalState.Instance.LastApData.tempCast = 0;
                     LocalState.Instance.LastApData.tempDam = 0;
+                    LocalState.Instance.LastApData.tempRum= 0;
 
                     // 2) usedCard 목록을 멀티셋 방식으로 hands에서 제거
                     RemoveUsedFromHands(LocalState.Instance.LastApData, LocalState.Instance.btmPacket?.usedCard);
@@ -200,14 +201,15 @@ public class CardDragHandler : MonoBehaviour,
             else if (thisCardData.cardType == 1)
             {
                 CardModeState.Instance.curAction.effects.AddRange(CardDEffectDatabase.GetEffects(thisCardData.code));
-
+                apData.tempRum += thisCardData.rumblePoint;
                 apData.tempDef += thisCardData.defense;
                 apData.tempDam += thisCardData.damage;
                 apData.tempCast += thisCardData.actionClock;
 
                 CardModeState.Instance.ActivatePachingOnCodeZero();
 
-                CardModeState.Instance.ActionPacketUpgrade_Bless(apData, thisCardData.rumblePoint, thisCardData.actionClock, thisCardData.defense, thisCardData.damage);
+                CardModeState.Instance.ActionPacketUpgrade(apData);
+             //   CardModeState.Instance.ActionPacketUpgrade_Bless(apData, thisCardData.rumblePoint, thisCardData.actionClock, thisCardData.defense, thisCardData.damage);
 
                 btmPacketAdd(thisCardData.code);
                 Destroy(gameObject);
@@ -240,7 +242,7 @@ public class CardDragHandler : MonoBehaviour,
                 }
                 CardModeState.Instance.curAction.blessList.Add(thisCardData.code);
 
-                CardModeState.Instance.ActionPacketUpgrade(apData);
+//                CardModeState.Instance.ActionPacketUpgrade(apData);
 
                 btmPacketAdd(thisCardData.code);
 
